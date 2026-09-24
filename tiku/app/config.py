@@ -10,7 +10,7 @@ JSON_FILE = "tiku.json"
 
 # ============ 服务器配置 ============
 API_KEY = os.environ.get("API_KEY", "your_api_key")
-DEFAULT_PORT = 8001
+DEFAULT_PORT = 8002
 
 # ============ 请求限制 ============
 MAX_QUESTION_LENGTH = 10000

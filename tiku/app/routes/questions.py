@@ -22,10 +22,11 @@ async def get_questions(
     db = req.app.state.db
     try:
         if search and search.strip():
-            questions = await db.search_questions(search.strip(), limit)
+            questions = await db.search_questions(search.strip(), limit, offset)
+            total = await db.get_search_count(search.strip())
         else:
             questions = await db.get_all_questions(limit, offset)
-        total = await db.get_count()
+            total = await db.get_count()
         return {"code": 1, "data": questions, "total": total}
     except Exception as e:
         logger.error(f"获取题目列表失败: {e}")

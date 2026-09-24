@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         💯【超星学习通满分助手】支持任务点自动跳转|章节测验、作业、考试全网检索答案，简答题支持chatgpt对接|音频、视频全自动静音播放|可视化参数配置
 // @namespace    askAuto
-// @version      2.1.6
+// @version      2.1.9-concurrent
 // @author       shushoujiu
 // @description  💯超星学习通满分助手，挂机解放时间，无需任何操作自动完成所有任务点。汇集全网免费、付费题库接口支持一键对接，答案更全更靠谱。
 // @icon         https://vitejs.dev/logo.svg
@@ -10,21 +10,25 @@
 // @match        *://*.nbdlib.cn/*
 // @match        *://*.hnsyu.net/*
 // @match        *://*.gdhkmooc.com/*
-// @require      https://cdn.staticfile.org/vue/3.3.4/vue.global.prod.js
-// @require      https://cdn.staticfile.org/vue-demi/0.14.0/index.iife.min.js
-// @require      https://cdn.staticfile.org/element-plus-icons-vue/2.1.0/global.iife.min.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue-demi@0.14.0/lib/index.iife.min.js
+// @require      https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.1.0/dist/index.iife.min.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.staticfile.org/pinia/2.1.6/pinia.iife.prod.js
-// @require      https://cdn.staticfile.org/element-plus/2.3.12/index.full.min.js
-// @require      https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js
-// @require      https://cdn.staticfile.org/jquery/3.7.1/jquery.min.js
-// @resource     element-plus  https://cdn.staticfile.org/element-plus/2.3.12/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.1.6/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.12/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
+// @require      https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
+// @resource     element-plus  https://cdn.jsdelivr.net/npm/element-plus@2.3.12/dist/index.css
 // @resource     ttf           https://www.forestpolice.org/ttf/2.0/table.json
 // @connect      cx.icodef.com
 // @connect      tk.enncy.cn
 // @connect      api.muketool.com
 // @connect      api.tikuhai.com
 // @connect      api.deepseek.com
+// @connect      jiahaoapi.zeabur.app
+// @connect      api.typesafe.ai
+// @connect      localhost
+// @connect      127.0.0.1
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_getValue
@@ -66,7 +70,7 @@
       _GM_setValue("config", config);
     }
     return config;
-  }, defaultConfig$1 = { debugger: false, autoAnswer: true, autoVideo: true, autoJump: true, autoSubmit: true, thtoken: "", yztoken: "", gptKey: "", gptModel: "gpt-3.5-turbo", gpt: false, gptType: ["0", "1", "2", "3", "4", "5", "6", "7"], interval: 3, answerIntervalMin: 8, answerIntervalMax: 30, submitDelayMin: 20, submitDelayMax: 40, minAccuracy: 0.8, autoExam: true, hideExam: false, notice: "本脚本仅供学习交流使用，严禁用于商业用途，否则后果自负！", deepseekKey: "", deepseekEnabled: false, deepseekModel: "deepseek-reasoner", customApiUrl: "", customApiKey: "", customApiEnabled: false, aiEnabled: false, aiApiKey: "", aiApiUrl: "https://api.deepseek.com/v1/chat/completions", aiModel: "deepseek-reasoner" }, userConfig = [{ name: "base", label: "基础配置", config: [{ name: "interval", label: "通用间隔(秒)", type: "number", value: defaultConfig$1.interval, desc: "通用间隔，用于脚本运行切换" }, { name: "answerIntervalMin", label: "答题间隔最小值(秒)", type: "number", value: defaultConfig$1.answerIntervalMin, desc: "每道题之间的最小等待时间" }, { name: "answerIntervalMax", label: "答题间隔最大值(秒)", type: "number", value: defaultConfig$1.answerIntervalMax, desc: "每道题之间的最大等待时间" }, { name: "submitDelayMin", label: "提交前延迟最小值(秒)", type: "number", value: defaultConfig$1.submitDelayMin, desc: "全部答完题后提交前的最小等待时间" }, { name: "submitDelayMax", label: "提交前延迟最大值(秒)", type: "number", value: defaultConfig$1.submitDelayMax, desc: "全部答完题后提交前的最大等待时间" }, { name: "customApiEnabled", label: "启用自定义题库", type: "switch", value: defaultConfig$1.customApiEnabled, desc: "开启后，会优先使用自定义题库接口查询答案" }, { name: "customApiUrl", label: "自定义题库地址", type: "input", value: defaultConfig$1.customApiUrl, desc: "你的题库服务器API地址，例如：http://localhost:8080/api/query" }, { name: "customApiKey", label: "自定义题库密钥", type: "input", value: defaultConfig$1.customApiKey, desc: "你的题库服务器API密钥（如果有的话）" }, { name: "aiEnabled", label: "启用AI自动答题", type: "switch", value: defaultConfig$1.aiEnabled, desc: "开启后，当题库查询失败时会调用AI获取答案" }, { name: "aiApiUrl", label: "AI API地址", type: "input", value: defaultConfig$1.aiApiUrl, desc: "OpenAI兼容的API地址，例如：https://api.deepseek.com/v1/chat/completions" }, { name: "aiModel", label: "AI模型名称", type: "input", value: defaultConfig$1.aiModel, desc: "模型名称，例如：deepseek-reasoner、gpt-4o、claude-3-opus等" }, { name: "aiApiKey", label: "AI API密钥", type: "input", value: defaultConfig$1.aiApiKey, desc: "API密钥，填写完请保存再刷新页面" }] }, { name: "chapter", label: "章节配置", config: [{ name: "autoAnswer", label: "自动答题", type: "switch", value: defaultConfig$1.autoAnswer, desc: "开启后，会自动答题" }, { name: "autoVideo", label: "自动视频", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动观看视频" }, { name: "autoJump", label: "自动切换", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动切换章节" }, { name: "autoSubmit", label: "自动提交", type: "switch", value: defaultConfig$1.autoSubmit, desc: "开启后，会自动提交答案" }, { name: "minAccuracy", label: "最低正确率", type: "input", value: defaultConfig$1.minAccuracy, desc: "不满足最低正确率则不会自动提交答案" }] }, { name: "exam", label: "作业/考试配置", config: [{ name: "autoExam", label: "考试自动切换", type: "switch", value: defaultConfig$1.autoExam, desc: "开启后，会考试会自动切换" }] }], useformStore = pinia$1.defineStore({ id: "formstore", state: () => ({ forminput: getConfig(), dialogV: false, activeName: "base" }), actions: { saveConfig(forminput) {
+  }, defaultConfig$1 = { debugger: false, autoAnswer: true, autoVideo: true, autoJump: true, autoSubmit: true, thtoken: "", yztoken: "", gptKey: "", gptModel: "gpt-3.5-turbo", gpt: false, gptType: ["0", "1", "2", "3", "4", "5", "6", "7"], interval: 3, answerIntervalMin: 8, answerIntervalMax: 30, submitDelayMin: 20, submitDelayMax: 40, minAccuracy: 0.8, autoExam: true, hideExam: false, notice: "本脚本仅供学习交流使用，严禁用于商业用途，否则后果自负！", deepseekKey: "", deepseekEnabled: false, deepseekModel: "deepseek-reasoner", customApiUrl: "http://localhost:8002/api/search", customApiKey: "", customApiEnabled: true, aiEnabled: true, aiApiKey: "<removed-configure-locally>", aiApiUrl: "https://jiahaoapi.zeabur.app/v1/chat/completions", aiModel: "deepseek-v4.1-flash", aiRetryCount: 3, aiRetryDelay: 1000, jevEnabled: true, jevApiKey: "<removed-configure-locally>", jevApiUrl: "https://api.typesafe.ai/v1/systemone", jevModel: "jev-latest", jevMinConfidence: 0.7 }, userConfig = [{ name: "base", label: "基础配置", config: [{ name: "interval", label: "通用间隔(秒)", type: "number", value: defaultConfig$1.interval, desc: "通用间隔，用于脚本运行切换" }, { name: "answerIntervalMin", label: "答题间隔最小值(秒)", type: "number", value: defaultConfig$1.answerIntervalMin, desc: "每道题之间的最小等待时间" }, { name: "answerIntervalMax", label: "答题间隔最大值(秒)", type: "number", value: defaultConfig$1.answerIntervalMax, desc: "每道题之间的最大等待时间" }, { name: "submitDelayMin", label: "提交前延迟最小值(秒)", type: "number", value: defaultConfig$1.submitDelayMin, desc: "全部答完题后提交前的最小等待时间" }, { name: "submitDelayMax", label: "提交前延迟最大值(秒)", type: "number", value: defaultConfig$1.submitDelayMax, desc: "全部答完题后提交前的最大等待时间" }, { name: "customApiEnabled", label: "启用自定义题库", type: "switch", value: defaultConfig$1.customApiEnabled, desc: "开启后，会优先使用自定义题库接口查询答案" }, { name: "customApiUrl", label: "自定义题库地址", type: "input", value: defaultConfig$1.customApiUrl, desc: "你的题库服务器API地址，例如：http://localhost:8080/api/query" }, { name: "customApiKey", label: "自定义题库密钥", type: "input", value: defaultConfig$1.customApiKey, desc: "你的题库服务器API密钥（如果有的话）" }, { name: "aiEnabled", label: "启用AI自动答题", type: "switch", value: defaultConfig$1.aiEnabled, desc: "开启后，当题库查询失败时会调用AI获取答案" }, { name: "aiApiUrl", label: "AI API地址", type: "input", value: defaultConfig$1.aiApiUrl, desc: "OpenAI兼容的API地址，例如：https://api.deepseek.com/v1/chat/completions" }, { name: "aiModel", label: "AI模型名称", type: "input", value: defaultConfig$1.aiModel, desc: "模型名称，例如：deepseek-reasoner、gpt-4o、claude-3-opus等" }, { name: "aiApiKey", label: "AI API密钥", type: "input", value: defaultConfig$1.aiApiKey, desc: "API密钥，填写完请保存再刷新页面" }, { name: "aiRetryCount", label: "AI重试次数", type: "number", value: defaultConfig$1.aiRetryCount, desc: "AI请求失败后的重试次数" }, { name: "aiRetryDelay", label: "AI重试延迟(毫秒)", type: "number", value: defaultConfig$1.aiRetryDelay, desc: "AI重试的初始延迟时间" }, { name: "jevEnabled", label: "启用Jev验证", type: "switch", value: defaultConfig$1.jevEnabled, desc: "开启后，使用TypeSafe Jev模型验证AI答案质量" }, { name: "jevApiUrl", label: "Jev API地址", type: "input", value: defaultConfig$1.jevApiUrl, desc: "TypeSafe API地址" }, { name: "jevModel", label: "Jev模型", type: "input", value: defaultConfig$1.jevModel, desc: "使用jev-latest" }, { name: "jevApiKey", label: "Jev API密钥", type: "input", value: defaultConfig$1.jevApiKey, desc: "TypeSafe API密钥" }, { name: "jevMinConfidence", label: "Jev最低置信度", type: "number", value: defaultConfig$1.jevMinConfidence, desc: "低于此置信度的答案将被拒绝(0-1)" }] }, { name: "chapter", label: "章节配置", config: [{ name: "autoAnswer", label: "自动答题", type: "switch", value: defaultConfig$1.autoAnswer, desc: "开启后，会自动答题" }, { name: "autoVideo", label: "自动视频", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动观看视频" }, { name: "autoJump", label: "自动切换", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动切换章节" }, { name: "autoSubmit", label: "自动提交", type: "switch", value: defaultConfig$1.autoSubmit, desc: "开启后，会自动提交答案" }, { name: "minAccuracy", label: "最低正确率", type: "input", value: defaultConfig$1.minAccuracy, desc: "不满足最低正确率则不会自动提交答案" }] }, { name: "exam", label: "作业/考试配置", config: [{ name: "autoExam", label: "考试自动切换", type: "switch", value: defaultConfig$1.autoExam, desc: "开启后，会考试会自动切换" }] }], useformStore = pinia$1.defineStore({ id: "formstore", state: () => ({ forminput: getConfig(), dialogV: false, activeName: "base" }), actions: { saveConfig(forminput) {
     _GM_setValue("config", forminput);
   } } });
   var export_helper_default = (sfc, props) => {
@@ -178,7 +182,8 @@
       return new Promise((resolve) => {
         const config = getConfig();
         if (!config.customApiEnabled || !config.customApiUrl) {
-          resolve({ form: "自定义题库", answer: "" });
+          console.log("📚 [题库] 未启用自定义题库");
+          resolve({ form: "自定义题库", answer: "", status: "disabled" });
           return;
         }
 
@@ -189,7 +194,8 @@
           key: config.customApiKey || ""
         };
 
-        console.log("自定义题库请求:", config.customApiUrl);
+        console.log("📚 [题库] 开始查询自定义题库...", config.customApiUrl);
+        console.log("📚 [题库] 题目:", questionData.question.substring(0, 50) + "...");
 
         _GM_xmlhttpRequest({
           method: "POST",
@@ -202,201 +208,368 @@
           timeout: 1e4,
           onload: (res) => {
             try {
-              console.log("自定义题库返回:", res.responseText);
               const data = JSON.parse(res.responseText);
-              if (data.code === 1 || data.code === 0 || data.success === true) {
-                resolve({ form: "自定义题库", answer: data.answer || data.data?.answer || "" });
+              if (data.code === -1 || data.code === 0 || data.code === 1 || data.success === true) {
+                const answer = data.answer || data.data?.answer || "";
+                if (answer && answer.length > 0) {
+                  console.log("✅ [题库] 查询成功，找到答案:", answer);
+                  resolve({ form: "自定义题库", answer: answer, status: "success" });
+                } else {
+                  console.log("⚠️ [题库] 查询成功，但未找到答案");
+                  resolve({ form: "自定义题库", answer: "", status: "not_found" });
+                }
               } else {
-                resolve({ form: "自定义题库", answer: "" });
+                console.log("❌ [题库] 查询失败，返回错误:", data);
+                resolve({ form: "自定义题库", answer: "", status: "error" });
               }
             } catch (e) {
-              console.error("自定义题库解析错误:", e);
-              resolve({ form: "自定义题库", answer: "" });
+              console.error("❌ [题库] 解析错误:", e);
+              resolve({ form: "自定义题库", answer: "", status: "parse_error" });
             }
           },
           ontimeout: () => {
-            console.log("自定义题库请求超时");
-            resolve({ form: "自定义题库", answer: "" });
+            console.log("⏱️ [题库] 请求超时");
+            resolve({ form: "自定义题库", answer: "", status: "timeout" });
           },
           onerror: (err) => {
-            console.error("自定义题库请求错误:", err);
-            resolve({ form: "自定义题库", answer: "" });
+            console.error("❌ [题库] 请求错误:", err);
+            resolve({ form: "自定义题库", answer: "", status: "network_error" });
           }
         });
       });
     }
-    async getAnswerFromAI(questionData) {
+    async callAIWithRetry(apiUrl, apiKey, model, prompt, retryCount = 3, retryDelay = 1000, modelName = "AI") {
       return new Promise((resolve) => {
-        const config = getConfig();
-        if (!config.aiEnabled || !config.aiApiKey) {
-          resolve({ form: "AI", answer: "" });
-          return;
-        }
+        const requestData = {
+          model: model,
+          messages: [{ role: "user", content: prompt }]
+        };
+        const attemptRequest = (attempt) => {
+          console.log(`🤖 [${modelName}] 发送请求 (第${attempt}/${retryCount}次尝试)...`);
+          _GM_xmlhttpRequest({
+            method: "POST",
+            url: apiUrl,
+            data: JSON.stringify(requestData),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + apiKey
+            },
+            timeout: 3e4,
+            onload: (res) => {
+              try {
+                const data = JSON.parse(res.responseText);
+                if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+                  const content = data.choices[0].message.content.trim();
+                  console.log(`✅ [${modelName}] 请求成功，返回内容:`, content.substring(0, 100) + (content.length > 100 ? "..." : ""));
+                  resolve({ success: true, content, model: modelName });
+                } else {
+                  console.log(`❌ [${modelName}] 返回格式异常:`, data);
+                  if (attempt < retryCount) {
+                    const delay = retryDelay * Math.pow(2, attempt - 1);
+                    console.log(`🔄 [${modelName}] 将在 ${delay}ms 后重试...`);
+                    setTimeout(() => attemptRequest(attempt + 1), delay);
+                  } else {
+                    console.log(`❌ [${modelName}] 已达最大重试次数，放弃请求`);
+                    resolve({ success: false, content: "", model: modelName });
+                  }
+                }
+              } catch (e) {
+                console.log(`❌ [${modelName}] JSON解析错误:`, e);
+                if (attempt < retryCount) {
+                  const delay = retryDelay * Math.pow(2, attempt - 1);
+                  console.log(`🔄 [${modelName}] 将在 ${delay}ms 后重试...`);
+                  setTimeout(() => attemptRequest(attempt + 1), delay);
+                } else {
+                  console.log(`❌ [${modelName}] 已达最大重试次数，放弃请求`);
+                  resolve({ success: false, content: "", model: modelName });
+                }
+              }
+            },
+            ontimeout: () => {
+              console.log(`⏱️ [${modelName}] 请求超时`);
+              if (attempt < retryCount) {
+                const delay = retryDelay * Math.pow(2, attempt - 1);
+                console.log(`🔄 [${modelName}] 将在 ${delay}ms 后重试...`);
+                setTimeout(() => attemptRequest(attempt + 1), delay);
+              } else {
+                console.log(`❌ [${modelName}] 已达最大重试次数，放弃请求`);
+                resolve({ success: false, content: "", model: modelName });
+              }
+            },
+            onerror: (err) => {
+              console.log(`❌ [${modelName}] 网络错误:`, err);
+              if (attempt < retryCount) {
+                const delay = retryDelay * Math.pow(2, attempt - 1);
+                console.log(`🔄 [${modelName}] 将在 ${delay}ms 后重试...`);
+                setTimeout(() => attemptRequest(attempt + 1), delay);
+              } else {
+                console.log(`❌ [${modelName}] 已达最大重试次数，放弃请求`);
+                resolve({ success: false, content: "", model: modelName });
+              }
+            }
+          });
+        };
+        attemptRequest(1);
+      });
+    }
+    async verifyAnswerWithJev(questionData, answer, jevApiUrl, jevApiKey, jevModel, minConfidence = 0.6) {
+      return new Promise((resolve) => {
         const questionTypeId = questionData.type;
-        let prompt = "";
-        const basePrompt = `你是一位专业的学习辅导老师，具备广泛的知识面，能够解答各类学科和学习问题。`;
-        if (questionTypeId === "3") {
-          prompt = `${basePrompt}
+        const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
+        const typeName = typeNames[questionTypeId] || "题目";
+        let state = {
+          question: questionData.question,
+          questionType: typeName,
+          answer: answer
+        };
+        if (questionData.options && questionData.options.length > 0) {
+          state.options = questionData.options;
+        }
+        const requestData = {
+          model: jevModel,
+          state: state,
+          questions: {
+            quality: {
+              type: "score",
+              instructions: "评估这个答案的质量和正确性",
+              criteria: [
+                "答案明显错误或完全不相关",
+                "答案部分正确但有明显缺陷",
+                "答案基本正确但不够完整",
+                "答案正确且完整",
+                "答案非常准确且详尽"
+              ]
+            },
+            confidence: {
+              type: "noul",
+              instructions: "这个答案是否看起来可靠和可信",
+              criteria: {
+                "true": "答案逻辑清晰、表述准确、符合常识",
+                "false": "答案含糊不清、自相矛盾或明显错误"
+              }
+            }
+          }
+        };
+        console.log("🔍 [Jev] 开始验证答案...");
+        console.log("🔍 [Jev] 待验证答案:", answer);
+        _GM_xmlhttpRequest({
+          method: "POST",
+          url: jevApiUrl,
+          data: JSON.stringify(requestData),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + jevApiKey
+          },
+          timeout: 3e4,
+          onload: (res) => {
+            try {
+              const data = JSON.parse(res.responseText);
+              if (data.answers && data.answers.quality && data.answers.confidence) {
+                const qualityScore = data.answers.quality.score || 0;
+                const qualityConfidence = data.answers.quality.confidence || 0;
+                const reliabilityScore = data.answers.confidence.noul || 0;
+                const overallConfidence = (qualityConfidence + reliabilityScore) / 2;
+                const passed = overallConfidence >= minConfidence && qualityScore >= 2;
+                console.log(`✅ [Jev] 验证完成:`);
+                console.log(`   📊 质量分数: ${qualityScore.toFixed(2)}/4`);
+                console.log(`   📊 质量置信度: ${qualityConfidence.toFixed(2)}`);
+                console.log(`   📊 可靠性分数: ${reliabilityScore.toFixed(2)}`);
+                console.log(`   📊 综合置信度: ${overallConfidence.toFixed(2)}`);
+                console.log(`   ${passed ? "✅" : "❌"} 验证结果: ${passed ? "通过" : "未通过"}`);
+                resolve({
+                  success: true,
+                  qualityScore,
+                  qualityConfidence,
+                  reliabilityScore,
+                  overallConfidence,
+                  passed
+                });
+              } else {
+                console.log("❌ [Jev] 返回格式异常:", data);
+                resolve({ success: false, passed: true });
+              }
+            } catch (e) {
+              console.log("❌ [Jev] 解析错误:", e);
+              resolve({ success: false, passed: true });
+            }
+          },
+          ontimeout: () => {
+            console.log("⏱️ [Jev] 请求超时");
+            resolve({ success: false, passed: true });
+          },
+          onerror: (err) => {
+            console.log("❌ [Jev] 请求错误:", err);
+            resolve({ success: false, passed: true });
+          }
+        });
+      });
+    }
+    parseAIAnswer(content, questionTypeId, questionData) {
+      const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
+      const typeName = typeNames[questionTypeId] || "单选题";
+      if (questionTypeId === "3") {
+        const isTrue = /正确|对|是|√|true/i.test(content);
+        const isFalse = /错误|错|否|×|false/i.test(content);
+        if (isTrue || isFalse) {
+          const answerText = isTrue ? "正确" : "错误";
+          return { valid: true, answer: [answerText] };
+        } else {
+          console.log("AI返回内容未匹配到判断结果:", content);
+          return { valid: false, answer: "" };
+        }
+      } else if (questionTypeId === "1") {
+        const answerMatch = content.match(/[A-D]+/);
+        if (answerMatch) {
+          const answerLetters = answerMatch[0];
+          const answerOptions = [];
+          for (let letter of answerLetters) {
+            const answerIndex = letter.charCodeAt(0) - 65;
+            if (answerIndex >= 0 && answerIndex < questionData.options.length) {
+              answerOptions.push(questionData.options[answerIndex]);
+            }
+          }
+          if (answerOptions.length > 0) {
+            return { valid: true, answer: answerOptions };
+          } else {
+            console.log("AI返回的选项超出范围");
+            return { valid: false, answer: "" };
+          }
+        } else {
+          console.log("AI返回内容未匹配到选项字母:", content);
+          return { valid: false, answer: "" };
+        }
+      } else if (questionTypeId === "0") {
+        const answerMatch = content.match(/[A-D]/);
+        if (answerMatch) {
+          const answerLetter = answerMatch[0];
+          const answerIndex = answerLetter.charCodeAt(0) - 65;
+          if (answerIndex >= 0 && answerIndex < questionData.options.length) {
+            return { valid: true, answer: [questionData.options[answerIndex]] };
+          } else {
+            console.log("AI返回的选项超出范围");
+            return { valid: false, answer: "" };
+          }
+        } else {
+          console.log("AI返回内容未匹配到选项字母:", content);
+          return { valid: false, answer: "" };
+        }
+      } else {
+        const textAnswers = content.split("|").map(s => s.trim()).filter(s => s.length > 0);
+        if (textAnswers.length > 0) {
+          return { valid: true, answer: textAnswers };
+        } else if (content.length > 0) {
+          return { valid: true, answer: [content] };
+        } else {
+          console.log("AI返回内容为空");
+          return { valid: false, answer: "" };
+        }
+      }
+    }
+    async getAnswerFromAI(questionData) {
+      const config = getConfig();
+      if (!config.aiEnabled || !config.aiApiKey) {
+        console.log("🤖 [AI] AI功能未启用");
+        return { form: "AI", answer: "", status: "disabled" };
+      }
+      const questionTypeId = questionData.type;
+      const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
+      const typeName = typeNames[questionTypeId] || "单选题";
+      console.log(`🤖 [AI] 开始AI答题 - 题型: ${typeName}`);
+      console.log(`🤖 [AI] 题目: ${questionData.question.substring(0, 50)}...`);
+      let prompt = "";
+      const basePrompt = `你是一位专业的学习辅导老师，具备广泛的知识面，能够解答各类学科和学习问题。`;
+      if (questionTypeId === "3") {
+        prompt = `${basePrompt}
 
 这是一道判断题，请根据你的专业知识，只返回"正确"或"错误"。
 
 题目：${questionData.question}`;
-        } else if (questionTypeId === "1") {
-          const optionsText = questionData.options.map((opt, idx) => {
-            const letter = String.fromCharCode(65 + idx);
-            return `${letter}.${opt}`;
-          }).join(" ");
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "1") {
+        const optionsText = questionData.options.map((opt, idx) => {
+          const letter = String.fromCharCode(65 + idx);
+          return `${letter}.${opt}`;
+        }).join(" ");
+        prompt = `${basePrompt}
 
 这是一道多选题，请根据你的专业知识，返回所有正确选项字母(如：AB、ACD、BC等)，不要有任何其他内容。
 
 题目：${questionData.question}
 选项：${optionsText}`;
-        } else if (questionTypeId === "2") {
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "2") {
+        prompt = `${basePrompt}
 
 这是一道填空题，请根据你的专业知识，直接返回答案内容。如果有多个空，用"|"分隔每个空的答案。
 
 题目：${questionData.question}`;
-        } else if (questionTypeId === "4") {
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "4") {
+        prompt = `${basePrompt}
 
 这是一道简答题，请根据你的专业知识，给出简洁准确的答案。
 
 题目：${questionData.question}`;
-        } else if (questionTypeId === "5") {
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "5") {
+        prompt = `${basePrompt}
 
 这是一道名词解释题，请根据你的专业知识，给出准确的名词解释。
 
 题目：${questionData.question}`;
-        } else if (questionTypeId === "6") {
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "6") {
+        prompt = `${basePrompt}
 
 这是一道论述题，请根据你的专业知识，给出完整、有条理的论述答案。
 
 题目：${questionData.question}`;
-        } else if (questionTypeId === "7") {
-          prompt = `${basePrompt}
+      } else if (questionTypeId === "7") {
+        prompt = `${basePrompt}
 
 这是一道计算题，请根据你的专业知识，给出计算过程和最终答案。
 
 题目：${questionData.question}`;
-        } else {
-          const optionsText = questionData.options.map((opt, idx) => {
-            const letter = String.fromCharCode(65 + idx);
-            return `${letter}.${opt}`;
-          }).join(" ");
-          prompt = `${basePrompt}
+      } else {
+        const optionsText = questionData.options.map((opt, idx) => {
+          const letter = String.fromCharCode(65 + idx);
+          return `${letter}.${opt}`;
+        }).join(" ");
+        prompt = `${basePrompt}
 
 这是一道单选题，请根据你的专业知识，只返回正确选项字母(A/B/C/D)。
 
 题目：${questionData.question}
 选项：${optionsText}`;
-        }
-        const requestData = {
-          model: config.aiModel || "deepseek-reasoner",
-          messages: [{ role: "user", content: prompt }]
-        };
-        console.log("AI请求发送中...", "模型:", config.aiModel, "题目类型:", questionTypeId === "3" ? "判断题" : questionTypeId === "1" ? "多选题" : "单选题");
-        _GM_xmlhttpRequest({
-          method: "POST",
-          url: config.aiApiUrl,
-          data: JSON.stringify(requestData),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + config.aiApiKey
-          },
-          timeout: 3e4,
-          onload: (res) => {
-            try {
-              console.log("AI返回结果:", res.responseText);
-              const data = JSON.parse(res.responseText);
-              if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-                const content = data.choices[0].message.content.trim();
-                const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
-                const typeName = typeNames[questionTypeId] || "单选题";
-                if (questionTypeId === "3") {
-                  const isTrue = /正确|对|是|√|true/i.test(content);
-                  const isFalse = /错误|错|否|×|false/i.test(content);
-                  if (isTrue || isFalse) {
-                    const answerText = isTrue ? "正确" : "错误";
-                    console.log(`AI解析成功(${typeName})，答案:`, answerText);
-                    resolve({ form: "AI", answer: [answerText] });
-                  } else {
-                    console.log("AI返回内容未匹配到判断结果:", content);
-                    resolve({ form: "AI", answer: "" });
-                  }
-                } else if (questionTypeId === "1") {
-                  const answerMatch = content.match(/[A-D]+/);
-                  if (answerMatch) {
-                    const answerLetters = answerMatch[0];
-                    const answerOptions = [];
-                    for (let letter of answerLetters) {
-                      const answerIndex = letter.charCodeAt(0) - 65;
-                      if (answerIndex >= 0 && answerIndex < questionData.options.length) {
-                        answerOptions.push(questionData.options[answerIndex]);
-                      }
-                    }
-                    if (answerOptions.length > 0) {
-                      console.log(`AI解析成功(${typeName})，答案:`, answerLetters);
-                      resolve({ form: "AI", answer: answerOptions });
-                    } else {
-                      console.log("AI返回的选项超出范围");
-                      resolve({ form: "AI", answer: "" });
-                    }
-                  } else {
-                    console.log("AI返回内容未匹配到选项字母:", content);
-                    resolve({ form: "AI", answer: "" });
-                  }
-                } else if (questionTypeId === "0") {
-                  const answerMatch = content.match(/[A-D]/);
-                  if (answerMatch) {
-                    const answerLetter = answerMatch[0];
-                    const answerIndex = answerLetter.charCodeAt(0) - 65;
-                    if (answerIndex >= 0 && answerIndex < questionData.options.length) {
-                      console.log(`AI解析成功(${typeName})，答案:`, answerLetter);
-                      resolve({ form: "AI", answer: [questionData.options[answerIndex]] });
-                    } else {
-                      console.log("AI返回的选项超出范围");
-                      resolve({ form: "AI", answer: "" });
-                    }
-                  } else {
-                    console.log("AI返回内容未匹配到选项字母:", content);
-                    resolve({ form: "AI", answer: "" });
-                  }
-                } else {
-                  const textAnswers = content.split("|").map(s => s.trim()).filter(s => s.length > 0);
-                  if (textAnswers.length > 0) {
-                    console.log(`AI解析成功(${typeName})，答案:`, textAnswers);
-                    resolve({ form: "AI", answer: textAnswers });
-                  } else if (content.length > 0) {
-                    console.log(`AI解析成功(${typeName})，答案:`, content);
-                    resolve({ form: "AI", answer: [content] });
-                  } else {
-                    console.log("AI返回内容为空");
-                    resolve({ form: "AI", answer: "" });
-                  }
-                }
-              } else {
-                console.log("AI返回格式异常:", data);
-                resolve({ form: "AI", answer: "" });
-              }
-            } catch (e) {
-              console.log("AI解析错误:", e);
-              resolve({ form: "AI", answer: "" });
-            }
-          },
-          ontimeout: () => {
-            console.log("AI请求超时");
-            resolve({ form: "AI", answer: "" });
-          },
-          onerror: (err) => {
-            console.log("AI请求错误:", err);
-            resolve({ form: "AI", answer: "" });
+      }
+      const retryCount = config.aiRetryCount || 3;
+      const retryDelay = config.aiRetryDelay || 1000;
+      const aiResult = await this.callAIWithRetry(config.aiApiUrl, config.aiApiKey, config.aiModel, prompt, retryCount, retryDelay, "DeepSeek");
+      if (!aiResult.success) {
+        console.log("❌ [AI] AI请求失败，无法获取答案");
+        return { form: "AI", answer: "", status: "failed" };
+      }
+      console.log("🔧 [AI] 开始解析AI返回内容...");
+      const parsed = this.parseAIAnswer(aiResult.content, questionTypeId, questionData);
+      if (!parsed.valid) {
+        console.log("❌ [AI] 答案解析失败，无法匹配有效答案格式");
+        return { form: "AI", answer: "", status: "parse_failed" };
+      }
+      console.log("✅ [AI] 答案解析成功:", parsed.answer);
+      if (config.jevEnabled && config.jevApiKey && config.jevApiUrl) {
+        const configuredConfidence = Number(config.jevMinConfidence);
+        const minConfidence = Number.isFinite(configuredConfidence) ? configuredConfidence : 0.6;
+        const verification = await this.verifyAnswerWithJev(questionData, parsed.answer, config.jevApiUrl, config.jevApiKey, config.jevModel || "jev-latest", minConfidence);
+        if (verification.success) {
+          if (verification.passed) {
+            console.log(`✅ [最终] 使用AI答案 (Jev验证通过, 置信度: ${verification.overallConfidence.toFixed(2)})`);
+            return { form: `AI(Jev验证✓ ${verification.overallConfidence.toFixed(2)})`, answer: parsed.answer, status: "jev_verified" };
+          } else {
+            console.log(`❌ [最终] 拒绝AI答案 (Jev验证未通过, 置信度: ${verification.overallConfidence.toFixed(2)}, 质量: ${verification.qualityScore.toFixed(2)})`);
+            return { form: "AI(Jev验证✗)", answer: "", status: "jev_rejected" };
           }
-        });
-      });
+        } else {
+          console.log("⚠️ [最终] Jev验证失败，降级使用AI原答案");
+          return { form: "AI(DeepSeek)", answer: parsed.answer, status: "jev_failed_fallback" };
+        }
+      }
+      console.log("✅ [最终] 使用AI答案 (未启用Jev验证)");
+      return { form: "AI(DeepSeek)", answer: parsed.answer, status: "success" };
     }
     async s(questionList, url) {
       return new Promise(async (resolve) => {
@@ -1642,26 +1815,78 @@
     const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
     const typeName = typeNames[questionData.type] || "单选题";
 
-    // 优先使用自定义题库
+    console.log("═══════════════════════════════════════════");
+    console.log(`📝 开始答题流程 - 题型: ${typeName}`);
+    console.log(`📝 题目: ${questionData.question}`);
+    console.log("═══════════════════════════════════════════");
+
+    // 并发执行题库查询和AI答题
+    const promises = [];
+
     if (config.customApiEnabled && config.customApiUrl) {
-      console.log(`使用自定义题库获取答案... 题型: ${typeName}`);
-      const customResult = await server.getAnswerFromCustomApi(questionData);
-      if (customResult.answer && customResult.answer.length > 0) {
-        return [customResult];
-      }
-      console.log("自定义题库未找到答案，尝试其他方式...");
+      promises.push(server.getAnswerFromCustomApi(questionData));
+    } else {
+      console.log("📚 [题库] 未启用题库查询，跳过");
     }
 
-    // 使用AI自动答题
     if (config.aiEnabled && config.aiApiKey) {
-      console.log(`使用AI获取答案... 模型: ${config.aiModel}, 题型: ${typeName}`);
-      const aiResult = await server.getAnswerFromAI(questionData);
-      if (aiResult.answer && aiResult.answer.length > 0) {
-        return [aiResult];
-      }
+      promises.push(server.getAnswerFromAI(questionData));
+    } else {
+      console.log("🤖 [AI] 未启用AI答题，跳过");
     }
 
-    return [{ form: "AI", answer: "" }];
+    if (promises.length === 0) {
+      console.log("❌ 未配置任何答题方式，无法获取答案");
+      console.log("═══════════════════════════════════════════");
+      return [{ form: "系统", answer: "" }];
+    }
+
+    console.log(`⚡ 并发执行 ${promises.length} 个查询任务...`);
+    const results = await Promise.all(promises);
+
+    console.log("───────────────────────────────────────────");
+    console.log("📊 查询结果汇总:");
+    results.forEach((result, index) => {
+      const hasAnswer = result.answer && result.answer.length > 0;
+      console.log(`   ${index + 1}. [${result.form}] ${hasAnswer ? "✅ 找到答案" : "❌ 未找到答案"} ${result.status ? `(状态: ${result.status})` : ""}`);
+      if (hasAnswer) {
+        console.log(`      答案: ${JSON.stringify(result.answer)}`);
+      }
+    });
+    console.log("───────────────────────────────────────────");
+
+    // 优先使用题库答案
+    const customResult = results.find(r => r.form === "自定义题库" && r.answer && r.answer.length > 0);
+    if (customResult) {
+      console.log("✅ [最终决策] 使用题库答案");
+      console.log("═══════════════════════════════════════════");
+      return [customResult];
+    }
+
+    // 使用AI答案
+    const aiResult = results.find(r => r.form && r.form.includes("AI") && r.answer && r.answer.length > 0);
+    if (aiResult) {
+      console.log("✅ [最终决策] 使用AI答案");
+      console.log("═══════════════════════════════════════════");
+      return [aiResult];
+    }
+
+    // 新接口都未命中时，恢复原版的多题库兜底查询。
+    const legacyResults = await Promise.all([
+      server.getAnswer(questionData),
+      server.getAnswer2(questionData),
+      server.getAnswer3(questionData),
+      server.getAnswer4(questionData)
+    ]);
+    const legacyResult = legacyResults.find((result) => result.answer && result.answer.length > 0);
+    if (legacyResult) {
+      console.log("✅ [最终决策] 使用旧版题库答案", legacyResult.form);
+      return [legacyResult];
+    }
+
+    console.log("❌ [最终决策] 所有方式均未找到答案");
+    console.log("═══════════════════════════════════════════");
+    return [{ form: "系统", answer: "" }];
   }, fillAnswer = (answer, questionData, html, iframeWindow) => {
     answer = answer.filter((item) => item.answer.length > 0), console.log(answer);
     for (let i = 0; i < answer.length; i++) {
@@ -1804,9 +2029,9 @@
       });
     }
     async video(iframeWindow) {
-      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 1, await waitElementLoaded(iframeWindow, "#video_html5_api"), console.log("视频加载完成");
+      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api"), console.log("视频加载完成");
       const player = iframeWindow.videojs("video_html5_api"), playerButton = iframeWindow.document.querySelector(".vjs-big-play-button");
-      player.muted(true), player.playbackRate(16), player.play();
+      player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => { this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0; }), player.play();
 
       // 生成随机暂停时间（30-93秒）
       const randomPauseTime = Math.floor(Math.random() * (93 - 30 + 1)) + 30;
@@ -1892,6 +2117,11 @@
     }
     work(iframeWindow) {
       return new Promise(async (resolve) => {
+        if (!this.defaultConfig.autoAnswer) {
+          this.askStore.task.status = "未开启自动答题，等待手动答题";
+          resolve();
+          return;
+        }
         decode(iframeWindow);
         const Timu = iframeWindow.document.querySelectorAll(".TiMu");
         if (!Timu)
@@ -1916,6 +2146,11 @@
     }
     homework() {
       return new Promise(async (resolve) => {
+        if (!this.defaultConfig.autoAnswer) {
+          this.askStore.task.status = "未开启自动答题，等待手动答题";
+          resolve();
+          return;
+        }
         const Timu = _unsafeWindow.document.querySelectorAll(".questionLi");
         if (!Timu)
           return void resolve();
@@ -1936,6 +2171,11 @@
     }
     exam() {
       return new Promise(async (resolve) => {
+        if (!this.defaultConfig.autoAnswer) {
+          this.askStore.task.status = "未开启自动答题，等待手动答题";
+          resolve();
+          return;
+        }
         this.askStore.reset(), this.askStore.count = 1, this.askStore.task.name = "考试";
         let data = getQuestion("3", _unsafeWindow.document.body);
         this.askStore.insert(data), this.askStore.task.work.inx = 0;

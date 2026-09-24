@@ -118,45 +118,41 @@ class AsyncDatabase:
                     logger.error(f"JSON格式错误: 期望数组，得到 {type(questions)}")
                     return False
 
+                batch = []
+                for q in questions:
+                    if not isinstance(q, dict):
+                        continue
+                    question_text = str(q.get('question', '')).strip()
+                    question_type = str(q.get('type', '0')).strip()
+                    options = q.get('options', [])
+                    answer = str(q.get('answer', '')).strip()
+
+                    if not question_text or not answer:
+                        continue
+
+                    options_str = json.dumps(options, ensure_ascii=False) if isinstance(options, list) else '[]'
+                    batch.append((question_text, question_type, options_str, answer))
+
+                if not batch:
+                    logger.warning(f"JSON文件没有可导入的有效题目: {json_file}")
+                    return False
+
                 conn = await self._get_connection()
                 try:
                     await conn.execute('DELETE FROM questions')
-                    batch = []
-                    for q in questions:
-                        if not isinstance(q, dict):
-                            continue
-                        question_text = str(q.get('question', '')).strip()
-                        question_type = str(q.get('type', '0')).strip()
-                        options = q.get('options', [])
-                        answer = str(q.get('answer', '')).strip()
-
-                        if not question_text or not answer:
-                            continue
-
-                        if isinstance(options, list):
-                            options_str = json.dumps(options, ensure_ascii=False)
-                        else:
-                            options_str = '[]'
-
-                        batch.append((question_text, question_type, options_str, answer))
-
-                        if len(batch) >= 1000:
-                            await conn.executemany(
-                                'INSERT INTO questions (question, type, options, answer) VALUES (?, ?, ?, ?)',
-                                batch
-                            )
-                            batch = []
-
-                    if batch:
+                    for start in range(0, len(batch), 1000):
                         await conn.executemany(
                             'INSERT INTO questions (question, type, options, answer) VALUES (?, ?, ?, ?)',
-                            batch
+                            batch[start:start + 1000]
                         )
 
                     await conn.commit()
                     self._question_count = None
                     logger.info(f"成功导入 {len(questions)} 道题目")
                     return True
+                except Exception:
+                    await conn.rollback()
+                    raise
                 finally:
                     await self._release_connection(conn)
         except Exception as e:
@@ -196,19 +192,20 @@ class AsyncDatabase:
             logger.error(f"获取题目失败 (id={question_id}): {e}")
             return None
 
-    async def search_questions(self, keyword: str, limit: int = 50) -> List[dict]:
+    async def search_questions(self, keyword: str, limit: int = 50, offset: int = 0) -> List[dict]:
         if not keyword or len(keyword) > MAX_SEARCH_LENGTH:
             return []
         keyword = keyword.replace('%', '').replace('_', '').replace('[', '').replace(']', '')
         if not keyword:
             return []
         limit = max(1, min(limit, MAX_LIMIT))
+        offset = max(0, min(offset, MAX_OFFSET))
         try:
             conn = await self._get_connection()
             try:
                 cursor = await conn.execute(
-                    'SELECT * FROM questions WHERE question LIKE ? ORDER BY id DESC LIMIT ?',
-                    (f'%{keyword}%', limit)
+                    'SELECT * FROM questions WHERE question LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?',
+                    (f'%{keyword}%', limit, offset)
                 )
                 rows = await cursor.fetchall()
                 return [self._row_to_dict(row) for row in rows]
@@ -217,6 +214,27 @@ class AsyncDatabase:
         except Exception as e:
             logger.error(f"搜索题目失败: {e}")
             return []
+
+    async def get_search_count(self, keyword: str) -> int:
+        if not keyword or len(keyword) > MAX_SEARCH_LENGTH:
+            return 0
+        keyword = keyword.replace('%', '').replace('_', '').replace('[', '').replace(']', '')
+        if not keyword:
+            return 0
+        try:
+            conn = await self._get_connection()
+            try:
+                cursor = await conn.execute(
+                    'SELECT COUNT(*) FROM questions WHERE question LIKE ?',
+                    (f'%{keyword}%',)
+                )
+                row = await cursor.fetchone()
+                return row[0] if row else 0
+            finally:
+                await self._release_connection(conn)
+        except Exception as e:
+            logger.error(f"获取搜索题目数量失败: {e}")
+            return 0
 
     async def find_by_question(
         self,
@@ -348,11 +366,15 @@ class AsyncDatabase:
 
                 scored.sort(key=lambda x: x[0], reverse=True)
 
+                # 有选项但完全不匹配时，不返回同题干的其他版本。
+                if any(candidate.get('options') for _, candidate in candidates):
+                    scored = [item for item in scored if item[1].get('options') and item[1].get('options')]
+                    scored = [item for item in scored if options_match_score(options, item[1]['options']) > 0]
+
                 # 返回最高分（阈值 > 0.3）
                 if scored and scored[0][0] > 0.3:
                     return scored[0][1]
-
-                return candidates[0][1]
+                return None
 
             finally:
                 await self._release_connection(conn)
@@ -600,6 +622,33 @@ class AsyncDatabase:
             except Exception as e:
                 logger.error(f"删除待处理题目失败 (id={pending_id}): {e}")
                 return False
+
+    async def promote_pending_question(self, pending_id: int, question: QuestionCreate) -> Optional[int]:
+        """在同一事务中把待处理题转入题库，避免先删后建导致丢题。"""
+        if pending_id <= 0 or pending_id > 2147483647:
+            return None
+        async with self._write_lock:
+            conn = await self._get_connection()
+            try:
+                cursor = await conn.execute(
+                    'SELECT id FROM pending_questions WHERE id = ?', (pending_id,)
+                )
+                if not await cursor.fetchone():
+                    return None
+                cursor = await conn.execute(
+                    'INSERT INTO questions (question, type, options, answer) VALUES (?, ?, ?, ?)',
+                    (question.question, question.type,
+                     json.dumps(question.options, ensure_ascii=False), question.answer)
+                )
+                await conn.execute('DELETE FROM pending_questions WHERE id = ?', (pending_id,))
+                await conn.commit()
+                self._question_count = None
+                return cursor.lastrowid
+            except Exception:
+                await conn.rollback()
+                raise
+            finally:
+                await self._release_connection(conn)
 
     def _row_to_dict(self, row) -> dict:
         if row is None:

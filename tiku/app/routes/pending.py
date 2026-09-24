@@ -40,8 +40,7 @@ async def delete_pending(pending_id: int, req: Request):
 @router.post("/api/pending/{pending_id}/to-question")
 async def pending_to_question(pending_id: int, question: QuestionCreate, req: Request):
     db = req.app.state.db
-    success = await db.delete_pending_question(pending_id)
-    if not success:
+    question_id = await db.promote_pending_question(pending_id, question)
+    if question_id is None:
         raise HTTPException(status_code=404, detail="待处理题目不存在")
-    question_id = await db.create_question(question)
     return {"code": 1, "msg": "已添加到题库", "data": {"id": question_id}}
