@@ -73,6 +73,8 @@
     return config;
   }, defaultConfig$1 = { debugger: false, autoAnswer: true, autoVideo: true, autoJump: true, autoSubmit: true, thtoken: "", yztoken: "", gptKey: "", gptModel: "gpt-3.5-turbo", gpt: false, gptType: ["0", "1", "2", "3", "4", "5", "6", "7"], interval: 3, answerIntervalMin: 8, answerIntervalMax: 30, submitDelayMin: 20, submitDelayMax: 40, minAccuracy: 0.8, autoExam: true, hideExam: false, notice: "本脚本仅供学习交流使用，严禁用于商业用途，否则后果自负！", deepseekKey: "", deepseekEnabled: false, deepseekModel: "deepseek-reasoner", customApiUrl: "http://localhost:8002/api/search", customApiKey: "", customApiEnabled: true, aiEnabled: true, aiApiKey: "", aiApiUrl: "https://jiahaoapi.zeabur.app/v1/chat/completions", aiModel: "deepseek-v4.1-flash", aiRetryCount: 3, aiRetryDelay: 1000, jevEnabled: true, jevApiKey: "", jevApiUrl: "https://api.typesafe.ai/v1/systemone", jevModel: "jev-latest", jevMinConfidence: 0.7 }, userConfig = [{ name: "base", label: "基础配置", config: [{ name: "interval", label: "通用间隔(秒)", type: "number", value: defaultConfig$1.interval, desc: "通用间隔，用于脚本运行切换" }, { name: "answerIntervalMin", label: "答题间隔最小值(秒)", type: "number", value: defaultConfig$1.answerIntervalMin, desc: "每道题之间的最小等待时间" }, { name: "answerIntervalMax", label: "答题间隔最大值(秒)", type: "number", value: defaultConfig$1.answerIntervalMax, desc: "每道题之间的最大等待时间" }, { name: "submitDelayMin", label: "提交前延迟最小值(秒)", type: "number", value: defaultConfig$1.submitDelayMin, desc: "全部答完题后提交前的最小等待时间" }, { name: "submitDelayMax", label: "提交前延迟最大值(秒)", type: "number", value: defaultConfig$1.submitDelayMax, desc: "全部答完题后提交前的最大等待时间" }, { name: "customApiEnabled", label: "启用自定义题库", type: "switch", value: defaultConfig$1.customApiEnabled, desc: "开启后，会优先使用自定义题库接口查询答案" }, { name: "customApiUrl", label: "自定义题库地址", type: "input", value: defaultConfig$1.customApiUrl, desc: "你的题库服务器API地址，例如：http://localhost:8080/api/query" }, { name: "customApiKey", label: "自定义题库密钥", type: "input", value: defaultConfig$1.customApiKey, desc: "你的题库服务器API密钥（如果有的话）" }, { name: "aiEnabled", label: "启用AI自动答题", type: "switch", value: defaultConfig$1.aiEnabled, desc: "开启后，当题库查询失败时会调用AI获取答案" }, { name: "aiApiUrl", label: "AI API地址", type: "input", value: defaultConfig$1.aiApiUrl, desc: "OpenAI兼容的API地址，例如：https://api.deepseek.com/v1/chat/completions" }, { name: "aiModel", label: "AI模型名称", type: "input", value: defaultConfig$1.aiModel, desc: "模型名称，例如：deepseek-reasoner、gpt-4o、claude-3-opus等" }, { name: "aiApiKey", label: "AI API密钥", type: "input", value: defaultConfig$1.aiApiKey, desc: "API密钥，填写完请保存再刷新页面" }, { name: "aiRetryCount", label: "AI重试次数", type: "number", value: defaultConfig$1.aiRetryCount, desc: "AI请求失败后的重试次数" }, { name: "aiRetryDelay", label: "AI重试延迟(毫秒)", type: "number", value: defaultConfig$1.aiRetryDelay, desc: "AI重试的初始延迟时间" }, { name: "jevEnabled", label: "启用Jev验证", type: "switch", value: defaultConfig$1.jevEnabled, desc: "开启后，使用TypeSafe Jev模型验证AI答案质量" }, { name: "jevApiUrl", label: "Jev API地址", type: "input", value: defaultConfig$1.jevApiUrl, desc: "TypeSafe API地址" }, { name: "jevModel", label: "Jev模型", type: "input", value: defaultConfig$1.jevModel, desc: "使用jev-latest" }, { name: "jevApiKey", label: "Jev API密钥", type: "input", value: defaultConfig$1.jevApiKey, desc: "TypeSafe API密钥" }, { name: "jevMinConfidence", label: "Jev最低置信度", type: "number", value: defaultConfig$1.jevMinConfidence, desc: "低于此置信度的答案将被拒绝(0-1)" }] }, { name: "chapter", label: "章节配置", config: [{ name: "autoAnswer", label: "自动答题", type: "switch", value: defaultConfig$1.autoAnswer, desc: "开启后，会自动答题" }, { name: "autoVideo", label: "自动视频", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动观看视频" }, { name: "autoJump", label: "自动切换", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动切换章节" }, { name: "autoSubmit", label: "自动提交", type: "switch", value: defaultConfig$1.autoSubmit, desc: "开启后，会自动提交答案" }, { name: "minAccuracy", label: "最低正确率", type: "input", value: defaultConfig$1.minAccuracy, desc: "不满足最低正确率则不会自动提交答案" }] }, { name: "exam", label: "作业/考试配置", config: [{ name: "autoExam", label: "考试自动切换", type: "switch", value: defaultConfig$1.autoExam, desc: "开启后，会考试会自动切换" }] }], useformStore = pinia$1.defineStore({ id: "formstore", state: () => ({ forminput: getConfig(), dialogV: false, activeName: "base" }), actions: { saveConfig(forminput) {
     _GM_setValue("config", forminput);
+    const askStore = useAskStore();
+    askStore.task.log = filterRuntimeLogs(askStore.task.log).map((item) => ({ ...item, msg: formatRuntimeLog(item.msg) }));
     if (_GM_xmlhttpRequest && /\/search\/?$/.test(forminput.customApiUrl || "")) {
       const configUrl = forminput.customApiUrl.replace(/\/search\/?$/, "/config");
       _GM_xmlhttpRequest({
@@ -139,6 +141,45 @@
       ]
     }
   ];
+  const logCategoriesFor = (message) => {
+    const text = String(message ?? "");
+    const categories = [];
+    if (/配置/.test(text)) categories.push("logShowConfig");
+    if (/Jev|验证/.test(text)) categories.push("logShowJev");
+    if (/AI|DeepSeek/.test(text)) categories.push("logShowAi");
+    if (/题库海|一之|言溪|Muke|free4|旧版/.test(text)) categories.push("logShowLegacy");
+    if (/题目|开始答题/.test(text)) categories.push("logShowQuestion");
+    if (/答案|最终/.test(text)) categories.push("logShowAnswer");
+    if (/请求|重试/.test(text)) categories.push("logShowRequests");
+    if (/超时|耗时/.test(text)) categories.push("logShowTiming");
+    return categories;
+  };
+  const logLevelAllowed = (configured, level) => {
+    const levels = { error: 0, warn: 1, info: 2, debug: 3 };
+    const normalizedLevel = level === "success" ? "info" : level;
+    return levels[normalizedLevel] !== void 0 && levels[normalizedLevel] <= levels[configured || "info"];
+  };
+  const shouldShowLog = (message, level = "info") => {
+    const config = getConfig();
+    if (!config.logEnabled || !logLevelAllowed(config.logLevel, level)) return false;
+    if (level === "error" && config.logShowErrors === false) return false;
+    if ((level === "warn" || level === "warning") && config.logShowWarnings === false) return false;
+    return logCategoriesFor(message).every((category) => config[category] !== false);
+  };
+  const formatRuntimeLog = (message) => {
+    const config = getConfig();
+    let text = String(message ?? "");
+    const questionLimit = Number(config.logQuestionPreviewLength);
+    const answerLimit = Number(config.logAnswerPreviewLength);
+    if (Number.isFinite(questionLimit) && questionLimit >= 0) {
+      text = text.replace(/((?:题目|开始答题)\s*[:：]\s*)(.+)/, (_, prefix, value) => `${prefix}${value.slice(0, questionLimit)}${value.length > questionLimit ? "..." : ""}`);
+    }
+    if (Number.isFinite(answerLimit) && answerLimit >= 0) {
+      text = text.replace(/((?:答案|最终)\s*[:：]\s*)(.+)/, (_, prefix, value) => `${prefix}${value.slice(0, answerLimit)}${value.length > answerLimit ? "..." : ""}`);
+    }
+    return text;
+  };
+  const filterRuntimeLogs = (logs) => logs.filter((item) => shouldShowLog(item.msg, item.type));
   const installLogFilter = () => {
     if (_unsafeWindow && _unsafeWindow.__chaoxingToolkitLogFilterInstalled) return;
     const original = {
@@ -152,30 +193,10 @@
       if (!first) return false;
       return /题库|AI|Jev|配置|答题|最终|请求|答案|题目|脚本|DeepSeek|言溪|一之|Muke|free4|超时/.test(first);
     };
-    const categoryFor = (args, level) => {
-      const text = args.filter((item) => typeof item === "string").join(" ");
-      if (level === "error") return "logShowErrors";
-      if (level === "warn") return "logShowWarnings";
-      if (/配置/.test(text)) return "logShowConfig";
-      if (/Jev|验证/.test(text)) return "logShowJev";
-      if (/AI|DeepSeek/.test(text)) return "logShowAi";
-      if (/题库海|一之|言溪|Muke|free4|旧版/.test(text)) return "logShowLegacy";
-      if (/题目|开始答题/.test(text)) return "logShowQuestion";
-      if (/答案|最终/.test(text)) return "logShowAnswer";
-      if (/请求|重试/.test(text)) return "logShowRequests";
-      if (/超时|耗时/.test(text)) return "logShowTiming";
-      return null;
-    };
-    const levelAllowed = (configured, level) => {
-      const levels = { error: 0, warn: 1, info: 2, debug: 3 };
-      return levels[level] <= levels[configured || "info"];
-    };
     const forward = (method, level, args) => {
       if (!pluginMessage(args)) return original[method](...args);
-      const config = getConfig();
-      if (!config.logEnabled || !levelAllowed(config.logLevel, level)) return;
-      const category = categoryFor(args, level);
-      if (category && config[category] === false) return;
+      const message = args.filter((item) => typeof item === "string").join(" ");
+      if (!shouldShowLog(message, level)) return;
       original[method](...args);
     };
     console.log = (...args) => forward("log", "info", args);
@@ -2184,7 +2205,8 @@
   }, update(index, question) {
     this.task.work.questionList[index] = question;
   }, log(msg, level = "info") {
-    this.task.log.length > 20 && this.task.log.shift(), this.task.log.push({ time: (/* @__PURE__ */ new Date()).toLocaleTimeString(), msg, type: level });
+    if (!shouldShowLog(msg, level)) return;
+    this.task.log.length > 20 && this.task.log.shift(), this.task.log.push({ time: (/* @__PURE__ */ new Date()).toLocaleTimeString(), msg: formatRuntimeLog(msg), type: level });
   }, msg(msg) {
     this.task.status = msg;
   } } }), _sfc_main = vue.defineComponent({ setup() {
