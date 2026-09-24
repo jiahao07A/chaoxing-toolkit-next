@@ -22,11 +22,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+const route = useRoute()
 const username = ref('')
 const password = ref('')
 
@@ -38,4 +39,20 @@ const handleLogin = () => {
     ElMessage.error('用户名或密码错误')
   }
 }
+
+// 自动登录功能：支持 URL 参数 ?auto=1&user=admin&pass=admin
+onMounted(() => {
+  const auto = route.query.auto
+  const user = route.query.user
+  const pass = route.query.pass
+
+  if (auto === '1' && user && pass) {
+    username.value = user
+    password.value = pass
+    // 延迟执行登录，确保页面完全加载
+    setTimeout(() => {
+      handleLogin()
+    }, 500)
+  }
+})
 </script>

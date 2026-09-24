@@ -5,7 +5,7 @@
 # 支持100+并发请求
 
 # 默认端口
-PORT=${1:-8001}
+PORT=${1:-8002}
 
 # 是否启用高性能模式（多工作进程）
 HIGH_PERFORMANCE=${2:-false}
@@ -14,8 +14,8 @@ HIGH_PERFORMANCE=${2:-false}
 if [[ $PORT -lt 8001 || $PORT -gt 8004 ]]; then
     echo "错误: 端口必须在 8001-8004 之间"
     echo "用法: ./start.sh [端口] [高性能模式]"
-    echo "示例: ./start.sh 8001        # 普通模式"
-    echo "示例: ./start.sh 8001 true   # 高性能模式(100并发)"
+    echo "示例: ./start.sh 8002        # 普通模式"
+    echo "示例: ./start.sh 8002 true   # 高性能模式(100并发)"
     exit 1
 fi
 
@@ -78,7 +78,7 @@ if [ "$HIGH_PERFORMANCE" = "true" ]; then
     exec python3 -c "
 import uvicorn
 import os
-port = int(os.environ.get('PORT', 8001))
+port = int(os.environ.get('PORT', 8002))
 workers = int(os.environ.get('WORKERS', 4))
 print(f'启动 {workers} 个工作进程...')
 uvicorn.run(

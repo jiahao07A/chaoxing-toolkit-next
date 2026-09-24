@@ -28,7 +28,7 @@
 
 ![脚本配置面板](images/脚本配置面板.png)
 
-**题库管理后台登录** - 访问 `http://localhost:8001` 进入管理界面：
+**题库管理后台登录** - 访问 `http://localhost:8002` 进入管理界面：
 
 ![题库管理后台登录](images/后台登录页.png)
 
@@ -100,21 +100,21 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # 安装依赖
 pip install -r requirements.txt
 
-# 启动服务（默认端口 8001）
+# 启动服务（默认端口 8002）
 python main.py
 ```
 
 或使用启动脚本：
 
 ```bash
-./start.sh              # 默认端口 8001
+./start.sh              # 默认端口 8002
 ./start.sh 8002         # 指定端口
-./start.sh 8001 true    # 高性能模式（多工作进程）
+./start.sh 8002 true    # 高性能模式（多工作进程）
 ```
 
 启动后访问：
-- 管理界面：`http://localhost:8001`
-- API 接口：`http://localhost:8001/api/search`
+- 管理界面：`http://localhost:8002`
+- API 接口：`http://localhost:8002/api/search`
 
 ### 3. 前端开发
 
@@ -180,7 +180,7 @@ Content-Type: application/json
 
 | 变量        | 默认值         | 说明                 |
 | ----------- | -------------- | -------------------- |
-| `PORT`      | `8001`         | 服务端口             |
+| `PORT`      | `8002`         | 服务端口             |
 | `API_KEY`   | `your_api_key` | API 认证密钥         |
 | `WORKERS`   | `1`            | 工作进程数           |
 
@@ -188,7 +188,7 @@ Content-Type: application/json
 
 在脚本配置面板中可设置：
 - **启用自定义题库**：开启后优先使用自定义接口
-- **自定义题库地址**：填入 API URL（如 `http://localhost:8001/api/search`）
+- **自定义题库地址**：填入 API URL（如 `http://localhost:8002/api/search`）
 - **自定义题库密钥**：填入服务器要求的 API 密钥
 
 ![脚本配置面板](images/脚本配置面板.png)
