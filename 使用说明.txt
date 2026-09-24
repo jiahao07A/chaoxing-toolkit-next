@@ -1,0 +1,47 @@
+# 最终使用说明
+
+## ✅ 配置已修正
+
+Chrome 工作区已修正为：**Default**（对应 jiahao001 账号）
+
+## 🚀 立即开始
+
+### 一键启动
+```
+双击运行: start-simple.bat
+```
+
+## 📋 启动脚本会自动完成
+
+1. ✅ 启动题库服务器（http://localhost:8002）
+2. ✅ 打开题库管理界面（使用 Default 工作区，jiahao001 账号）
+3. ✅ 自动登录管理后台（admin/admin）
+4. ✅ 打开学习通页面（使用 Default 工作区，jiahao001 账号）
+
+## 🎯 确认配置
+
+- **Chrome 工作区**: Default
+- **Chrome 账号**: jiahao001 (jiahao071016001@gmail.com)
+- **服务端口**: 8002
+- **管理账号**: admin / admin
+
+## 📝 下一步操作
+
+### 1. 启动系统
+双击 `start-simple.bat`
+
+### 2. 配置 Tampermonkey
+在脚本设置中填入：
+```
+http://localhost:8002/api/search
+```
+
+### 3. 开始使用
+在学习通页面做题，脚本会自动查询题库答案
+
+## 🛑 停止服务器
+双击 `stop.bat`
+
+---
+
+**现在配置正确，可以开始使用了！** 🎉
