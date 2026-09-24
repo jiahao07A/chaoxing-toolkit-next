@@ -1,0 +1,70 @@
+╔══════════════════════════════════════════════════════════════╗
+║          超星学习通自动化系统 - 快速启动卡片                  ║
+╚══════════════════════════════════════════════════════════════╝
+
+【快速启动】
+  双击运行: start-simple.bat ⭐ 推荐
+
+【停止服务】
+  双击运行: stop.bat
+
+【服务地址】
+  题库管理: http://localhost:8002
+  API 接口: http://localhost:8002/api/search
+  学习通页: https://i.chaoxing.com/base
+
+【登录信息】
+  用户名: admin
+  密码: admin
+
+【Chrome 配置】
+  工作区: Profile 4
+  账号: jiahao071016001@gmail.com
+
+【Tampermonkey 配置】
+  1. 安装扩展: https://www.tampermonkey.net/
+  2. 导入脚本: 学习通脚本.js
+  3. 启用自定义题库
+  4. 填入地址: http://localhost:8002/api/search
+
+【题库信息】
+  总题数: 1036 道
+  数据库: tiku/questions.db
+  备份: tiku/tiku.json
+
+【常见问题】
+  Q: 服务器启动失败？
+  A: 运行 tiku/venv/Scripts/python.exe main.py 查看错误
+
+  Q: Chrome 打开错误工作区？
+  A: 访问 chrome://version/ 查看正确的 Profile 名称
+
+  Q: 端口 8002 被占用？
+  A: 运行 stop.bat 或修改脚本中的 TIKU_PORT
+
+  Q: 题库管理界面未自动登录？
+  A: 手动输入 admin/admin 登录
+
+【文件说明】
+  start-simple.bat  - 一键启动（推荐）
+  start.py         - Python 跨平台启动
+  stop.bat         - 停止服务器
+  启动指南.md       - 详细使用文档
+  DEPLOYMENT.md    - 部署说明
+
+【使用流程】
+  1. 双击 start-simple.bat
+  2. 等待 Chrome 自动打开（两个窗口）
+  3. 在学习通页面做题
+  4. 脚本自动查询答案
+  5. 完成后运行 stop.bat
+
+【技术支持】
+  - 详细文档: 查看 启动指南.md
+  - 项目地址: https://github.com/pang-qin/chaoxing-toolkit
+  - 部署日期: 2026-09-23
+
+╔══════════════════════════════════════════════════════════════╗
+║  提示: 服务器在后台运行，关闭命令行窗口不会停止服务          ║
+║       使用 stop.bat 停止服务器                               ║
+╚══════════════════════════════════════════════════════════════╝
