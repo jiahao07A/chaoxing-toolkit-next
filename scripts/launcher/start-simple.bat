@@ -11,7 +11,7 @@ set "CHROME_PROFILE=Default"
 set "TIKU_PORT=8002"
 
 echo [1/3] Starting server...
-cd /d "%~dp0tiku"
+cd /d "%~dp0..\..\tiku"
 
 REM Check virtual environment
 if not exist "venv\Scripts\python.exe" (
@@ -59,7 +59,7 @@ echo Tampermonkey Setup:
 echo   Configure API URL: http://localhost:%TIKU_PORT%/api/search
 echo.
 echo Note: Server is running in a separate window (minimized)
-echo       To stop server, run stop.bat
+echo       To stop server, run scripts\launcher\stop.bat
 echo.
 echo You can close this window now.
 echo.

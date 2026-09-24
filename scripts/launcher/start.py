@@ -61,7 +61,8 @@ def start_server():
     """启动题库服务器"""
     print("\n[1/4] 启动题库服务器...")
 
-    tiku_dir = Path(__file__).parent / "tiku"
+    repo_root = Path(__file__).resolve().parents[2]
+    tiku_dir = repo_root / "tiku"
     if not tiku_dir.exists():
         print(f"❌ 错误: 未找到题库目录 {tiku_dir}")
         return None

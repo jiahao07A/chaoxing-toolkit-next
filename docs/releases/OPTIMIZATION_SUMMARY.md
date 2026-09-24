@@ -180,7 +180,7 @@ Jev验证通过，使用答案
 
 ## 变更文件
 
-- `学习通脚本.js` (v2.1.8-optimized)
+- `scripts/userscript/学习通脚本.js` (v2.1.8-optimized)
   - 修改了 `defaultConfig$1`（硬编码测试配置）
   - 新增 `callAIWithRetry()` 方法
   - 新增 `verifyAnswerWithJev()` 方法

@@ -1,5 +1,18 @@
-# Vue 3 + Vite
+# 题库管理前端
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+本目录是题库管理后台的 Vue 3 + Vite 源码，构建产物输出到上级服务目录的 `static/`。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 开发
+
+```powershell
+npm install
+npm run dev
+```
+
+开发服务器默认使用 `5173`，`/api` 请求代理到后端 `8002`。
+
+构建生产资源：
+
+```powershell
+npm run build
+```

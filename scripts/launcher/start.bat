@@ -9,7 +9,7 @@ REM 设置变量
 set "CHROME_PROFILE=Profile 4"
 set "CHROME_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe"
 set "TIKU_PORT=8002"
-set "TIKU_DIR=%~dp0tiku"
+set "TIKU_DIR=%~dp0..\..\tiku"
 set "CHAOXING_URL=https://i.chaoxing.com/base?ws=1&t=1790138632014"
 set "TIKU_URL=http://localhost:%TIKU_PORT%"
 

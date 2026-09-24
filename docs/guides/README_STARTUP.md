@@ -4,10 +4,10 @@
 
 ### Windows 用户
 
-双击运行 `start.bat` 或在命令行中执行：
+双击运行 `scripts/launcher/start.bat` 或在命令行中执行：
 
 ```cmd
-start.bat
+scripts/launcher/start.bat
 ```
 
 ### 所有平台（推荐）
@@ -15,7 +15,7 @@ start.bat
 使用 Python 脚本：
 
 ```bash
-python start.py
+python scripts/launcher/start.py
 ```
 
 ## 功能说明
@@ -31,15 +31,15 @@ python start.py
 
 ### 修改 Chrome 配置文件
 
-编辑 `start.py` 或 `start.bat`，修改以下变量：
+编辑 `scripts/launcher/start.py` 或 `scripts/launcher/start.bat`，修改以下变量：
 
 ```python
-# start.py
+# scripts/launcher/start.py
 CHROME_PROFILE = "jiahao071016001@gmail.com"  # 改为你的 Chrome 配置名称
 ```
 
 ```batch
-REM start.bat
+REM scripts/launcher/start.bat
 set "CHROME_PROFILE=jiahao071016001@gmail.com"
 ```
 
@@ -48,12 +48,12 @@ set "CHROME_PROFILE=jiahao071016001@gmail.com"
 如果 8002 端口被占用，可以修改：
 
 ```python
-# start.py
+# scripts/launcher/start.py
 TIKU_PORT = 8002  # 改为其他端口，如 8003
 ```
 
 ```batch
-REM start.bat
+REM scripts/launcher/start.bat
 set "TIKU_PORT=8002"
 ```
 
@@ -62,7 +62,7 @@ set "TIKU_PORT=8002"
 默认账号为 `admin/admin`，如需修改：
 
 ```python
-# start.py
+# scripts/launcher/start.py
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin"
 ```
@@ -86,7 +86,7 @@ http://localhost:8002/#/login?auto=1&user=admin&pass=admin
 
 1. **运行启动脚本**
    ```bash
-   python start.py
+   python scripts/launcher/start.py
    ```
 
 2. **等待服务器启动**
@@ -108,10 +108,10 @@ http://localhost:8002/#/login?auto=1&user=admin&pass=admin
 
 ## 停止服务
 
-### start.py
+### scripts/launcher/start.py
 按 `Ctrl+C` 停止服务器并退出
 
-### start.bat
+### scripts/launcher/start.bat
 按任意键停止服务器并退出
 
 ## 常见问题
@@ -160,14 +160,14 @@ chrome --profile-directory="jiahao071016001@gmail.com" https://i.chaoxing.com/ba
 
 ## 技术细节
 
-### start.py 特性
+### scripts/launcher/start.py 特性
 
 - 自动检测 Chrome 路径（Windows/macOS/Linux）
 - 智能等待服务器就绪
 - 优雅关闭（Ctrl+C 自动清理）
 - 跨平台支持
 
-### start.bat 特性
+### scripts/launcher/start.bat 特性
 
 - 纯 Windows 批处理
 - 无需额外依赖

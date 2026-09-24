@@ -13,6 +13,15 @@ __pycache__/
 *.sqlite3
 node_modules/
 dist/
+**/venv/
+**/node_modules/
+tiku/frontend/dist/
+tiku/data/config.json
+tiku/data/questions.db*
+tiku/data/*.log
+.env
+.env.*
+!.env.example
 Thumbs.db
 Desktop.ini
 .DS_Store

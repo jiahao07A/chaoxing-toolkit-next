@@ -26,24 +26,26 @@
 
 **脚本配置面板** - 在学习通页面中打开 Tampermonkey 设置，配置题库地址和 AI API：
 
-![脚本配置面板](images/脚本配置面板.png)
+![脚本配置面板](docs/assets/脚本配置面板.png)
 
 **题库管理后台登录** - 访问 `http://localhost:8002` 进入管理界面：
 
-![题库管理后台登录](images/后台登录页.png)
+![题库管理后台登录](docs/assets/后台登录页.png)
 
 **题库管理面板** - 登录后可查看、搜索、新增、导入、导出题目：
 
-![题库管理面板](images/题库管理面板.png)
+![题库管理面板](docs/assets/题库管理面板.png)
 
 **待处理题目** - 未匹配到答案的题目会自动归入待处理列表，支持手动补充答案：
 
-![待处理题目](images/待处理题目.png)
+![待处理题目](docs/assets/待处理题目.png)
 
 ## 项目结构
 
 ```
-├── 学习通脚本.js              # Tampermonkey 用户脚本（自动答题、视频播放、任务点导航）
+├── scripts/                  # 本地启动器和用户脚本
+│   ├── launcher/             # Windows、跨平台和 Linux 启停脚本
+│   └── userscript/           # Tampermonkey 用户脚本
 ├── tiku/                      # 题库服务器
 │   ├── main.py                # 服务入口
 │   ├── app/                   # FastAPI 应用（路由、数据库、中间件）
@@ -54,12 +56,15 @@
 │   │   ├── schemas.py         # Pydantic 数据模型
 │   │   └── routes/            # API 路由
 │   ├── frontend/              # Vue 3 管理界面（Vite + Element Plus）
-│   ├── templates/             # 旧版 HTML 管理界面
-│   ├── tiku.json              # 题库数据
-│   ├── questions.db           # SQLite 数据库
+│   ├── data/
+│   │   └── tiku.json          # 可版本控制的题库种子数据
+│   ├── legacy/templates/      # 旧版 HTML，仅作历史参考
+│   ├── static/                # 前端构建产物（本机生成）
+│   ├── questions.db           # SQLite 数据库（本机运行时文件）
 │   ├── requirements.txt       # Python 依赖
-│   └── start.sh               # 启动脚本
-└── CLAUDE.md                  # 项目说明
+│   └── README.md              # 服务说明
+├── docs/                      # 指南、架构记录、截图和发布记录
+└── AGENTS.md                  # 项目协作约定
 ```
 
 ## 快速开始
@@ -79,7 +84,7 @@
 1. 点击浏览器右上角的 Tampermonkey 图标
 2. 选择「添加新脚本...」
 3. 清空编辑器中的默认内容
-4. 将 `学习通脚本.js` 的全部内容粘贴进去
+4. 将 `scripts/userscript/学习通脚本.js` 的全部内容粘贴进去
 5. 按 `Ctrl + S` 保存
 
 **第三步：使用脚本**
@@ -91,6 +96,7 @@
 ### 2. 启动题库服务器
 
 ```bash
+# 在仓库根目录执行
 cd tiku
 
 # 创建虚拟环境
@@ -107,9 +113,10 @@ python main.py
 或使用启动脚本：
 
 ```bash
-./start.sh              # 默认端口 8002
-./start.sh 8002         # 指定端口
-./start.sh 8002 true    # 高性能模式（多工作进程）
+cd ..
+./scripts/launcher/start-linux.sh              # 默认端口 8002
+./scripts/launcher/start-linux.sh 8002         # 指定端口
+./scripts/launcher/start-linux.sh 8002 true    # 高性能模式（多工作进程）
 ```
 
 启动后访问：
@@ -191,7 +198,7 @@ Content-Type: application/json
 - **自定义题库地址**：填入 API URL（如 `http://localhost:8002/api/search`）
 - **自定义题库密钥**：填入服务器要求的 API 密钥
 
-![脚本配置面板](images/脚本配置面板.png)
+![脚本配置面板](docs/assets/脚本配置面板.png)
 
 ## 技术栈
 

@@ -4,6 +4,12 @@
 # 可用端口: 8001, 8002, 8003, 8004
 # 支持100+并发请求
 
+# 从脚本位置定位仓库和题库服务目录，避免依赖当前工作目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TIKU_DIR="$REPO_ROOT/tiku"
+cd "$TIKU_DIR" || exit 1
+
 # 默认端口
 PORT=${1:-8002}
 

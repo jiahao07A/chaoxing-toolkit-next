@@ -84,7 +84,7 @@ curl -s "http://localhost:8002/api/questions?page=1&page_size=10"
 ### 用户脚本安装
 
 1. 安装 [Tampermonkey 浏览器扩展](https://www.tampermonkey.net/)
-2. 打开 `学习通脚本.js` 文件
+2. 打开 `scripts/userscript/学习通脚本.js` 文件
 3. 在 Tampermonkey 中创建新脚本，粘贴内容并保存
 4. 在脚本设置中配置题库服务器地址: `http://localhost:8002/api/search`
 
@@ -109,7 +109,7 @@ curl -s "http://localhost:8002/api/questions?page=1&page_size=10"
 
 1. **端口冲突**: 如果 8001 端口被占用，使用 `PORT=8002` 指定其他端口
 2. **数据库位置**: SQLite 数据库文件位于 `tiku/questions.db`
-3. **题库备份**: 原始题库数据存储在 `tiku/tiku.json`
+3. **题库备份**: 原始题库数据存储在 `tiku/data/tiku.json`
 4. **跨域访问**: 服务器已配置 CORS，允许所有来源访问
 
 ## 停止服务

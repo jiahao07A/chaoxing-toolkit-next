@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import (
-    DATABASE_FILE, JSON_FILE, CONFIG_FILE, DEFAULT_PORT,
+    DATABASE_FILE, JSON_FILE, CONFIG_FILE, DEFAULT_PORT, SERVICE_DIR,
     RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW,
     REQUEST_TIMEOUT, MAX_CONCURRENT_REQUESTS
 )
@@ -110,8 +110,10 @@ def create_app() -> FastAPI:
     app.add_middleware(RateLimitMiddleware)
 
     # 静态文件
-    os.makedirs("static", exist_ok=True)
-    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+    static_dir = SERVICE_DIR / "static"
+    assets_dir = static_dir / "assets"
+    os.makedirs(assets_dir, exist_ok=True)
+    app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
     # 注册 API 路由
     app.include_router(search_router)
@@ -124,15 +126,15 @@ def create_app() -> FastAPI:
     @app.get("/{full_path:path}", response_class=HTMLResponse)
     async def spa_fallback(full_path: str):
         # 检查是否是静态文件
-        static_file = os.path.join("static", full_path)
+        static_file = os.path.join(static_dir, full_path)
         if os.path.isfile(static_file):
             from fastapi.responses import FileResponse
             return FileResponse(static_file)
         # 返回 SPA index.html
-        index_path = os.path.join("static", "index.html")
+        index_path = static_dir / "index.html"
         if os.path.exists(index_path):
             with open(index_path, "r", encoding="utf-8") as f:
                 return HTMLResponse(content=f.read())
-        return HTMLResponse(content="<h1>请先构建前端: cd frontend && npm run build</h1>")
+        return HTMLResponse(content="<h1>请先构建前端: cd tiku/frontend && npm run build</h1>")
 
     return app
