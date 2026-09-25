@@ -148,8 +148,8 @@
     if (/Jev|验证/.test(text)) categories.push("logShowJev");
     if (/AI|DeepSeek/.test(text)) categories.push("logShowAi");
     if (/题库海|一之|言溪|Muke|free4|旧版/.test(text)) categories.push("logShowLegacy");
-    if (/题目|开始答题/.test(text)) categories.push("logShowQuestion");
-    if (/答案|最终/.test(text)) categories.push("logShowAnswer");
+    if (/题目|开始答题|\bquestion\b/i.test(text)) categories.push("logShowQuestion");
+    if (/答案|最终|\banswer\b/i.test(text)) categories.push("logShowAnswer");
     if (/请求|重试/.test(text)) categories.push("logShowRequests");
     if (/超时|耗时/.test(text)) categories.push("logShowTiming");
     return categories;
@@ -180,6 +180,34 @@
     return text;
   };
   const filterRuntimeLogs = (logs) => logs.filter((item) => shouldShowLog(item.msg, item.type));
+  let runtimeLogSink = null;
+  const setRuntimeLogSink = (sink) => {
+    runtimeLogSink = typeof sink === "function" ? sink : null;
+  };
+  const serializeLogArg = (value) => {
+    if (typeof value === "string") return value;
+    if (value instanceof Error) return value.stack || value.message;
+    if (value && typeof value === "object") {
+      if (typeof value.question === "string") {
+        const options = Array.isArray(value.options) && value.options.length > 0 ? ` 选项: ${JSON.stringify(value.options)}` : "";
+        return `题目: ${value.question}${options}`;
+      }
+      if (Object.prototype.hasOwnProperty.call(value, "answer")) {
+        return `答案: ${serializeLogArg(value.answer)}`;
+      }
+    }
+    try {
+      const serialized = JSON.stringify(value);
+      return serialized === void 0 ? String(value) : serialized;
+    } catch (error) {
+      return String(value);
+    }
+  };
+  const inferLogLevel = (message, fallback = "info") => {
+    if (/^\s*❌/.test(message)) return "error";
+    if (/^\s*(?:⚠️|⏱️)/.test(message)) return "warn";
+    return fallback;
+  };
   const installLogFilter = () => {
     if (_unsafeWindow && _unsafeWindow.__chaoxingToolkitLogFilterInstalled) return;
     const original = {
@@ -190,13 +218,23 @@
     };
     const pluginMessage = (args) => {
       const first = args.find((item) => typeof item === "string");
+      const structured = args.find((item) => item && typeof item === "object" && (typeof item.question === "string" || Object.prototype.hasOwnProperty.call(item, "answer")));
+      if (structured) return true;
       if (!first) return false;
-      return /题库|AI|Jev|配置|答题|最终|请求|答案|题目|脚本|DeepSeek|言溪|一之|Muke|free4|超时/.test(first);
+      return /题库|AI|Jev|配置|答题|最终|请求|答案|题目|脚本|DeepSeek|言溪|一之|Muke|free4|超时|视频|音频|任务点|章节测验|作业|考试/.test(first);
     };
     const forward = (method, level, args) => {
       if (!pluginMessage(args)) return original[method](...args);
-      const message = args.filter((item) => typeof item === "string").join(" ");
-      if (!shouldShowLog(message, level)) return;
+      const message = args.map(serializeLogArg).join(" ");
+      const effectiveLevel = inferLogLevel(message, level);
+      if (!shouldShowLog(message, effectiveLevel)) return;
+      if (runtimeLogSink) {
+        try {
+          runtimeLogSink(message, effectiveLevel);
+        } catch (error) {
+          // 运行日志接收器故障时仍保留浏览器控制台输出。
+        }
+      }
       original[method](...args);
     };
     console.log = (...args) => forward("log", "info", args);
@@ -2240,7 +2278,7 @@
       __publicField(this, "askStore");
       __publicField(this, "ServerApi");
       __publicField(this, "defaultConfig");
-      this.app = vue.createApp(Ask).use(ElementPlus).use(pinia$1.createPinia()), this.askStore = useAskStore(), this.ServerApi = new ServerApi(), this.defaultConfig = getConfig(), this.app.mount((() => {
+      this.app = vue.createApp(Ask).use(ElementPlus).use(pinia$1.createPinia()), this.askStore = useAskStore(), setRuntimeLogSink((message, level) => this.askStore.log(message, level)), this.ServerApi = new ServerApi(), this.defaultConfig = getConfig(), this.app.mount((() => {
         const div = _unsafeWindow.top.document.createElement("div");
         return div.id = "xxxxzx", _unsafeWindow.top.document.getElementById(div.id) || _unsafeWindow.top.document.body.append(div), div;
       })());
