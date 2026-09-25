@@ -2306,25 +2306,42 @@
     async video(iframeWindow) {
       this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api"), console.log("视频加载完成");
       const player = iframeWindow.videojs("video_html5_api"), playerButton = iframeWindow.document.querySelector(".vjs-big-play-button");
-      player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => { this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0; }), player.play();
-
-      // 生成随机暂停时间（30-93秒）
-      const randomPauseTime = Math.floor(Math.random() * (93 - 30 + 1)) + 30;
-      let pauseTimer = null;
-      let mouseMoveTimer = null;
+      player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => {
+        const rate = player.playbackRate();
+        this.askStore.task.video.status = rate > 1 ? 1 : 0;
+        if (rate !== 1) {
+          player.playbackRate(1);
+          console.log(`[视频] 播放速率已恢复为 1 倍（原速率: ${rate}）`);
+        }
+      });
+      const startPlayback = () => {
+        const result = player.play();
+        if (result && typeof result.catch === "function") {
+          result.catch((error) => console.warn("[视频] 播放请求未成功", error));
+        }
+        return result;
+      };
+      startPlayback();
+     let pauseTimer = null;
+     let resumeTimer = null;
+      let randomPauseActive = false;
+     let mouseMoveTimer = null;
 
       // 随机暂停功能
       const scheduleRandomPause = () => {
         const delay = Math.floor(Math.random() * (93 - 30 + 1) + 30) * 1000;
         pauseTimer = setTimeout(() => {
           if (!player.paused()) {
-            player.pause();
-            console.log(`[视频] 已随机暂停，暂停时间: ${delay / 1000}秒`);
+           const pausedAt = Date.now();
+            randomPauseActive = true;
+           player.pause();
+            console.log(`[视频] 已随机暂停，触发间隔: ${delay / 1000}秒`);
             // 暂停2-5秒后恢复播放
-            setTimeout(() => {
-              if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
-                player.play();
-                console.log("[视频] 已恢复播放");
+           resumeTimer = setTimeout(() => {
+              randomPauseActive = false;
+             if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+                startPlayback();
+                console.log(`[视频] 已恢复播放，实际暂停: ${Math.round((Date.now() - pausedAt) / 1000)}秒`);
                 scheduleRandomPause();
               }
             }, Math.floor(Math.random() * (5 - 2 + 1) + 2) * 1000);
@@ -2380,13 +2397,29 @@
       scheduleMouseMovement();
 
       await new Promise((resolve) => {
+        const cleanup = () => {
+          clearInterval(intervalId);
+          clearTimeout(pauseTimer);
+          clearTimeout(resumeTimer);
+          clearTimeout(mouseMoveTimer);
+        };
+        const finish = (message) => {
+          cleanup();
+          console.log(message);
+          resolve();
+        };
         const intervalId = setInterval(() => {
-          "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob() ? player.paused() && (playerButton == null ? void 0 : playerButton.click()) : (clearInterval(intervalId), clearTimeout(pauseTimer), clearTimeout(mouseMoveTimer), resolve());
-        }, 1e3), pauseBase = player.pause;
-        player.pause = function() {
-          player.currentTime() >= player.duration() && (console.log("视频播放完成"), player.pause = pauseBase, clearTimeout(pauseTimer), clearTimeout(mouseMoveTimer), resolve());
-        }, player.on("ended", () => {
-          console.log("视频播放完成1"), player.pause = pauseBase, player.pause(), clearInterval(intervalId), clearTimeout(pauseTimer), clearTimeout(mouseMoveTimer), resolve();
+          if ("isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+            if (!randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
+              startPlayback();
+              playerButton == null ? void 0 : playerButton.click();
+            }
+          } else {
+            finish("视频任务状态已完成");
+          }
+        }, 1e3);
+        player.on("ended", () => {
+          finish("视频播放完成");
         });
       }), console.log("任务点完成");
     }
