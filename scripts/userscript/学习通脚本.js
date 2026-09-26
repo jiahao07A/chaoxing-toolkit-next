@@ -59,10 +59,51 @@
     GM_addStyle(t);
   })("element-plus");
   var _GM_getResourceText = (() => "undefined" != typeof GM_getResourceText ? GM_getResourceText : void 0)(), _GM_getValue = (() => "undefined" != typeof GM_getValue ? GM_getValue : void 0)(), _GM_info = (() => "undefined" != typeof GM_info ? GM_info : void 0)(), _GM_setValue = (() => "undefined" != typeof GM_setValue ? GM_setValue : void 0)(), _GM_xmlhttpRequest = (() => "undefined" != typeof GM_xmlhttpRequest ? GM_xmlhttpRequest : void 0)(), _unsafeWindow = (() => "undefined" != typeof unsafeWindow ? unsafeWindow : void 0)();
+  if (typeof GM_addStyle === "function") GM_addStyle(".cx-settings-dialog{width:min(720px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-settings-dialog .el-dialog__header{flex:0 0 auto}.cx-settings-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 150px);overflow-y:auto;overflow-x:hidden;padding:8px 24px 16px}.cx-settings-dialog .el-dialog__footer{flex:0 0 auto;padding-top:12px}.cx-settings-dialog .el-form{min-width:0}@media (max-width:600px){.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}}");
+  const markSettingsDialogs = () => {
+    if (typeof document === "undefined") return;
+    document.querySelectorAll(".el-dialog").forEach((dialog) => {
+      if (dialog.querySelector(".demo-ruleForm")) dialog.classList.add("cx-settings-dialog");
+    });
+  };
+  if (typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
+    markSettingsDialogs();
+    new MutationObserver(markSettingsDialogs).observe(document.body, { childList: true, subtree: true });
+  }
+  const GENERATED_CONFIG_CONTRACT = {"schemaVersion":1,"sourceSchemaSha256":"317199fbf6671a2b737b0e885771f928db0c6df5b1f8ad3293eb600aad77eb36","defaults":{"videoDiagnosticsEnabled":true,"randomPauseEnabled":true,"randomPauseIntervalMin":30,"randomPauseIntervalMax":93,"randomPauseDurationMin":2,"randomPauseDurationMax":5},"rules":{"videoDiagnosticsEnabled":{"type":"boolean"},"randomPauseEnabled":{"type":"boolean"},"randomPauseIntervalMin":{"type":"integer","minimum":1,"maximum":86400},"randomPauseIntervalMax":{"type":"integer","minimum":1,"maximum":86400},"randomPauseDurationMin":{"type":"integer","minimum":1,"maximum":3600},"randomPauseDurationMax":{"type":"integer","minimum":1,"maximum":3600}},"constraints":[["randomPauseIntervalMin","<=","randomPauseIntervalMax"],["randomPauseDurationMin","<=","randomPauseDurationMax"]]};
+  const applyGeneratedConfigContract = (input) => {
+    const output = { ...input };
+    for (const [key, rule] of Object.entries(GENERATED_CONFIG_CONTRACT.rules || {})) {
+      const value = output[key];
+      if (rule.type === "boolean" && typeof value !== "boolean") output[key] = GENERATED_CONFIG_CONTRACT.defaults[key];
+      if (rule.type === "integer" && (!Number.isInteger(value) || value < rule.minimum || value > rule.maximum)) output[key] = GENERATED_CONFIG_CONTRACT.defaults[key];
+    }
+    for (const [left, operator, right] of GENERATED_CONFIG_CONTRACT.constraints || []) {
+      if (operator === "<=" && output[left] > output[right]) {
+        output[left] = GENERATED_CONFIG_CONTRACT.defaults[left];
+        output[right] = GENERATED_CONFIG_CONTRACT.defaults[right];
+      }
+    }
+    return output;
+  };
+  const validateGeneratedConfigContract = (input) => {
+    for (const [key, rule] of Object.entries(GENERATED_CONFIG_CONTRACT.rules || {})) {
+      const value = input[key];
+      if (rule.type === "boolean" && typeof value !== "boolean") return `${key} 必须是布尔值`;
+      if (rule.type === "integer" && (!Number.isInteger(value) || value < rule.minimum || value > rule.maximum)) {
+        return `${key} 必须是 ${rule.minimum}-${rule.maximum} 之间的整数`;
+      }
+    }
+    for (const [left, operator, right] of GENERATED_CONFIG_CONTRACT.constraints || []) {
+      if (operator === "<=" && input[left] > input[right]) return `${left} 必须小于或等于 ${right}`;
+    }
+    return null;
+  };
   const getConfig = () => {
     const storedConfig = _GM_getValue("config");
     if (!storedConfig) return { ...defaultConfig$1, ...extendedConfigDefaults };
-    let config = { ...defaultConfig$1, ...extendedConfigDefaults, ...storedConfig };
+    let config = { ...GENERATED_CONFIG_CONTRACT.defaults, ...defaultConfig$1, ...extendedConfigDefaults, ...storedConfig };
+    config = applyGeneratedConfigContract(config);
     if (config.deepseekEnabled && !config.aiEnabled) {
       config.aiEnabled = true;
       config.aiApiKey = config.deepseekKey || "";
@@ -72,22 +113,35 @@
     }
     return config;
   }, defaultConfig$1 = { debugger: false, autoAnswer: true, autoVideo: true, autoJump: true, autoSubmit: true, thtoken: "", yztoken: "", gptKey: "", gptModel: "gpt-3.5-turbo", gpt: false, gptType: ["0", "1", "2", "3", "4", "5", "6", "7"], interval: 3, answerIntervalMin: 8, answerIntervalMax: 30, submitDelayMin: 20, submitDelayMax: 40, minAccuracy: 0.8, autoExam: true, hideExam: false, notice: "本脚本仅供学习交流使用，严禁用于商业用途，否则后果自负！", deepseekKey: "", deepseekEnabled: false, deepseekModel: "deepseek-reasoner", customApiUrl: "http://localhost:8002/api/search", customApiKey: "", customApiEnabled: true, aiEnabled: true, aiApiKey: "", aiApiUrl: "https://jiahaoapi.zeabur.app/v1/chat/completions", aiModel: "deepseek-v4.1-flash", aiRetryCount: 3, aiRetryDelay: 1000, jevEnabled: true, jevApiKey: "", jevApiUrl: "https://api.typesafe.ai/v1/systemone", jevModel: "jev-latest", jevMinConfidence: 0.7 }, userConfig = [{ name: "base", label: "基础配置", config: [{ name: "interval", label: "通用间隔(秒)", type: "number", value: defaultConfig$1.interval, desc: "通用间隔，用于脚本运行切换" }, { name: "answerIntervalMin", label: "答题间隔最小值(秒)", type: "number", value: defaultConfig$1.answerIntervalMin, desc: "每道题之间的最小等待时间" }, { name: "answerIntervalMax", label: "答题间隔最大值(秒)", type: "number", value: defaultConfig$1.answerIntervalMax, desc: "每道题之间的最大等待时间" }, { name: "submitDelayMin", label: "提交前延迟最小值(秒)", type: "number", value: defaultConfig$1.submitDelayMin, desc: "全部答完题后提交前的最小等待时间" }, { name: "submitDelayMax", label: "提交前延迟最大值(秒)", type: "number", value: defaultConfig$1.submitDelayMax, desc: "全部答完题后提交前的最大等待时间" }, { name: "customApiEnabled", label: "启用自定义题库", type: "switch", value: defaultConfig$1.customApiEnabled, desc: "开启后，会优先使用自定义题库接口查询答案" }, { name: "customApiUrl", label: "自定义题库地址", type: "input", value: defaultConfig$1.customApiUrl, desc: "你的题库服务器API地址，例如：http://localhost:8080/api/query" }, { name: "customApiKey", label: "自定义题库密钥", type: "input", value: defaultConfig$1.customApiKey, desc: "你的题库服务器API密钥（如果有的话）" }, { name: "aiEnabled", label: "启用AI自动答题", type: "switch", value: defaultConfig$1.aiEnabled, desc: "开启后，当题库查询失败时会调用AI获取答案" }, { name: "aiApiUrl", label: "AI API地址", type: "input", value: defaultConfig$1.aiApiUrl, desc: "OpenAI兼容的API地址，例如：https://api.deepseek.com/v1/chat/completions" }, { name: "aiModel", label: "AI模型名称", type: "input", value: defaultConfig$1.aiModel, desc: "模型名称，例如：deepseek-reasoner、gpt-4o、claude-3-opus等" }, { name: "aiApiKey", label: "AI API密钥", type: "input", value: defaultConfig$1.aiApiKey, desc: "API密钥，填写完请保存再刷新页面" }, { name: "aiRetryCount", label: "AI重试次数", type: "number", value: defaultConfig$1.aiRetryCount, desc: "AI请求失败后的重试次数" }, { name: "aiRetryDelay", label: "AI重试延迟(毫秒)", type: "number", value: defaultConfig$1.aiRetryDelay, desc: "AI重试的初始延迟时间" }, { name: "jevEnabled", label: "启用Jev验证", type: "switch", value: defaultConfig$1.jevEnabled, desc: "开启后，使用TypeSafe Jev模型验证AI答案质量" }, { name: "jevApiUrl", label: "Jev API地址", type: "input", value: defaultConfig$1.jevApiUrl, desc: "TypeSafe API地址" }, { name: "jevModel", label: "Jev模型", type: "input", value: defaultConfig$1.jevModel, desc: "使用jev-latest" }, { name: "jevApiKey", label: "Jev API密钥", type: "input", value: defaultConfig$1.jevApiKey, desc: "TypeSafe API密钥" }, { name: "jevMinConfidence", label: "Jev最低置信度", type: "number", value: defaultConfig$1.jevMinConfidence, desc: "低于此置信度的答案将被拒绝(0-1)" }] }, { name: "chapter", label: "章节配置", config: [{ name: "autoAnswer", label: "自动答题", type: "switch", value: defaultConfig$1.autoAnswer, desc: "开启后，会自动答题" }, { name: "autoVideo", label: "自动视频", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动观看视频" }, { name: "autoJump", label: "自动切换", type: "switch", value: defaultConfig$1.autoVideo, desc: "开启后，会自动切换章节" }, { name: "autoSubmit", label: "自动提交", type: "switch", value: defaultConfig$1.autoSubmit, desc: "开启后，会自动提交答案" }, { name: "minAccuracy", label: "最低正确率", type: "input", value: defaultConfig$1.minAccuracy, desc: "不满足最低正确率则不会自动提交答案" }] }, { name: "exam", label: "作业/考试配置", config: [{ name: "autoExam", label: "考试自动切换", type: "switch", value: defaultConfig$1.autoExam, desc: "开启后，会考试会自动切换" }] }], useformStore = pinia$1.defineStore({ id: "formstore", state: () => ({ forminput: getConfig(), dialogV: false, activeName: "base" }), actions: { saveConfig(forminput) {
-    _GM_setValue("config", forminput);
+    const validationError = validateGeneratedConfigContract(forminput);
+    if (validationError) {
+      console.warn(`⚠️ [配置] ${validationError}`);
+      return false;
+    }
+    const normalizedConfig = applyGeneratedConfigContract(forminput);
+    _GM_setValue("config", normalizedConfig);
     const askStore = useAskStore();
     askStore.task.log = filterRuntimeLogs(askStore.task.log).map((item) => ({ ...item, msg: formatRuntimeLog(item.msg) }));
-    if (_GM_xmlhttpRequest && /\/search\/?$/.test(forminput.customApiUrl || "")) {
-      const configUrl = forminput.customApiUrl.replace(/\/search\/?$/, "/config");
+    if (_GM_xmlhttpRequest && /\/search\/?$/.test(normalizedConfig.customApiUrl || "")) {
+      const configUrl = normalizedConfig.customApiUrl.replace(/\/search\/?$/, "/config");
       _GM_xmlhttpRequest({
         method: "PUT",
         url: configUrl,
-        data: JSON.stringify({ config: forminput }),
+        data: JSON.stringify({ config: normalizedConfig }),
         headers: { "Content-Type": "application/json" },
         timeout: 3000,
         onerror: () => console.warn("⚠️ [配置] 后端不可用，已保留本地配置")
       });
     }
+    return true;
   } } });
   const extendedConfigDefaults = {
+    randomPauseEnabled: GENERATED_CONFIG_CONTRACT.defaults.randomPauseEnabled,
+    randomPauseIntervalMin: GENERATED_CONFIG_CONTRACT.defaults.randomPauseIntervalMin,
+    randomPauseIntervalMax: GENERATED_CONFIG_CONTRACT.defaults.randomPauseIntervalMax,
+    randomPauseDurationMin: GENERATED_CONFIG_CONTRACT.defaults.randomPauseDurationMin,
+    randomPauseDurationMax: GENERATED_CONFIG_CONTRACT.defaults.randomPauseDurationMax,
+    videoDiagnosticsEnabled: GENERATED_CONFIG_CONTRACT.defaults.videoDiagnosticsEnabled,
     questionBankEnabled: true,
     tikuHaiEnabled: true,
     yiZhiEnabled: true,
@@ -139,6 +193,18 @@
         { name: "logQuestionPreviewLength", label: "题目预览长度", type: "number", value: 50, desc: "日志中题目最多显示的字符数" },
         { name: "logAnswerPreviewLength", label: "答案预览长度", type: "number", value: 120, desc: "日志中答案最多显示的字符数" }
       ]
+    },
+    {
+      name: "videoDiagnostics",
+      label: "视频诊断",
+      config: [
+        { name: "randomPauseEnabled", label: "启用视频随机暂停", type: "switch", value: GENERATED_CONFIG_CONTRACT.defaults.randomPauseEnabled, desc: "控制是否启用视频随机暂停" },
+        { name: "randomPauseIntervalMin", label: "随机暂停触发间隔最小值(秒)", type: "number", value: GENERATED_CONFIG_CONTRACT.defaults.randomPauseIntervalMin, desc: "随机暂停触发间隔下限" },
+        { name: "randomPauseIntervalMax", label: "随机暂停触发间隔最大值(秒)", type: "number", value: GENERATED_CONFIG_CONTRACT.defaults.randomPauseIntervalMax, desc: "随机暂停触发间隔上限" },
+        { name: "randomPauseDurationMin", label: "随机暂停时长最小值(秒)", type: "number", value: GENERATED_CONFIG_CONTRACT.defaults.randomPauseDurationMin, desc: "随机暂停时长下限" },
+        { name: "randomPauseDurationMax", label: "随机暂停时长最大值(秒)", type: "number", value: GENERATED_CONFIG_CONTRACT.defaults.randomPauseDurationMax, desc: "随机暂停时长上限" },
+        { name: "videoDiagnosticsEnabled", label: "记录本地视频诊断", type: "switch", value: GENERATED_CONFIG_CONTRACT.defaults.videoDiagnosticsEnabled, desc: "只在 Tampermonkey 本地保存脱敏播放器状态，默认保留 7 天" }
+      ]
     }
   ];
   const logCategoriesFor = (message) => {
@@ -180,6 +246,146 @@
     return text;
   };
   const filterRuntimeLogs = (logs) => logs.filter((item) => shouldShowLog(item.msg, item.type));
+  // 视频诊断只保存播放器状态，且始终留在 Tampermonkey 本地存储中。
+  const VIDEO_DIAGNOSTICS_KEY = "videoDiagnostics";
+  const VIDEO_DIAGNOSTICS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+  const VIDEO_DIAGNOSTICS_MAX_EVENTS = 2e3;
+  const VIDEO_DIAGNOSTIC_EVENT_TYPES = new Set(["loadedmetadata", "play", "playing", "pause", "waiting", "stalled", "canplay", "seeking", "seeked", "ratechange", "timeupdate", "ended", "error"]);
+  const diagnosticNumber = (value, minimum = 0, maximum = Number.POSITIVE_INFINITY) => {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return void 0;
+    return Math.min(maximum, Math.max(minimum, Math.round(number * 100) / 100));
+  };
+  const sanitizeVideoDiagnosticEvent = (input, now = Date.now()) => {
+    if (!input || typeof input !== "object") return null;
+    const event = VIDEO_DIAGNOSTIC_EVENT_TYPES.has(input.event) ? input.event : "state";
+    const timestamp = diagnosticNumber(input.timestamp, 0, Number.MAX_SAFE_INTEGER) ?? now;
+    const output = { timestamp: Math.trunc(timestamp), event };
+    const currentTime = diagnosticNumber(input.currentTime);
+    const duration = diagnosticNumber(input.duration);
+    const playbackRate = diagnosticNumber(input.playbackRate, 0, 16);
+    const readyState = diagnosticNumber(input.readyState, 0, 4);
+    const networkState = diagnosticNumber(input.networkState, 0, 3);
+    if (currentTime !== void 0) output.currentTime = currentTime;
+    if (duration !== void 0) output.duration = duration;
+    if (playbackRate !== void 0) output.playbackRate = playbackRate;
+    if (readyState !== void 0) output.readyState = Math.trunc(readyState);
+    if (networkState !== void 0) output.networkState = Math.trunc(networkState);
+    if (typeof input.paused === "boolean") output.paused = input.paused;
+    if (typeof input.ended === "boolean") output.ended = input.ended;
+    return output;
+  };
+  const pruneVideoDiagnostics = (events, now = Date.now()) => {
+    const cutoff = now - VIDEO_DIAGNOSTICS_TTL_MS;
+    if (!Array.isArray(events)) return [];
+    return events.map((item) => sanitizeVideoDiagnosticEvent(item, now)).filter((item) => item && item.timestamp >= cutoff && item.timestamp <= now).slice(-VIDEO_DIAGNOSTICS_MAX_EVENTS);
+  };
+  const readVideoDiagnostics = (now = Date.now()) => {
+    try {
+      const events = _GM_getValue ? _GM_getValue(VIDEO_DIAGNOSTICS_KEY, []) : [];
+      const pruned = pruneVideoDiagnostics(events, now);
+      if (JSON.stringify(events) !== JSON.stringify(pruned) && _GM_setValue) _GM_setValue(VIDEO_DIAGNOSTICS_KEY, pruned);
+      return pruned;
+    } catch (error) {
+      return [];
+    }
+  };
+  const recordVideoDiagnostic = (input, now = Date.now()) => {
+    const event = sanitizeVideoDiagnosticEvent(input, now);
+    if (!event || !_GM_setValue) return null;
+    const next = [...readVideoDiagnostics(now), event].slice(-VIDEO_DIAGNOSTICS_MAX_EVENTS);
+    try {
+      _GM_setValue(VIDEO_DIAGNOSTICS_KEY, next);
+    } catch (error) {
+      return null;
+    }
+    return event;
+  };
+  const clearVideoDiagnostics = () => {
+    try {
+      _GM_setValue && _GM_setValue(VIDEO_DIAGNOSTICS_KEY, []);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  const exportVideoDiagnostics = () => {
+    const data = JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), events: readVideoDiagnostics() }, null, 2);
+    const document2 = _unsafeWindow?.top?.document;
+    if (document2 && typeof Blob !== "undefined" && document2.createElement) {
+      const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+      const link = document2.createElement("a");
+      link.href = url;
+      link.download = `chaoxing-video-diagnostics-${new Date().toISOString().slice(0, 10)}.json`;
+      document2.body && document2.body.append(link);
+      link.click();
+      setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 0);
+    }
+    return data;
+  };
+  const installVideoDiagnostics = (player) => {
+    if (!getConfig().videoDiagnosticsEnabled || !player || typeof player.on !== "function") return () => {
+    };
+    const listeners = [];
+    let lastTimeUpdate = 0;
+    const readPlayerValue = (name) => {
+      try {
+        return typeof player[name] === "function" ? player[name]() : player[name];
+      } catch (error) {
+        return void 0;
+      }
+    };
+    const capture = (event) => {
+      const now = Date.now();
+      if (event === "timeupdate" && now - lastTimeUpdate < 1e3) return;
+      if (event === "timeupdate") lastTimeUpdate = now;
+      recordVideoDiagnostic({
+        timestamp: now,
+        event,
+        currentTime: readPlayerValue("currentTime"),
+        duration: readPlayerValue("duration"),
+        paused: readPlayerValue("paused"),
+        readyState: readPlayerValue("readyState"),
+        networkState: readPlayerValue("networkState"),
+        playbackRate: readPlayerValue("playbackRate"),
+        ended: readPlayerValue("ended")
+      }, now);
+    };
+    ["loadedmetadata", "play", "playing", "pause", "waiting", "stalled", "canplay", "seeking", "seeked", "ratechange", "timeupdate", "ended", "error"].forEach((event) => {
+      const handler = () => capture(event);
+      player.on(event, handler);
+      listeners.push([event, handler]);
+    });
+    capture("loadedmetadata");
+    return () => {
+      if (typeof player.off !== "function") return;
+      listeners.forEach(([event, handler]) => player.off(event, handler));
+    };
+  };
+  const mountVideoDiagnosticsPanel = () => {
+    const document2 = _unsafeWindow?.top?.document;
+    if (!document2 || !document2.body || document2.getElementById("cx-video-diagnostics")) return;
+    const panel = document2.createElement("div");
+    panel.id = "cx-video-diagnostics";
+    panel.style.cssText = "position:fixed;right:20px;bottom:68px;z-index:99999;display:flex;align-items:center;gap:6px;padding:6px 8px;background:#fff;border:1px solid #dcdfe6;box-shadow:0 2px 8px rgba(0,0,0,.12);font:12px sans-serif;color:#606266";
+    const label = document2.createElement("span");
+    const updateLabel = () => { label.textContent = `视频诊断 ${readVideoDiagnostics().length} 条`; };
+    const exportButton = document2.createElement("button");
+    exportButton.type = "button";
+    exportButton.textContent = "导出";
+    exportButton.onclick = () => { exportVideoDiagnostics(); };
+    const clearButton = document2.createElement("button");
+    clearButton.type = "button";
+    clearButton.textContent = "清理";
+    clearButton.onclick = () => {
+      if (typeof _unsafeWindow.top.confirm === "function" && !_unsafeWindow.top.confirm("清理本机视频诊断记录？")) return;
+      clearVideoDiagnostics();
+      updateLabel();
+    };
+    panel.append(label, exportButton, clearButton);
+    document2.body.append(panel);
+    updateLabel();
+  };
   let runtimeLogSink = null;
   const setRuntimeLogSink = (sink) => {
     runtimeLogSink = typeof sink === "function" ? sink : null;
@@ -304,7 +510,15 @@
       dialogV.value = true;
     }, submitForm: async (formEl) => {
       formEl && await formEl.validate((valid, fields) => {
-        valid && (formstoreObj.saveConfig(forminput.value), ElementPlus.ElNotification({ title: "Success", message: "配置保存成功,请自行刷新页面", type: "success" }), dialogV.value = false);
+        if (valid) {
+          const saved = formstoreObj.saveConfig(forminput.value);
+          if (saved) {
+            ElementPlus.ElNotification({ title: "Success", message: "配置保存成功,请自行刷新页面", type: "success" });
+            dialogV.value = false;
+          } else {
+            ElementPlus.ElNotification({ title: "配置无效", message: "随机暂停配置不符合范围或最小值大于最大值", type: "error" });
+          }
+        }
       });
     }, userConfig: [...userConfig, ...extendedUserConfig], Setting: setting_default };
   } }), _export_sfc = (sfc, props) => {
@@ -2264,7 +2478,15 @@
       dialogV.value = true;
     }, submitForm: async (formEl) => {
       formEl && await formEl.validate((valid, fields) => {
-        valid && (formstoreObj.saveConfig(forminput.value), ElementPlus.ElNotification({ title: "Success", message: "配置保存成功,请自行刷新页面", type: "success" }), dialogV.value = false);
+        if (valid) {
+          const saved = formstoreObj.saveConfig(forminput.value);
+          if (saved) {
+            ElementPlus.ElNotification({ title: "Success", message: "配置保存成功,请自行刷新页面", type: "success" });
+            dialogV.value = false;
+          } else {
+            ElementPlus.ElNotification({ title: "配置无效", message: "随机暂停配置不符合范围或最小值大于最大值", type: "error" });
+          }
+        }
       });
     }, userConfig: [...userConfig, ...extendedUserConfig], Setting: setting_default };
   } }), _hoisted_1 = { class: "dialog-footer" }, _hoisted_2 = { key: 0 }, _hoisted_3 = { class: "question_div" }, _hoisted_4 = { class: "question_ti" }, _hoisted_5 = { key: 0 }, _hoisted_6 = { key: 1 }, _hoisted_7 = { key: 2 }, _hoisted_8 = ["innerHTML"], _hoisted_9 = { key: 0, style: { "margin-top": "20px" } }, _hoisted_10 = { key: 1 }, _hoisted_11 = { key: 2 }, _hoisted_12 = { height: "100px" }, _hoisted_13 = ["innerHTML"];
@@ -2305,7 +2527,10 @@
     }
     async video(iframeWindow) {
       this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api"), console.log("视频加载完成");
-      const player = iframeWindow.videojs("video_html5_api"), playerButton = iframeWindow.document.querySelector(".vjs-big-play-button");
+      const player = iframeWindow.videojs("video_html5_api");
+      const config = getConfig();
+      const stopVideoDiagnostics = installVideoDiagnostics(player);
+      mountVideoDiagnosticsPanel();
       player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => {
         const rate = player.playbackRate();
         this.askStore.task.video.status = rate > 1 ? 1 : 0;
@@ -2322,21 +2547,47 @@
         return result;
       };
       startPlayback();
-     let pauseTimer = null;
-     let resumeTimer = null;
+      const pauseBase = player.pause;
+      let allowPlayerPause = false;
+      let playbackFinished = false;
       let randomPauseActive = false;
-     let mouseMoveTimer = null;
+      let pauseTimer = null;
+      let resumeTimer = null;
+      let mouseMoveTimer = null;
+      const pauseForRandomInterval = () => {
+        allowPlayerPause = true;
+        try {
+          return pauseBase.call(player);
+        } finally {
+          allowPlayerPause = false;
+        }
+      };
+      player.pause = function(...args) {
+        if (allowPlayerPause || randomPauseActive || playbackFinished) {
+          return pauseBase.apply(this, args);
+        }
+        return startPlayback();
+      };
+      const handleUnexpectedPause = () => {
+        if (!allowPlayerPause && !randomPauseActive && !playbackFinished) startPlayback();
+      };
+      player.on("pause", handleUnexpectedPause);
 
       // 随机暂停功能
       const scheduleRandomPause = () => {
-        const delay = Math.floor(Math.random() * (93 - 30 + 1) + 30) * 1000;
+        if (config.randomPauseEnabled === false) return;
+        const intervalMin = Math.max(1, Number(config.randomPauseIntervalMin) || 30);
+        const intervalMax = Math.max(intervalMin, Number(config.randomPauseIntervalMax) || 93);
+        const durationMin = Math.max(1, Number(config.randomPauseDurationMin) || 2);
+        const durationMax = Math.max(durationMin, Number(config.randomPauseDurationMax) || 5);
+        const delay = Math.floor(Math.random() * (intervalMax - intervalMin + 1) + intervalMin) * 1000;
         pauseTimer = setTimeout(() => {
           if (!player.paused()) {
-           const pausedAt = Date.now();
+            const pausedAt = Date.now();
             randomPauseActive = true;
-           player.pause();
+            pauseForRandomInterval();
             console.log(`[视频] 已随机暂停，触发间隔: ${delay / 1000}秒`);
-            // 暂停2-5秒后恢复播放
+            // 使用配置的范围暂停后恢复播放
            resumeTimer = setTimeout(() => {
               randomPauseActive = false;
              if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
@@ -2344,7 +2595,7 @@
                 console.log(`[视频] 已恢复播放，实际暂停: ${Math.round((Date.now() - pausedAt) / 1000)}秒`);
                 scheduleRandomPause();
               }
-            }, Math.floor(Math.random() * (5 - 2 + 1) + 2) * 1000);
+            }, Math.floor(Math.random() * (durationMax - durationMin + 1) + durationMin) * 1000);
           }
         }, delay);
       };
@@ -2398,10 +2649,14 @@
 
       await new Promise((resolve) => {
         const cleanup = () => {
+          playbackFinished = true;
           clearInterval(intervalId);
           clearTimeout(pauseTimer);
           clearTimeout(resumeTimer);
           clearTimeout(mouseMoveTimer);
+          if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
+          player.pause = pauseBase;
+          stopVideoDiagnostics();
         };
         const finish = (message) => {
           cleanup();
@@ -2412,7 +2667,6 @@
           if ("isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
             if (!randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
               startPlayback();
-              playerButton == null ? void 0 : playerButton.click();
             }
           } else {
             finish("视频任务状态已完成");

@@ -197,6 +197,7 @@ Content-Type: application/json
 - **启用自定义题库**：开启后优先使用自定义接口
 - **自定义题库地址**：填入 API URL（如 `http://localhost:8002/api/search`）
 - **自定义题库密钥**：填入服务器要求的 API 密钥
+- **本地视频诊断**：可选开启播放器事件记录；数据只保存在 Tampermonkey 本地，默认保留 7 天，可从页面右下角导出或清理
 
 ![脚本配置面板](docs/assets/脚本配置面板.png)
 

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": 1,
+  "title": "Chaoxing Toolkit settings contract",
+  "type": "object",
+  "properties": {
+    "videoDiagnosticsEnabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否在 Tampermonkey 本地记录脱敏视频诊断"
+    },
+    "randomPauseEnabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否启用视频随机暂停"
+    },
+    "randomPauseIntervalMin": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400,
+      "default": 30,
+      "description": "随机暂停触发间隔下限（秒）"
+    },
+    "randomPauseIntervalMax": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400,
+      "default": 93,
+      "description": "随机暂停触发间隔上限（秒）"
+    },
+    "randomPauseDurationMin": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3600,
+      "default": 2,
+      "description": "随机暂停时长下限（秒）"
+    },
+    "randomPauseDurationMax": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3600,
+      "default": 5,
+      "description": "随机暂停时长上限（秒）"
+    }
+  },
+  "required": [
+    "videoDiagnosticsEnabled",
+    "randomPauseEnabled",
+    "randomPauseIntervalMin",
+    "randomPauseIntervalMax",
+    "randomPauseDurationMin",
+    "randomPauseDurationMax"
+  ],
+  "x-constraints": [
+    ["randomPauseIntervalMin", "<=", "randomPauseIntervalMax"],
+    ["randomPauseDurationMin", "<=", "randomPauseDurationMax"]
+  ]
+}

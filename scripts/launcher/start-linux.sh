@@ -89,7 +89,7 @@ workers = int(os.environ.get('WORKERS', 4))
 print(f'启动 {workers} 个工作进程...')
 uvicorn.run(
     'main:app',
-    host='0.0.0.0',
+    host='127.0.0.1',
     port=port,
     workers=workers,
     loop='uvloop',

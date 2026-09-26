@@ -5,6 +5,7 @@
 import os
 import logging
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, HTMLResponse
@@ -13,11 +14,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import (
-    DATABASE_FILE, JSON_FILE, CONFIG_FILE, DEFAULT_PORT, SERVICE_DIR,
+    DATABASE_FILE, JSON_FILE, CONFIG_FILE, IMPORT_BACKUP_DIR, DEFAULT_PORT, SERVICE_DIR,
     RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW,
-    REQUEST_TIMEOUT, MAX_CONCURRENT_REQUESTS
+    REQUEST_TIMEOUT, MAX_CONCURRENT_REQUESTS, get_cors_origins
 )
 from .database import AsyncDatabase
+from .import_service import ImportService
+from .decision_service import DecisionService
 from .middleware import RateLimitMiddleware, rate_limiter, concurrency_counter
 from .routes import search_router, questions_router, pending_router, admin_router, config_router
 from .config_service import ConfigService
@@ -32,16 +35,23 @@ db: AsyncDatabase = None
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     global db
-    db = AsyncDatabase(DATABASE_FILE)
+    database_file = getattr(app.state, "database_file", DATABASE_FILE)
+    json_file = getattr(app.state, "json_file", JSON_FILE)
+    config_file = getattr(app.state, "config_file", CONFIG_FILE)
+
+    db = AsyncDatabase(database_file)
     await db.init_db()
 
     count = await db.get_count()
     if count == 0:
-        await db.import_from_json(JSON_FILE)
+        await db.import_from_json(json_file)
 
     # 将 db 注入到 app.state 以便路由访问
     app.state.db = db
-    app.state.config_service = ConfigService(CONFIG_FILE)
+    app.state.config_service = ConfigService(config_file)
+    app.state.import_service = ImportService(db, app.state.backup_dir)
+    app.state.decision_service = DecisionService(db)
+    await app.state.decision_service.ensure_audit_table()
 
     print(f"题库服务器已启动，共 {count} 道题目")
     print(f"并发限制: {MAX_CONCURRENT_REQUESTS}")
@@ -84,7 +94,13 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-def create_app() -> FastAPI:
+def create_app(
+    *,
+    database_file: Optional[str] = None,
+    json_file: Optional[str] = None,
+    config_file: Optional[str] = None,
+    backup_dir: Optional[str] = None,
+) -> FastAPI:
     """创建 FastAPI 应用实例"""
     app = FastAPI(
         title="司索工题库服务器",
@@ -93,6 +109,50 @@ def create_app() -> FastAPI:
         lifespan=lifespan
     )
 
+    # 测试或嵌入式调用可以注入隔离的运行时文件，生产调用继续使用默认配置。
+    app.state.database_file = database_file or DATABASE_FILE
+    app.state.json_file = json_file or JSON_FILE
+    app.state.config_file = config_file or CONFIG_FILE
+    app.state.backup_dir = backup_dir or str(IMPORT_BACKUP_DIR)
+
+    @app.get("/api/health")
+    async def health_check(req: Request):
+        """报告本机服务、数据库和配置文件的可用状态。"""
+        database_ok = False
+        config_ok = False
+        database_detail = {"status": "unavailable"}
+        config_detail = {"status": "unavailable"}
+        db_instance = getattr(req.app.state, "db", None)
+        if db_instance is not None:
+            try:
+                conn = await db_instance._get_connection()
+                try:
+                    await conn.execute("SELECT 1")
+                    database_ok = True
+                    database_detail = {"status": "ok", "questions": await db_instance.get_count()}
+                finally:
+                    await db_instance._release_connection(conn)
+            except Exception:
+                database_ok = False
+                database_detail = {"status": "error"}
+        try:
+            await req.app.state.config_service.get()
+            config_ok = True
+            config_detail = {"status": "ok"}
+        except Exception:
+            config_ok = False
+            config_detail = {"status": "error"}
+        status = "ok" if database_ok and config_ok else "degraded"
+        return {
+            "code": 1 if status == "ok" else 0,
+            "status": status,
+            "service": {"name": "tiku", "status": status},
+            "database": database_ok,
+            "database_detail": database_detail,
+            "config": config_ok,
+            "config_detail": config_detail,
+        }
+
     # 注册异常处理器
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, global_exception_handler)
@@ -100,8 +160,8 @@ def create_app() -> FastAPI:
     # CORS 中间件
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
+        allow_origins=get_cors_origins(),
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )

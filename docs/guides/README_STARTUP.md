@@ -24,7 +24,7 @@ python scripts/launcher/start.py
 
 1. ✅ 启动题库服务器（端口 8002）
 2. ✅ 打开 Chrome 浏览器（使用配置 `jiahao071016001@gmail.com`）
-3. ✅ 自动打开并登录题库管理界面
+3. ✅ 自动打开题库管理界面（仅本机访问，无需登录）
 4. ✅ 自动打开学习通界面
 
 ## 配置说明
@@ -57,30 +57,13 @@ REM scripts/launcher/start.bat
 set "TIKU_PORT=8002"
 ```
 
-### 修改登录账号
+### 本机访问与健康检查
 
-默认账号为 `admin/admin`，如需修改：
+管理台不再使用伪登录或 URL 凭据。服务默认绑定 `127.0.0.1`，只接受本机访问；启动后可打开 `http://localhost:8002`。
 
-```python
-# scripts/launcher/start.py
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin"
-```
+健康检查地址为 `http://localhost:8002/api/health`，会报告服务、SQLite 数据库和本地配置状态。
 
-然后修改前端 `tiku/frontend/src/views/Login.vue` 中的验证逻辑。
-
-## 自动登录功能
-
-前端已支持 URL 参数自动登录：
-
-```
-http://localhost:8002/#/login?auto=1&user=admin&pass=admin
-```
-
-参数说明：
-- `auto=1`: 启用自动登录
-- `user`: 用户名
-- `pass`: 密码
+默认 CORS 只允许本机来源。前端开发服务器如需跨域调试，可在启动后端前设置 `CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173`；Windows PowerShell 示例：`$env:CORS_ORIGINS='http://localhost:5173,http://127.0.0.1:5173'; python tiku/main.py`。不要把来源设置为 `*`。
 
 ## 使用流程
 
@@ -94,7 +77,7 @@ http://localhost:8002/#/login?auto=1&user=admin&pass=admin
    - 看到 "✓ 题库服务器已启动" 即表示成功
 
 3. **浏览器自动打开**
-   - 题库管理界面会自动登录
+   - 题库管理界面会直接打开
    - 学习通界面会自动打开
 
 4. **配置用户脚本**
@@ -137,12 +120,12 @@ http://localhost:8002/#/login?auto=1&user=admin&pass=admin
 2. Windows: 确认路径 `C:\Program Files\Google\Chrome\Application\chrome.exe`
 3. 手动修改脚本中的 `CHROME_PATH` 变量
 
-### Q: 自动登录不工作
+### Q: 管理台打不开或接口无响应
 
-**A**: 
-1. 确保前端已重新构建：`cd tiku/frontend && npm run build`
-2. 确保静态文件已更新：`cp -r frontend/dist/* static/`
-3. 重启服务器
+**A**:
+1. 打开 `http://localhost:8002/api/health` 查看服务、数据库和配置状态。
+2. 确保端口没有被其他程序占用，并重启服务器。
+3. 管理台只绑定本机；远程设备无法访问是预期行为。
 
 ## 手动启动（备选方案）
 
@@ -174,27 +157,16 @@ chrome --profile-directory="jiahao071016001@gmail.com" https://i.chaoxing.com/ba
 - 自动检测服务状态
 - 按键退出并清理
 
-### 自动登录实现
-
-前端 `Login.vue` 监听 URL 参数：
-```javascript
-onMounted(() => {
-  if (route.query.auto === '1') {
-    username.value = route.query.user
-    password.value = route.query.pass
-    setTimeout(handleLogin, 500)
-  }
-})
-```
-
 ## 安全提示
 
-⚠️ **注意**: URL 参数中包含明文密码，仅适用于本地开发环境。生产环境请使用更安全的认证方式（如 Token、Cookie 等）。
+⚠️ **注意**: 当前管理台不提供认证授权，只绑定本机地址并拒绝默认跨域来源。若要暴露到其他设备，必须先补充正式认证和网络隔离方案。
 
 ## 更新日志
 
+- **2026-09-26**: 收紧本机安全边界
+  - 移除伪登录、sessionStorage 登录标记和 URL 明文凭据
+  - 默认绑定 localhost，增加 `/api/health` 健康检查
 - **2026-09-23**: 创建启动脚本
   - 支持自动启动服务器
   - 支持自动打开浏览器
-  - 支持自动登录管理界面
   - 支持跨平台（Windows/macOS/Linux）

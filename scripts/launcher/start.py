@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 超星学习通自动化系统 - 增强启动脚本
-自动启动服务器、打开浏览器并登录题库管理界面
+自动启动服务器并打开题库管理界面
 """
 
 import os
@@ -19,8 +19,6 @@ CHROME_PROFILE = "Default"  # jiahao001 对应的配置文件目录
 TIKU_PORT = 8002
 CHAOXING_URL = "https://i.chaoxing.com/base?ws=1&t=1790138632014"
 TIKU_URL = f"http://localhost:{TIKU_PORT}"
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin"
 
 def find_chrome():
     """查找 Chrome 浏览器路径"""
@@ -47,7 +45,7 @@ def check_server(port, timeout=30):
 
     while time.time() - start_time < timeout:
         try:
-            urllib.request.urlopen(f"http://localhost:{port}/api/stats", timeout=1)
+            urllib.request.urlopen(f"http://localhost:{port}/api/health", timeout=1)
             print(" ✓")
             return True
         except:
@@ -107,12 +105,9 @@ def open_browser(chrome_path):
     """打开 Chrome 浏览器"""
     print("\n[2/4] 打开题库管理界面...")
 
-    # 打开题库管理界面（带自动登录参数）
-    login_url = f"{TIKU_URL}/#/login?auto=1&user={ADMIN_USERNAME}&pass={ADMIN_PASSWORD}"
-
     try:
         subprocess.Popen(
-            [chrome_path, f"--profile-directory={CHROME_PROFILE}", login_url],
+            [chrome_path, f"--profile-directory={CHROME_PROFILE}", TIKU_URL],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
@@ -145,14 +140,11 @@ def print_instructions():
     print(f"  Chrome 配置: {CHROME_PROFILE}")
 
     print(f"\n使用说明:")
-    print(f"  1. 题库管理界面已自动打开并登录")
+    print(f"  1. 题库管理界面已自动打开（本机无需登录）")
     print(f"  2. 学习通界面已自动打开")
     print(f"  3. 确保已在 Tampermonkey 中安装用户脚本")
     print(f"  4. 在脚本设置中配置题库地址: {TIKU_URL}/api/search")
 
-    print(f"\n默认登录账号:")
-    print(f"  用户名: {ADMIN_USERNAME}")
-    print(f"  密码:   {ADMIN_PASSWORD}")
     print("\n按 Ctrl+C 停止服务器并退出\n")
 
 def main():

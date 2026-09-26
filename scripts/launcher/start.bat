@@ -47,7 +47,7 @@ timeout /t 5 /nobreak >nul
 
 REM 检查服务器是否启动成功
 echo 检查服务器状态...
-curl -s http://localhost:%TIKU_PORT%/api/stats >nul 2>&1
+curl -s http://localhost:%TIKU_PORT%/api/health >nul 2>&1
 if %errorlevel% neq 0 (
     echo [警告] 服务器可能未完全启动，继续等待...
     timeout /t 3 /nobreak >nul
@@ -73,7 +73,7 @@ echo - 学习通界面: %CHAOXING_URL%
 echo - Chrome 配置: %CHROME_PROFILE%
 echo.
 echo 使用说明:
-echo 1. 题库管理界面已自动打开 (默认账号: admin/admin)
+echo 1. 题库管理界面已自动打开（仅本机访问，无需登录）
 echo 2. 学习通界面已自动打开
 echo 3. 确保已在 Tampermonkey 中安装用户脚本
 echo 4. 在脚本设置中配置题库地址: %TIKU_URL%/api/search

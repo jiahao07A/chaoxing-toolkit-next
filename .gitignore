@@ -18,6 +18,7 @@ dist/
 tiku/frontend/dist/
 tiku/data/config.json
 tiku/data/questions.db*
+tiku/data/import_backups/
 tiku/data/*.log
 .env
 .env.*

@@ -7,6 +7,8 @@ import tempfile
 from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
 
+from .generated_config import GENERATED_CONSTRAINTS, GENERATED_DEFAULTS, GENERATED_RULES
+
 
 CONFIG_VERSION = 1
 SECRET_MARKER = "***"
@@ -70,6 +72,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "logQuestionPreviewLength": 50,
     "logAnswerPreviewLength": 120,
 }
+DEFAULT_CONFIG.update(GENERATED_DEFAULTS)
 
 
 def _is_secret(key: str) -> bool:
@@ -79,6 +82,28 @@ def _is_secret(key: str) -> bool:
 
 def _validate(config: Dict[str, Any]) -> Dict[str, Any]:
     validated = deepcopy(config)
+    for key, rule in GENERATED_RULES.items():
+        if key not in validated:
+            continue
+        value = validated[key]
+        if rule.get("type") == "boolean":
+            if not isinstance(value, bool):
+                raise ValueError(f"{key} 必须是布尔值")
+            continue
+        if rule.get("type") == "integer":
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise ValueError(f"{key} 必须是整数")
+            integer_value = value
+            minimum = rule.get("minimum")
+            maximum = rule.get("maximum")
+            if minimum is not None and integer_value < minimum:
+                raise ValueError(f"{key} 不能小于 {minimum}")
+            if maximum is not None and integer_value > maximum:
+                raise ValueError(f"{key} 不能大于 {maximum}")
+            validated[key] = integer_value
+    for left, operator, right in GENERATED_CONSTRAINTS:
+        if operator == "<=" and validated[left] > validated[right]:
+            raise ValueError(f"{left} 必须小于或等于 {right}")
     for key in ("aiRetryCount",):
         if key in validated:
             value = int(validated[key])
@@ -134,7 +159,7 @@ class ConfigService:
             raise ValueError("配置文件格式错误")
         merged = deepcopy(DEFAULT_CONFIG)
         merged.update(stored)
-        return version, merged
+        return version, _validate(merged)
 
     def _write(self, version: int, config: Dict[str, Any]) -> None:
         directory = os.path.dirname(os.path.abspath(self.path))

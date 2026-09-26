@@ -36,13 +36,21 @@
 import { reactive, ref, onMounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getConfig, updateConfig } from '../api'
+import { GENERATED_CONFIG_FIELDS } from '../generated/config'
 
 const loading = ref(true)
 const saving = ref(false)
 const version = ref(1)
 const form = reactive({})
 
+const generatedFields = GENERATED_CONFIG_FIELDS.map((field) => [
+  field.key,
+  field.description,
+  field.type === 'integer' ? 'number' : field.type
+])
+
 const fields = [
+  ...generatedFields,
   ['debugger', '调试模式', 'boolean'],
   ['thtoken', '题库海密钥', 'text', true],
   ['yztoken', '一之题库密钥', 'text', true],

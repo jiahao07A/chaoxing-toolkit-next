@@ -9,6 +9,7 @@
       />
       <button class="tool-btn primary" @click="openCreateModal">新增</button>
       <button class="tool-btn" @click="showImportModal">导入</button>
+      <button class="tool-btn" @click="backupVisible = true">备份</button>
       <button class="tool-btn" @click="handleExport">导出</button>
     </div>
 
@@ -42,6 +43,11 @@
       v-model:visible="importVisible"
       @imported="onImported"
     />
+
+    <BackupModal
+      v-model:visible="backupVisible"
+      @restored="onImported"
+    />
   </div>
 </template>
 
@@ -52,6 +58,7 @@ import { getQuestions, deleteQuestion as apiDelete, exportJson } from '../api'
 import QuestionCard from '../components/QuestionCard.vue'
 import QuestionForm from '../components/QuestionForm.vue'
 import ImportModal from '../components/ImportModal.vue'
+import BackupModal from '../components/BackupModal.vue'
 
 const questions = ref([])
 const total = ref(0)
@@ -60,6 +67,7 @@ const searchText = ref('')
 const formVisible = ref(false)
 const editingQuestion = ref(null)
 const importVisible = ref(false)
+const backupVisible = ref(false)
 
 const loadQuestions = async () => {
   try {

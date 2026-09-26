@@ -29,10 +29,12 @@ start "Tiku Server" /MIN cmd /c "set PORT=%TIKU_PORT% && venv\Scripts\python.exe
 REM Wait for server (using ping instead of timeout to avoid Ctrl+C issues)
 echo Waiting for server to start...
 ping 127.0.0.1 -n 8 >nul 2>&1
+curl -s http://localhost:%TIKU_PORT%/api/health >nul 2>&1
+if %errorlevel% neq 0 echo [WARN] Service health check did not pass yet.
 
 echo.
 echo [2/3] Opening admin panel...
-start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --profile-directory="%CHROME_PROFILE%" "http://localhost:%TIKU_PORT%/#/login?auto=1&user=admin&pass=admin"
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --profile-directory="%CHROME_PROFILE%" "http://localhost:%TIKU_PORT%"
 
 REM Short delay
 ping 127.0.0.1 -n 3 >nul 2>&1
@@ -51,9 +53,7 @@ echo   Admin Panel: http://localhost:%TIKU_PORT%
 echo   API Endpoint: http://localhost:%TIKU_PORT%/api/search
 echo   Chrome Profile: %CHROME_PROFILE% (jiahao001)
 echo.
-echo Admin Login:
-echo   Username: admin
-echo   Password: admin
+echo Admin Panel: local-only, no login required
 echo.
 echo Tampermonkey Setup:
 echo   Configure API URL: http://localhost:%TIKU_PORT%/api/search

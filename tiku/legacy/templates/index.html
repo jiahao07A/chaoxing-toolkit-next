@@ -362,19 +362,8 @@
 </head>
 <body>
 <div id="app">
-  <!-- Login -->
-  <div v-if="!isLoggedIn" class="login-overlay">
-    <div class="login-box">
-      <div class="login-title">題庫</div>
-      <div class="login-sub">QUESTION BANK SYSTEM</div>
-      <input class="login-input" placeholder="用户名" v-model="loginForm.username" @keyup.enter="handleLogin">
-      <input class="login-input" placeholder="密码" type="password" v-model="loginForm.password" @keyup.enter="handleLogin">
-      <button class="login-btn" @click="handleLogin">进入</button>
-    </div>
-  </div>
-
   <!-- Main -->
-  <div v-else class="app-layout">
+  <div class="app-layout">
     <header class="app-header">
       <div class="header-left">
         <span class="header-logo">題庫</span>
@@ -390,7 +379,6 @@
           <span class="stat-label">待处理</span>
           <span class="stat-num">{{ stats.pending }}</span>
         </div>
-        <button class="logout-btn" @click="logout">退出</button>
       </div>
     </header>
 
@@ -539,8 +527,6 @@ const typeMap = {'0':'单选题','1':'多选题','2':'填空题','3':'判断题'
 
 createApp({
   setup() {
-    const isLoggedIn = ref(sessionStorage.getItem('isLoggedIn')==='true');
-    const loginForm = reactive({username:'',password:''});
     const currentTab = ref('questions');
     const questions = ref([]);
     const questionTotal = ref(0);
@@ -572,16 +558,6 @@ createApp({
       '0':'如: A', '1':'如: A#B#C', '2':'如: 答案1|答案2',
       '3':'正确', '4':'简答内容', '5':'名词解释', '6':'论述内容', '7':'计算结果'
     }[form.type]||'输入答案'));
-
-    const handleLogin = () => {
-      if (loginForm.username==='admin' && loginForm.password==='admin') {
-        isLoggedIn.value = true;
-        sessionStorage.setItem('isLoggedIn','true');
-        loadStats(); loadQuestions();
-      } else { ElementPlus.ElMessage.error('用户名或密码错误'); }
-    };
-
-    const logout = () => { isLoggedIn.value=false; sessionStorage.removeItem('isLoggedIn'); };
 
     const loadStats = async () => {
       try {
@@ -694,10 +670,9 @@ createApp({
       return d.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
     };
 
-    onMounted(() => { if(isLoggedIn.value){loadStats();loadQuestions();} });
+    onMounted(() => { loadStats(); loadQuestions(); });
 
     return {
-      isLoggedIn, loginForm, handleLogin, logout,
       currentTab, switchTab,
       questions, questionTotal, questionPage, loadQuestions,
       searchText, debounceSearch,

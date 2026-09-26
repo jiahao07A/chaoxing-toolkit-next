@@ -15,7 +15,7 @@ Chrome 工作区已修正为：**Default**（对应 jiahao001 账号）
 
 1. ✅ 启动题库服务器（http://localhost:8002）
 2. ✅ 打开题库管理界面（使用 Default 工作区，jiahao001 账号）
-3. ✅ 自动登录管理后台（admin/admin）
+3. ✅ 打开仅供本机访问的管理后台（无需登录）
 4. ✅ 打开学习通页面（使用 Default 工作区，jiahao001 账号）
 
 ## 🎯 确认配置

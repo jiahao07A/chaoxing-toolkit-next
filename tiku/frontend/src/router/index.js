@@ -2,11 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/Login.vue')
-  },
-  {
     path: '/',
     component: () => import('../views/Layout.vue'),
     redirect: '/questions',
@@ -25,6 +20,11 @@ const routes = [
         path: 'settings',
         name: 'Settings',
         component: () => import('../views/Settings.vue')
+      },
+      {
+        path: 'match-quality',
+        name: 'MatchQuality',
+        component: () => import('../views/MatchQuality.vue')
       }
     ]
   }
@@ -33,15 +33,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
-})
-
-router.beforeEach((to, from, next) => {
-  const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true'
-  if (to.path !== '/login' && !isLoggedIn) {
-    next('/login')
-  } else {
-    next()
-  }
 })
 
 export default router

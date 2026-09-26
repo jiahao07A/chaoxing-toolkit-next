@@ -18,3 +18,23 @@ python main.py
 ```
 
 默认服务地址为 `http://localhost:8002`。
+服务仅绑定本机地址；健康检查为 `http://localhost:8002/api/health`。管理台不使用伪登录，打开后即可使用。
+
+## 运行后端测试
+
+测试使用临时目录中的 SQLite 文件，不会连接或修改本机运行数据库：
+
+```powershell
+tiku\venv\Scripts\python.exe -m pip install -r tiku\requirements-dev.txt
+tiku\venv\Scripts\python.exe -m pytest -q
+```
+
+## 配置契约
+
+修改 `config/settings.schema.json` 后，在仓库根目录运行：
+
+```powershell
+python scripts/generate_config_contract.py
+```
+
+生成器会同步更新后端、管理台和用户脚本中的配置契约，并写入同一份 schema 哈希。

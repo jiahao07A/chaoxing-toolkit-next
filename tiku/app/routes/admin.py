@@ -12,7 +12,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.responses import FileResponse
 
-from ..config import JSON_FILE
+from ..schemas import ImportCommitRequest
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -25,59 +25,103 @@ async def get_stats(req: Request):
     return {"code": 1, "data": {"total": total, "pending": pending}}
 
 
-@router.post("/api/import-json")
-async def import_json(req: Request, file: UploadFile = File(None)):
-    db = req.app.state.db
+@router.get("/api/decisions/audit")
+async def list_decision_audits(req: Request, limit: int = 100, request_digest: str | None = None):
+    if not 1 <= limit <= 500:
+        raise HTTPException(status_code=422, detail="limit 必须在 1-500 之间")
+    audits = await req.app.state.decision_service.list_audits(limit, request_digest)
+    return {"code": 1, "data": audits}
+
+
+@router.get("/api/decisions/match-quality")
+async def list_match_quality(
+    req: Request,
+    page: int = 1,
+    page_size: int = 20,
+    match_stage: str | None = None,
+    status: str | None = None,
+    found: bool | None = None,
+):
+    """匹配质量只读工作台数据，不触发搜索、入队或其他写操作。"""
+    if page < 1:
+        raise HTTPException(status_code=422, detail="page 必须大于等于 1")
+    if not 1 <= page_size <= 100:
+        raise HTTPException(status_code=422, detail="page_size 必须在 1-100 之间")
+    data = await req.app.state.decision_service.list_match_quality(
+        page=page,
+        page_size=page_size,
+        match_stage=match_stage,
+        status=status,
+        found=found,
+    )
+    return {"code": 1, "data": data}
+
+
+@router.post("/api/import-json/preview")
+async def preview_import_json(req: Request, file: UploadFile = File(...)):
     try:
-        if file is None:
-            if not os.path.exists(JSON_FILE):
-                raise HTTPException(status_code=404, detail="找不到默认JSON文件")
-            success = await db.import_from_json(JSON_FILE)
-        else:
-            try:
-                content = await file.read()
-                content_str = content.decode('utf-8')
-                questions = json.loads(content_str)
-
-                if not isinstance(questions, list):
-                    raise HTTPException(status_code=400, detail="JSON格式错误：根元素必须是数组")
-
-                for i, q in enumerate(questions):
-                    if not isinstance(q, dict):
-                        raise HTTPException(status_code=400, detail=f"第{i+1}个题目格式错误：必须是对象")
-                    if 'question' not in q:
-                        raise HTTPException(status_code=400, detail=f"第{i+1}个题目缺少'question'字段")
-                    if 'type' not in q:
-                        raise HTTPException(status_code=400, detail=f"第{i+1}个题目缺少'type'字段")
-                    if 'answer' not in q:
-                        raise HTTPException(status_code=400, detail=f"第{i+1}个题目缺少'answer'字段")
-
-                temp_dir = tempfile.gettempdir()
-                temp_file = os.path.join(temp_dir, f"tiku_import_{os.getpid()}_{datetime.now().strftime('%Y%m%d%H%M%S')}.json")
-
-                with open(temp_file, 'w', encoding='utf-8') as f:
-                    f.write(content_str)
-
-                try:
-                    success = await db.import_from_json(temp_file)
-                finally:
-                    if os.path.exists(temp_file):
-                        os.remove(temp_file)
-            except UnicodeDecodeError:
-                raise HTTPException(status_code=400, detail="文件编码错误，请使用UTF-8编码的JSON文件")
-            except json.JSONDecodeError as e:
-                raise HTTPException(status_code=400, detail=f"JSON解析错误: {str(e)}")
-
-        if success:
-            total = await db.get_count()
-            return {"code": 1, "msg": "导入成功", "total": total}
-        else:
-            raise HTTPException(status_code=500, detail="导入失败，请检查JSON文件格式")
-    except HTTPException:
-        raise
+        content = await file.read(10 * 1024 * 1024 + 1)
+        report = await req.app.state.import_service.preview(content, file.filename or "题库.json")
+        return {"code": 1, "data": report}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as e:
-        logger.error(f"导入JSON失败: {e}")
-        raise HTTPException(status_code=500, detail=f"导入失败: {str(e)}")
+        logger.error(f"题库导入预检失败: {e}")
+        raise HTTPException(status_code=500, detail="题库导入预检失败") from e
+
+
+@router.post("/api/import-json")
+async def legacy_import_json(req: Request, file: UploadFile = File(None)):
+    """兼容旧入口，但只执行预检，不再绕过安全提交流程。"""
+    if file is None:
+        json_file = req.app.state.json_file
+        if not os.path.exists(json_file):
+            raise HTTPException(status_code=404, detail="找不到默认 JSON 文件")
+        with open(json_file, "rb") as source:
+            content = source.read(10 * 1024 * 1024 + 1)
+        source_name = os.path.basename(json_file)
+    else:
+        content = await file.read(10 * 1024 * 1024 + 1)
+        source_name = file.filename or "题库.json"
+    try:
+        report = await req.app.state.import_service.preview(content, source_name)
+        return {"code": 1, "msg": "预检完成，请确认后提交", "data": report}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/import-json/commit")
+async def commit_import_json(req: Request, request: ImportCommitRequest):
+    try:
+        result = await req.app.state.import_service.commit(request.run_id)
+        return {"code": 1, "msg": "导入成功", "data": result}
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as e:
+        logger.error(f"题库导入提交失败: {e}")
+        raise HTTPException(status_code=500, detail="题库导入提交失败") from e
+
+
+@router.get("/api/import-backups")
+async def list_import_backups(req: Request):
+    try:
+        backups = await req.app.state.import_service.list_backups()
+        return {"code": 1, "data": backups}
+    except Exception as e:
+        logger.error(f"获取题库备份失败: {e}")
+        raise HTTPException(status_code=500, detail="获取题库备份失败") from e
+
+
+@router.post("/api/import-backups/{backup_id}/restore")
+async def restore_import_backup(backup_id: str, req: Request):
+    try:
+        result = await req.app.state.import_service.restore(backup_id)
+        return {"code": 1, "msg": "题库备份已恢复", "data": result}
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as e:
+        logger.error(f"恢复题库备份失败: {e}")
+        raise HTTPException(status_code=500, detail="恢复题库备份失败") from e
 
 
 @router.get("/api/export-json")

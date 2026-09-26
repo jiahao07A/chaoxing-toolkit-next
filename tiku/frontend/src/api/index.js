@@ -26,9 +26,14 @@ export const deleteQuestion = (id) => api.delete(`/questions/${id}`)
 export const getPending = (params) => api.get('/pending', { params })
 export const deletePending = (id) => api.delete(`/pending/${id}`)
 export const pendingToQuestion = (id, data) => api.post(`/pending/${id}/to-question`, data)
+export const batchDeletePending = (ids, confirm = true) => api.post('/pending/batch/delete', { ids, confirm })
+export const batchPromotePending = (items) => api.post('/pending/batch/promote', { items })
+export const getPendingHistory = (params) => api.get('/pending/history', { params })
 
 export const getStats = () => api.get('/stats')
-export const importJson = (formData) => api.post('/import-json', formData, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-})
+export const getDecisionAudits = (params) => api.get('/decisions/match-quality', { params })
+export const previewImportJson = (formData) => api.post('/import-json/preview', formData)
+export const commitImportJson = (runId) => api.post('/import-json/commit', { run_id: runId })
+export const getImportBackups = () => api.get('/import-backups')
+export const restoreImportBackup = (id) => api.post(`/import-backups/${id}/restore`)
 export const exportJson = () => '/api/export-json'

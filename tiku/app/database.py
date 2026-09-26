@@ -6,7 +6,8 @@ import json
 import os
 import asyncio
 import logging
-from typing import List, Optional
+import uuid
+from typing import Any, Dict, List, Optional, Sequence
 
 import aiosqlite
 
@@ -83,9 +84,33 @@ class AsyncDatabase:
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
+                await conn.execute('''
+                    CREATE TABLE IF NOT EXISTS pending_operation_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        batch_id TEXT NOT NULL,
+                        operation TEXT NOT NULL,
+                        actor TEXT NOT NULL DEFAULT 'local',
+                        requested_count INTEGER NOT NULL DEFAULT 0,
+                        success_count INTEGER NOT NULL DEFAULT 0,
+                        skipped_count INTEGER NOT NULL DEFAULT 0,
+                        failed_count INTEGER NOT NULL DEFAULT 0,
+                        result TEXT NOT NULL,
+                        failure_reason TEXT,
+                        details TEXT NOT NULL DEFAULT '[]',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
                 await conn.execute('CREATE INDEX IF NOT EXISTS idx_question ON questions(question)')
                 await conn.execute('CREATE INDEX IF NOT EXISTS idx_pending_question ON pending_questions(question)')
                 await conn.execute('CREATE INDEX IF NOT EXISTS idx_type ON questions(type)')
+                await conn.execute(
+                    'CREATE INDEX IF NOT EXISTS idx_pending_history_created '
+                    'ON pending_operation_history(created_at)'
+                )
+                await conn.execute(
+                    'CREATE INDEX IF NOT EXISTS idx_pending_history_batch '
+                    'ON pending_operation_history(batch_id)'
+                )
 
                 # 迁移：检查 pending_questions 是否有 options 列
                 cursor = await conn.execute("PRAGMA table_info(pending_questions)")
@@ -99,6 +124,9 @@ class AsyncDatabase:
                 self._initialized = True
             finally:
                 await self._release_connection(conn)
+
+        # 过期历史只在启动时做一次轻量清理；调用方也可以显式触发清理。
+        await self.cleanup_pending_operation_history()
 
     async def import_from_json(self, json_file: str) -> bool:
         if not os.path.exists(json_file):
@@ -544,6 +572,55 @@ class AsyncDatabase:
             except Exception as e:
                 logger.error(f"添加待处理题目失败: {e}")
 
+    @staticmethod
+    def _normalize_pending_value(value: Any) -> str:
+        """使用保守规则生成重复提示键：只折叠空白，不改变标点和大小写。"""
+        return ' '.join(str(value or '').strip().split())
+
+    @classmethod
+    def _pending_duplicate_key(cls, question: str, question_type: str, options: Sequence[str]) -> str:
+        normalized_options = [cls._normalize_pending_value(option) for option in (options or [])]
+        return json.dumps(
+            [cls._normalize_pending_value(question), cls._normalize_pending_value(question_type), normalized_options],
+            ensure_ascii=False,
+            separators=(',', ':'),
+        )
+
+    async def _pending_duplicate_metadata(self, conn: aiosqlite.Connection) -> Dict[str, dict]:
+        """返回待处理记录的重复提示元数据，不执行任何合并或删除。"""
+        cursor = await conn.execute('SELECT id, question, type, options FROM pending_questions')
+        pending_rows = await cursor.fetchall()
+        cursor = await conn.execute('SELECT question, type, options FROM questions')
+        question_rows = await cursor.fetchall()
+
+        pending_by_key: Dict[str, List[int]] = {}
+        question_keys = set()
+        for row in pending_rows:
+            try:
+                options = json.loads(row['options']) if row['options'] else []
+            except (json.JSONDecodeError, TypeError):
+                options = []
+            key = self._pending_duplicate_key(row['question'], row['type'], options)
+            pending_by_key.setdefault(key, []).append(row['id'])
+        for row in question_rows:
+            try:
+                options = json.loads(row['options']) if row['options'] else []
+            except (json.JSONDecodeError, TypeError):
+                options = []
+            question_keys.add(self._pending_duplicate_key(row['question'], row['type'], options))
+
+        metadata = {}
+        for key, ids in pending_by_key.items():
+            if len(ids) <= 1 and key not in question_keys:
+                continue
+            for pending_id in ids:
+                metadata[str(pending_id)] = {
+                    'duplicate': True,
+                    'duplicate_ids': [item for item in ids if item != pending_id],
+                    'duplicate_in_questions': key in question_keys,
+                }
+        return metadata
+
     async def get_pending_questions(self, limit: int = 100, offset: int = 0, search: str = "", sort: str = "count") -> List[dict]:
         limit = max(1, min(limit, MAX_LIMIT))
         offset = max(0, min(offset, MAX_OFFSET))
@@ -561,15 +638,16 @@ class AsyncDatabase:
                 if search and search.strip():
                     keyword = search.strip().replace('%', '').replace('_', '')
                     cursor = await conn.execute(
-                        f'SELECT * FROM pending_questions WHERE question LIKE ? ORDER BY {order} LIMIT ? OFFSET ?',
+                        f'SELECT * FROM pending_questions WHERE question LIKE ? ORDER BY {order}, id DESC LIMIT ? OFFSET ?',
                         (f'%{keyword}%', limit, offset)
                     )
                 else:
                     cursor = await conn.execute(
-                        f'SELECT * FROM pending_questions ORDER BY {order} LIMIT ? OFFSET ?',
+                        f'SELECT * FROM pending_questions ORDER BY {order}, id DESC LIMIT ? OFFSET ?',
                         (limit, offset)
                     )
                 rows = await cursor.fetchall()
+                duplicate_metadata = await self._pending_duplicate_metadata(conn)
                 return [{
                     'id': row['id'],
                     'question': row['question'],
@@ -577,7 +655,12 @@ class AsyncDatabase:
                     'options': json.loads(row['options']) if row['options'] else [],
                     'search_count': row['search_count'],
                     'created_at': row['created_at'],
-                    'updated_at': row['updated_at']
+                    'updated_at': row['updated_at'],
+                    **duplicate_metadata.get(str(row['id']), {
+                        'duplicate': False,
+                        'duplicate_ids': [],
+                        'duplicate_in_questions': False,
+                    }),
                 } for row in rows]
             finally:
                 await self._release_connection(conn)
@@ -615,8 +698,24 @@ class AsyncDatabase:
                     cursor = await conn.execute(
                         'DELETE FROM pending_questions WHERE id = ?', (pending_id,)
                     )
+                    deleted = cursor.rowcount > 0
+                    await self._insert_pending_history(
+                        conn,
+                        batch_id=str(uuid.uuid4()),
+                        operation='delete',
+                        requested_count=1,
+                        success_count=1 if deleted else 0,
+                        skipped_count=0 if deleted else 1,
+                        failed_count=0,
+                        result='success' if deleted else 'skipped',
+                        details=[{
+                            'id': pending_id,
+                            'status': 'success' if deleted else 'skipped',
+                            **({} if deleted else {'reason': 'not_found'}),
+                        }],
+                    )
                     await conn.commit()
-                    return cursor.rowcount > 0
+                    return deleted
                 finally:
                     await self._release_connection(conn)
             except Exception as e:
@@ -634,6 +733,18 @@ class AsyncDatabase:
                     'SELECT id FROM pending_questions WHERE id = ?', (pending_id,)
                 )
                 if not await cursor.fetchone():
+                    await self._insert_pending_history(
+                        conn,
+                        batch_id=str(uuid.uuid4()),
+                        operation='promote',
+                        requested_count=1,
+                        success_count=0,
+                        skipped_count=1,
+                        failed_count=0,
+                        result='skipped',
+                        details=[{'id': pending_id, 'status': 'skipped', 'reason': 'not_found'}],
+                    )
+                    await conn.commit()
                     return None
                 cursor = await conn.execute(
                     'INSERT INTO questions (question, type, options, answer) VALUES (?, ?, ?, ?)',
@@ -641,6 +752,17 @@ class AsyncDatabase:
                      json.dumps(question.options, ensure_ascii=False), question.answer)
                 )
                 await conn.execute('DELETE FROM pending_questions WHERE id = ?', (pending_id,))
+                await self._insert_pending_history(
+                    conn,
+                    batch_id=str(uuid.uuid4()),
+                    operation='promote',
+                    requested_count=1,
+                    success_count=1,
+                    skipped_count=0,
+                    failed_count=0,
+                    result='success',
+                    details=[{'id': pending_id, 'status': 'success', 'question_id': cursor.lastrowid}],
+                )
                 await conn.commit()
                 self._question_count = None
                 return cursor.lastrowid
@@ -649,6 +771,234 @@ class AsyncDatabase:
                 raise
             finally:
                 await self._release_connection(conn)
+
+    async def _insert_pending_history(
+        self,
+        conn: aiosqlite.Connection,
+        *,
+        batch_id: str,
+        operation: str,
+        requested_count: int,
+        success_count: int,
+        skipped_count: int,
+        failed_count: int,
+        result: str,
+        details: List[dict],
+        failure_reason: Optional[str] = None,
+    ) -> None:
+        await conn.execute(
+            '''INSERT INTO pending_operation_history
+               (batch_id, operation, actor, requested_count, success_count,
+                skipped_count, failed_count, result, failure_reason, details)
+               VALUES (?, ?, 'local', ?, ?, ?, ?, ?, ?, ?)''',
+            (
+                batch_id,
+                operation,
+                requested_count,
+                success_count,
+                skipped_count,
+                failed_count,
+                result,
+                failure_reason,
+                json.dumps(details, ensure_ascii=False),
+            ),
+        )
+
+    async def batch_delete_pending_questions(self, pending_ids: Sequence[int], confirm: bool = False) -> dict:
+        """按明确 ID 集合删除待处理题目，要求调用方提供二次确认。"""
+        if not confirm:
+            raise ValueError('批量删除需要 confirm=true')
+        ids = list(dict.fromkeys(int(item) for item in pending_ids))
+        if not ids or any(item <= 0 or item > 2147483647 for item in ids):
+            raise ValueError('题目 ID 必须是正整数')
+
+        batch_id = str(uuid.uuid4())
+        details = []
+        success = skipped = failed = 0
+        async with self._write_lock:
+            conn = await self._get_connection()
+            try:
+                await conn.execute('BEGIN')
+                for pending_id in ids:
+                    try:
+                        cursor = await conn.execute(
+                            'DELETE FROM pending_questions WHERE id = ?', (pending_id,)
+                        )
+                        if cursor.rowcount:
+                            success += 1
+                            details.append({'id': pending_id, 'status': 'success'})
+                        else:
+                            skipped += 1
+                            details.append({'id': pending_id, 'status': 'skipped', 'reason': 'not_found'})
+                    except Exception as exc:
+                        failed += 1
+                        details.append({'id': pending_id, 'status': 'failed', 'reason': str(exc)})
+                result = 'success' if failed == 0 and skipped == 0 else ('partial' if success else 'failed')
+                await self._insert_pending_history(
+                    conn, batch_id=batch_id, operation='delete', requested_count=len(ids),
+                    success_count=success, skipped_count=skipped, failed_count=failed,
+                    result=result, details=details,
+                    failure_reason=next((item['reason'] for item in details if item['status'] == 'failed'), None),
+                )
+                await conn.commit()
+            except Exception:
+                await conn.rollback()
+                raise
+            finally:
+                await self._release_connection(conn)
+        return {
+            'batch_id': batch_id,
+            'requested': len(ids),
+            'success': success,
+            'skipped': skipped,
+            'failed': failed,
+            'details': details,
+        }
+
+    async def batch_promote_pending_questions(self, items: Sequence[dict]) -> dict:
+        """按明确 ID 集合逐条转正，并在一次事务中提交可处理记录。"""
+        if not items:
+            raise ValueError('至少需要一条待处理题目')
+        ids = [int(item['id']) for item in items]
+        if len(set(ids)) != len(ids) or any(item <= 0 or item > 2147483647 for item in ids):
+            raise ValueError('题目 ID 必须是正整数且不能重复')
+
+        batch_id = str(uuid.uuid4())
+        details = []
+        success = skipped = failed = 0
+        async with self._write_lock:
+            conn = await self._get_connection()
+            try:
+                await conn.execute('BEGIN')
+                for index, item in enumerate(items):
+                    pending_id = int(item['id'])
+                    savepoint = f'pending_promote_{index}'
+                    await conn.execute(f'SAVEPOINT {savepoint}')
+                    try:
+                        cursor = await conn.execute(
+                            'SELECT id FROM pending_questions WHERE id = ?', (pending_id,)
+                        )
+                        if not await cursor.fetchone():
+                            await conn.execute(f'RELEASE SAVEPOINT {savepoint}')
+                            skipped += 1
+                            details.append({'id': pending_id, 'status': 'skipped', 'reason': 'not_found'})
+                            continue
+                        cursor = await conn.execute(
+                            'INSERT INTO questions (question, type, options, answer) VALUES (?, ?, ?, ?)',
+                            (
+                                str(item['question']).strip(),
+                                str(item['type']).strip(),
+                                json.dumps(item.get('options') or [], ensure_ascii=False),
+                                str(item['answer']).strip(),
+                            ),
+                        )
+                        await conn.execute('DELETE FROM pending_questions WHERE id = ?', (pending_id,))
+                        await conn.execute(f'RELEASE SAVEPOINT {savepoint}')
+                        success += 1
+                        details.append({
+                            'id': pending_id,
+                            'status': 'success',
+                            'question_id': cursor.lastrowid,
+                        })
+                    except Exception as exc:
+                        await conn.execute(f'ROLLBACK TO SAVEPOINT {savepoint}')
+                        await conn.execute(f'RELEASE SAVEPOINT {savepoint}')
+                        failed += 1
+                        details.append({'id': pending_id, 'status': 'failed', 'reason': str(exc)})
+                result = 'success' if failed == 0 and skipped == 0 else ('partial' if success else 'failed')
+                await self._insert_pending_history(
+                    conn, batch_id=batch_id, operation='promote', requested_count=len(items),
+                    success_count=success, skipped_count=skipped, failed_count=failed,
+                    result=result, details=details,
+                    failure_reason=next((item['reason'] for item in details if item['status'] == 'failed'), None),
+                )
+                await conn.commit()
+                if success:
+                    self._question_count = None
+            except Exception:
+                await conn.rollback()
+                raise
+            finally:
+                await self._release_connection(conn)
+        return {
+            'batch_id': batch_id,
+            'requested': len(items),
+            'success': success,
+            'skipped': skipped,
+            'failed': failed,
+            'details': details,
+        }
+
+    async def get_pending_operation_history(
+        self,
+        page: int = 1,
+        page_size: int = 50,
+        operation: str = '',
+    ) -> dict:
+        page = max(1, int(page))
+        page_size = max(1, min(int(page_size), 100))
+        offset = (page - 1) * page_size
+        operation = operation.strip()
+        try:
+            conn = await self._get_connection()
+            try:
+                where = 'WHERE operation = ?' if operation else ''
+                params = (operation,) if operation else ()
+                cursor = await conn.execute(
+                    f'SELECT COUNT(*) FROM pending_operation_history {where}', params
+                )
+                total_row = await cursor.fetchone()
+                total = int(total_row[0] if total_row else 0)
+                cursor = await conn.execute(
+                    f'''SELECT * FROM pending_operation_history {where}
+                        ORDER BY id DESC LIMIT ? OFFSET ?''',
+                    (*params, page_size, offset),
+                )
+                rows = await cursor.fetchall()
+                items = []
+                for row in rows:
+                    try:
+                        details = json.loads(row['details']) if row['details'] else []
+                    except (json.JSONDecodeError, TypeError):
+                        details = []
+                    items.append({
+                        'id': row['id'],
+                        'batch_id': row['batch_id'],
+                        'operation': row['operation'],
+                        'actor': row['actor'],
+                        'requested': row['requested_count'],
+                        'success': row['success_count'],
+                        'skipped': row['skipped_count'],
+                        'failed': row['failed_count'],
+                        'result': row['result'],
+                        'failure_reason': row['failure_reason'],
+                        'details': details,
+                        'created_at': row['created_at'],
+                    })
+                return {'page': page, 'page_size': page_size, 'total': total, 'items': items}
+            finally:
+                await self._release_connection(conn)
+        except Exception:
+            logger.exception('获取待处理操作历史失败')
+            raise
+
+    async def cleanup_pending_operation_history(self, retention_days: int = 90) -> int:
+        retention_days = max(1, int(retention_days))
+        try:
+            conn = await self._get_connection()
+            try:
+                cursor = await conn.execute(
+                    "DELETE FROM pending_operation_history "
+                    "WHERE created_at < datetime('now', ?)",
+                    (f'-{retention_days} days',),
+                )
+                await conn.commit()
+                return max(0, cursor.rowcount)
+            finally:
+                await self._release_connection(conn)
+        except Exception as exc:
+            logger.error(f'清理待处理操作历史失败: {exc}')
+            return 0
 
     def _row_to_dict(self, row) -> dict:
         if row is None:

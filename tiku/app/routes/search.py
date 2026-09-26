@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request
 
 from ..schemas import SearchRequest, SearchResponse
 from ..config import API_KEY
-from ..answer_service import AnswerService
+from ..decision_service import DecisionService
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def search_answer(request: SearchRequest, req: Request):
     if API_KEY and request.key and request.key != API_KEY:
         return SearchResponse(code=0, msg="密钥无效", data={})
 
-    result = await AnswerService(req.app.state.db).search(
+    result = await DecisionService(req.app.state.db).search(
         request.question, request.type, request.options
     )
     if result["found"]:

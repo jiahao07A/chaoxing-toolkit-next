@@ -13,9 +13,9 @@
   API 接口: http://localhost:8002/api/search
   学习通页: https://i.chaoxing.com/base
 
-【登录信息】
-  用户名: admin
-  密码: admin
+【本机安全】
+  管理台无需登录，仅绑定本机地址
+  健康检查: http://localhost:8002/api/health
 
 【Chrome 配置】
   工作区: Profile 4
@@ -42,8 +42,8 @@
   Q: 端口 8002 被占用？
   A: 运行 scripts/launcher/stop.bat 或修改脚本中的 TIKU_PORT
 
-  Q: 题库管理界面未自动登录？
-  A: 手动输入 admin/admin 登录
+  Q: 如何检查服务状态？
+  A: 打开 http://localhost:8002/api/health
 
 【文件说明】
   scripts/launcher/start-simple.bat  - 一键启动（推荐）

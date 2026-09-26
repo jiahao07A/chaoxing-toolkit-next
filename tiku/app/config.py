@@ -32,10 +32,28 @@ def _runtime_path(filename: str) -> str:
 DATABASE_FILE = _runtime_path("questions.db")
 JSON_FILE = _runtime_path("tiku.json")
 CONFIG_FILE = os.environ.get("CONFIG_FILE", _runtime_path("config.json"))
+IMPORT_BACKUP_DIR = Path(os.environ.get("IMPORT_BACKUP_DIR", DATA_DIR / "import_backups")).expanduser().resolve()
 
 # ============ 服务器配置 ============
 API_KEY = os.environ.get("API_KEY", "your_api_key")
 DEFAULT_PORT = 8002
+
+
+def get_cors_origins() -> list[str]:
+    """返回 CORS 允许来源，默认只允许本机管理界面。"""
+    configured = os.environ.get("CORS_ORIGINS")
+    if configured:
+        origins = [origin.strip() for origin in configured.split(",") if origin.strip()]
+        if origins:
+            return origins
+
+    port = os.environ.get("PORT", str(DEFAULT_PORT))
+    return [
+        f"http://localhost:{port}",
+        f"http://127.0.0.1:{port}",
+        "http://localhost",
+        "http://127.0.0.1",
+    ]
 
 # ============ 请求限制 ============
 MAX_QUESTION_LENGTH = 10000

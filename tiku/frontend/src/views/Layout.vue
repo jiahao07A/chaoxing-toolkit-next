@@ -15,7 +15,6 @@
           <span class="stat-label">待处理</span>
           <span class="stat-num">{{ stats.pending }}</span>
         </div>
-        <button class="logout-btn" @click="logout">退出</button>
       </div>
     </header>
 
@@ -39,6 +38,11 @@
           :class="{ active: $route.path === '/settings' }"
           @click="$router.push('/settings')"
         >配置</div>
+        <div
+          class="tab-item"
+          :class="{ active: $route.path === '/match-quality' }"
+          @click="$router.push('/match-quality')"
+        >匹配质量</div>
       </div>
       <router-view />
     </main>
@@ -47,10 +51,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { getStats } from '../api'
 
-const router = useRouter()
 const stats = ref({ total: 0, pending: 0 })
 
 const loadStats = async () => {
@@ -58,11 +60,6 @@ const loadStats = async () => {
     const res = await getStats()
     if (res.code === 1) stats.value = res.data
   } catch (e) {}
-}
-
-const logout = () => {
-  sessionStorage.removeItem('isLoggedIn')
-  router.push('/login')
 }
 
 onMounted(loadStats)
