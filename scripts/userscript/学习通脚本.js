@@ -61,7 +61,7 @@
   var _GM_getResourceText = (() => "undefined" != typeof GM_getResourceText ? GM_getResourceText : void 0)(), _GM_getValue = (() => "undefined" != typeof GM_getValue ? GM_getValue : void 0)(), _GM_info = (() => "undefined" != typeof GM_info ? GM_info : void 0)(), _GM_setValue = (() => "undefined" != typeof GM_setValue ? GM_setValue : void 0)(), _GM_xmlhttpRequest = (() => "undefined" != typeof GM_xmlhttpRequest ? GM_xmlhttpRequest : void 0)(), _unsafeWindow = (() => "undefined" != typeof unsafeWindow ? unsafeWindow : void 0)();
   if (typeof GM_addStyle === "function") GM_addStyle(".cx-settings-dialog{width:min(720px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-settings-dialog .el-dialog__header{flex:0 0 auto}.cx-settings-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 150px);overflow-y:auto;overflow-x:hidden;padding:8px 24px 16px}.cx-settings-dialog .el-dialog__footer{flex:0 0 auto;padding-top:12px}.cx-settings-dialog .el-form{min-width:0}@media (max-width:600px){.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}}");
   if (typeof GM_addStyle === "function") GM_addStyle("#csbutton[data-v-6ed29f7f]{position:fixed;right:20px;bottom:20px;z-index:99999;width:44px;height:44px;border:1px solid rgba(255,255,255,.24);box-shadow:0 8px 24px rgba(0,0,0,.18)}#zeokdjg[data-v-c3c6b09f]{position:fixed;right:20px;left:auto;bottom:76px;z-index:9999;max-width:calc(100vw - 40px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.14)}.cx-settings-dialog .el-dialog__header{padding:18px 24px 12px;border-bottom:1px solid #ebeef5}.cx-settings-dialog .el-dialog__title{font-size:18px;font-weight:600}.cx-settings-dialog .el-tabs__header{margin-bottom:16px}.cx-settings-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-settings-dialog .el-tabs__nav{white-space:nowrap}.cx-settings-dialog .el-form-item{margin-bottom:18px}.cx-settings-dialog .el-form-item__label{line-height:1.5}.cx-settings-dialog .el-input,.cx-settings-dialog .el-input-number,.cx-settings-dialog .el-select{width:100%;max-width:100%}.cx-runtime-dialog{width:min(520px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-runtime-dialog .el-dialog__header{flex:0 0 auto;padding:16px 20px 12px}.cx-runtime-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 142px);overflow-y:auto;overflow-x:hidden;padding:8px 20px 16px}.cx-runtime-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-runtime-dialog .el-tabs__nav{white-space:nowrap}.cx-runtime-dialog .question_btn{width:36px;height:36px;margin:4px;border-radius:8px}.cx-runtime-dialog .question_div{height:auto;min-height:160px}.cx-runtime-dialog .question_ti{margin:8px 0 16px;line-height:1.6;overflow-wrap:anywhere}.cx-runtime-dialog .cx_log{margin:0;padding:6px 0;border-bottom:1px solid #f0f0f0;line-height:1.5;overflow-wrap:anywhere}.cx-runtime-dialog .el-dialog__footer{flex:0 0 auto;padding:10px 20px 16px}@media (max-width:600px){#csbutton[data-v-6ed29f7f]{right:12px;bottom:12px}.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}.cx-runtime-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-runtime-dialog .el-dialog__body{max-height:calc(100vh - 124px);padding-left:12px;padding-right:12px}#zeokdjg[data-v-c3c6b09f]{right:12px;bottom:66px;max-width:calc(100vw - 24px)}}");
-  if (typeof GM_addStyle === "function") GM_addStyle("#csbutton{display:none !important}.cx-workbench-trigger{position:fixed;right:20px;bottom:20px;z-index:99999;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border:1px solid #d8c5a8;border-radius:12px;background:#fffdfa;color:#76572f;box-shadow:0 8px 22px rgba(67,49,28,.16);font:600 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;transition:all .2s ease}.cx-workbench-trigger:hover{border-color:#b68a4a;background:#fbf5ea}.cx-workbench-trigger.is-open{right:calc(420px + 28px)}.cx-workbench-trigger__icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:16px;line-height:1}.cx-workbench{position:fixed;top:16px;right:16px;z-index:99998;display:flex;flex-direction:column;width:min(400px,calc(100vw - 32px));height:calc(100vh - 32px);overflow:hidden;border:1px solid #e5ddd1;border-radius:16px;background:#fffdfa;color:#2f2b26;box-shadow:0 16px 48px rgba(51,39,23,.2);font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}.cx-workbench.is-open{transform:translateX(0);opacity:1;pointer-events:auto}.cx-workbench__header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid #eee7dc;background:#fffdfa}.cx-workbench__identity{display:flex;min-width:0;flex-direction:column;gap:2px}.cx-workbench__eyebrow{color:#a07b4c;font-size:10px;letter-spacing:2px}.cx-workbench__identity strong{overflow:hidden;color:#302a24;font-size:16px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.cx-workbench__status{overflow:hidden;color:#998f82;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.cx-icon-button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f8374;font-size:20px;line-height:1;cursor:pointer}.cx-icon-button:hover{border-color:#b68a4a;color:#76572f}.cx-workbench__tabs{display:flex;flex:0 0 auto;gap:4px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid #eee7dc;background:#fcfaf6}.cx-workbench__tab{flex:0 0 auto;height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#998f82;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;white-space:nowrap}.cx-workbench__tab:hover{background:#f5eee3;color:#76572f}.cx-workbench__tab.is-active{background:#b68a4a;color:#fff}.cx-workbench__content{min-height:0;flex:1;overflow:auto;padding:16px}.cx-workbench__content::-webkit-scrollbar{width:6px}.cx-workbench__content::-webkit-scrollbar-thumb{background:#ded3c5;border-radius:8px}.cx-run-content{display:flex;flex-direction:column;gap:12px}.cx-progress-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid #eee3d4;border-radius:9px;background:#fbf5ea;color:#8f7553;font-size:11px}.cx-current-card{padding:16px;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-card-kicker,.cx-section-heading{display:flex;align-items:center;justify-content:space-between;color:#a07b4c;font-size:10px;letter-spacing:1px}.cx-current-card h3{margin:8px 0 14px;color:#2f2b26;font-size:15px;font-weight:600;line-height:1.65;overflow-wrap:anywhere}.cx-answer-block{padding-top:12px;border-top:1px solid #f0e9df}.cx-answer-block pre{margin:7px 0 0;padding:10px;border-radius:8px;background:#f7f3ec;color:#4d402f;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.cx-answer-pending{padding:12px;border-radius:8px;background:#faf8f4;color:#a69b8d;font-size:12px}.cx-sources{padding:14px;border:1px solid #eee5da;border-radius:12px;background:#fff}.cx-section-heading{margin-bottom:8px}.cx-section-heading span{font-weight:400;letter-spacing:0}.cx-answer-source{border-top:1px solid #f0e9df}.cx-answer-source summary{padding:10px 0;color:#76572f;font-size:12px;font-weight:600;cursor:pointer}.cx-source-body{padding:0 0 9px;color:#53483c;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.cx-source-meta{padding:7px 0 10px;color:#a69b8d;font-size:10px}.cx-video-status{padding:12px;border:1px solid #ecd8ba;border-radius:9px;background:#fff7e9;color:#94682d;font-size:12px}.cx-empty-state{display:flex;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:20px;color:#a69b8d;text-align:center}.cx-empty-state strong{color:#66594b;font-size:14px;font-weight:600}.cx-empty-state span{font-size:12px}.cx-question-list{display:flex;flex-direction:column;gap:8px}.cx-question-item{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid #ece4d9;border-radius:10px;background:#fff;color:#685c4f;text-align:left;cursor:pointer}.cx-question-item:hover{border-color:#c7a878;background:#fffbf4}.cx-question-item.is-current{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-question-index{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#f3eee6;color:#8f7553;font-size:12px;font-weight:700}.cx-question-item.is-primary .cx-question-index{background:#e8f4ec;color:#3e8257}.cx-question-item.is-danger .cx-question-index{background:#fbe9e5;color:#b4594b}.cx-question-state{margin-left:auto;color:#a69b8d;font-size:11px}.cx-log-list{display:flex;flex-direction:column;gap:0}.cx-log-item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:9px 0;border-bottom:1px solid #f0e9df;color:#65594d;font-size:12px;line-height:1.5}.cx-log-item time{color:#a69b8d;font-variant-numeric:tabular-nums}.cx-log-item span{overflow-wrap:anywhere}.cx-log-item.is-error span{color:#b4594b}.cx-log-item.is-success span{color:#3e8257}.cx-workbench-settings{display:flex;flex-direction:column;gap:12px}.cx-workbench-settings__toolbar{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;z-index:2;padding:0 0 10px;background:#fffdfa}.cx-workbench-settings__toolbar input{min-width:0;flex:1;height:34px;padding:0 10px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#4b4035;outline:0;font:12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif}.cx-workbench-settings__toolbar input:focus{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-link-button{flex:0 0 auto;height:34px;padding:0 9px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f7553;font-size:11px;cursor:pointer}.cx-link-button:hover{border-color:#b68a4a;color:#76572f}.cx-link-button:disabled{opacity:.5;cursor:wait}.cx-settings-group{overflow:hidden;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-settings-group__heading{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid #f0e9df;background:#fcfaf6}.cx-settings-group__heading strong{color:#4d4033;font-size:13px}.cx-settings-group__heading span{color:#a69b8d;font-size:10px}.cx-setting-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:12px;align-items:center;padding:12px 13px;border-bottom:1px solid #f4eee6}.cx-setting-row:last-child{border-bottom:0}.cx-setting-copy{min-width:0}.cx-setting-copy>span{display:block;color:#65594d;font-size:12px}.cx-setting-copy small{display:block;margin-top:3px;color:#a69b8d;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.cx-setting-control{min-width:0}.cx-setting-control>.el-input,.cx-setting-control>.el-input-number,.cx-setting-control>.el-select{width:100%}.cx-setting-control .el-input__wrapper,.cx-setting-control .el-select__wrapper{min-height:32px;border-radius:8px;box-shadow:0 0 0 1px #e5ddd1 inset}.cx-setting-control .el-input-number{width:100%}.cx-setting-secret{display:flex;min-width:0;border:1px solid #e5ddd1;border-radius:8px;background:#fff;overflow:hidden}.cx-setting-secret>.el-input{flex:1;min-width:0}.cx-setting-secret .el-input__wrapper{box-shadow:none}.cx-setting-secret__toggle{flex:0 0 auto;padding:0 8px;border:0;border-left:1px solid #eee7dc;background:#fff;color:#8f7553;font-size:10px;cursor:pointer}.cx-workbench__footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #eee7dc;background:#fffdfa}.cx-primary-button,.cx-secondary-button{height:34px;padding:0 13px;border-radius:8px;font-size:12px;cursor:pointer}.cx-primary-button{border:1px solid #b68a4a;background:#b68a4a;color:#fff}.cx-secondary-button{border:1px solid #e5ddd1;background:#fff;color:#76572f}.cx-primary-button:hover{background:#9f743c}.cx-secondary-button:hover{border-color:#b68a4a}@media (max-width:600px){.cx-workbench-trigger{right:12px;bottom:12px}.cx-workbench-trigger.is-open{right:12px;bottom:calc(100vh - 58px)}.cx-workbench{top:8px;right:8px;width:calc(100vw - 16px);height:calc(100vh - 16px);border-radius:14px}.cx-setting-row{grid-template-columns:1fr;gap:7px}.cx-workbench__content{padding:12px}.cx-workbench-settings__toolbar{top:-12px}.cx-log-item{grid-template-columns:52px minmax(0,1fr)}}@media (prefers-reduced-motion:reduce){.cx-workbench,.cx-workbench-trigger{transition:none}}");
+  if (typeof GM_addStyle === "function") GM_addStyle("#csbutton{display:none !important}.cx-workbench-trigger{position:fixed;right:20px;bottom:20px;z-index:99999;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border:1px solid #d8c5a8;border-radius:12px;background:#fffdfa;color:#76572f;box-shadow:0 8px 22px rgba(67,49,28,.16);font:600 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:move;touch-action:none;user-select:none;transition:all .2s ease}.cx-workbench-trigger:hover{border-color:#b68a4a;background:#fbf5ea}.cx-workbench-trigger.is-open{right:calc(420px + 28px)}.cx-workbench-trigger__icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:16px;line-height:1}.cx-workbench{position:fixed;top:16px;right:16px;z-index:99998;display:flex;flex-direction:column;width:min(400px,calc(100vw - 32px));height:calc(100vh - 32px);overflow:hidden;border:1px solid #e5ddd1;border-radius:16px;background:#fffdfa;color:#2f2b26;box-shadow:0 16px 48px rgba(51,39,23,.2);font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}.cx-workbench.is-open{transform:translateX(0);opacity:1;pointer-events:auto}.cx-workbench__header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid #eee7dc;background:#fffdfa}.cx-workbench__identity{display:flex;min-width:0;flex-direction:column;gap:2px}.cx-workbench__eyebrow{color:#a07b4c;font-size:10px;letter-spacing:2px}.cx-workbench__identity strong{overflow:hidden;color:#302a24;font-size:16px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.cx-workbench__status{overflow:hidden;color:#998f82;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.cx-icon-button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f8374;font-size:20px;line-height:1;cursor:pointer}.cx-icon-button:hover{border-color:#b68a4a;color:#76572f}.cx-workbench__tabs{display:flex;flex:0 0 auto;gap:4px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid #eee7dc;background:#fcfaf6}.cx-workbench__tab{flex:0 0 auto;height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#998f82;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;white-space:nowrap}.cx-workbench__tab:hover{background:#f5eee3;color:#76572f}.cx-workbench__tab.is-active{background:#b68a4a;color:#fff}.cx-workbench__content{min-height:0;flex:1;overflow:auto;padding:16px}.cx-workbench__content::-webkit-scrollbar{width:6px}.cx-workbench__content::-webkit-scrollbar-thumb{background:#ded3c5;border-radius:8px}.cx-run-content{display:flex;flex-direction:column;gap:12px}.cx-progress-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid #eee3d4;border-radius:9px;background:#fbf5ea;color:#8f7553;font-size:11px}.cx-current-card{padding:16px;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-card-kicker,.cx-section-heading{display:flex;align-items:center;justify-content:space-between;color:#a07b4c;font-size:10px;letter-spacing:1px}.cx-current-card h3{margin:8px 0 14px;color:#2f2b26;font-size:15px;font-weight:600;line-height:1.65;overflow-wrap:anywhere}.cx-answer-block{padding-top:12px;border-top:1px solid #f0e9df}.cx-answer-block pre{margin:7px 0 0;padding:10px;border-radius:8px;background:#f7f3ec;color:#4d402f;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.cx-answer-pending{padding:12px;border-radius:8px;background:#faf8f4;color:#a69b8d;font-size:12px}.cx-sources{padding:14px;border:1px solid #eee5da;border-radius:12px;background:#fff}.cx-section-heading{margin-bottom:8px}.cx-section-heading span{font-weight:400;letter-spacing:0}.cx-answer-source{border-top:1px solid #f0e9df}.cx-answer-source summary{padding:10px 0;color:#76572f;font-size:12px;font-weight:600;cursor:pointer}.cx-source-body{padding:0 0 9px;color:#53483c;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.cx-source-meta{padding:7px 0 10px;color:#a69b8d;font-size:10px}.cx-video-status{padding:12px;border:1px solid #ecd8ba;border-radius:9px;background:#fff7e9;color:#94682d;font-size:12px}.cx-empty-state{display:flex;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:20px;color:#a69b8d;text-align:center}.cx-empty-state strong{color:#66594b;font-size:14px;font-weight:600}.cx-empty-state span{font-size:12px}.cx-question-list{display:flex;flex-direction:column;gap:8px}.cx-question-item{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid #ece4d9;border-radius:10px;background:#fff;color:#685c4f;text-align:left;cursor:pointer}.cx-question-item:hover{border-color:#c7a878;background:#fffbf4}.cx-question-item.is-current{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-question-index{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#f3eee6;color:#8f7553;font-size:12px;font-weight:700}.cx-question-item.is-primary .cx-question-index{background:#e8f4ec;color:#3e8257}.cx-question-item.is-danger .cx-question-index{background:#fbe9e5;color:#b4594b}.cx-question-state{margin-left:auto;color:#a69b8d;font-size:11px}.cx-log-list{display:flex;flex-direction:column;gap:0}.cx-log-item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:9px 0;border-bottom:1px solid #f0e9df;color:#65594d;font-size:12px;line-height:1.5}.cx-log-item time{color:#a69b8d;font-variant-numeric:tabular-nums}.cx-log-item span{overflow-wrap:anywhere}.cx-log-item.is-error span{color:#b4594b}.cx-log-item.is-success span{color:#3e8257}.cx-workbench-settings{display:flex;flex-direction:column;gap:12px}.cx-workbench-settings__toolbar{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;z-index:2;padding:0 0 10px;background:#fffdfa}.cx-workbench-settings__toolbar input{min-width:0;flex:1;height:34px;padding:0 10px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#4b4035;outline:0;font:12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif}.cx-workbench-settings__toolbar input:focus{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-link-button{flex:0 0 auto;height:34px;padding:0 9px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f7553;font-size:11px;cursor:pointer}.cx-link-button:hover{border-color:#b68a4a;color:#76572f}.cx-link-button:disabled{opacity:.5;cursor:wait}.cx-settings-group{overflow:hidden;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-settings-group__heading{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid #f0e9df;background:#fcfaf6}.cx-settings-group__heading strong{color:#4d4033;font-size:13px}.cx-settings-group__heading span{color:#a69b8d;font-size:10px}.cx-setting-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:12px;align-items:center;padding:12px 13px;border-bottom:1px solid #f4eee6}.cx-setting-row:last-child{border-bottom:0}.cx-setting-copy{min-width:0}.cx-setting-copy>span{display:block;color:#65594d;font-size:12px}.cx-setting-copy small{display:block;margin-top:3px;color:#a69b8d;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.cx-setting-control{min-width:0}.cx-setting-control>.el-input,.cx-setting-control>.el-input-number,.cx-setting-control>.el-select{width:100%}.cx-setting-control .el-input__wrapper,.cx-setting-control .el-select__wrapper{min-height:32px;border-radius:8px;box-shadow:0 0 0 1px #e5ddd1 inset}.cx-setting-control .el-input-number{width:100%}.cx-setting-secret{display:flex;min-width:0;border:1px solid #e5ddd1;border-radius:8px;background:#fff;overflow:hidden}.cx-setting-secret>.el-input{flex:1;min-width:0}.cx-setting-secret .el-input__wrapper{box-shadow:none}.cx-setting-secret__toggle{flex:0 0 auto;padding:0 8px;border:0;border-left:1px solid #eee7dc;background:#fff;color:#8f7553;font-size:10px;cursor:pointer}.cx-workbench__footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #eee7dc;background:#fffdfa}.cx-primary-button,.cx-secondary-button{height:34px;padding:0 13px;border-radius:8px;font-size:12px;cursor:pointer}.cx-primary-button{border:1px solid #b68a4a;background:#b68a4a;color:#fff}.cx-secondary-button{border:1px solid #e5ddd1;background:#fff;color:#76572f}.cx-primary-button:hover{background:#9f743c}.cx-secondary-button:hover{border-color:#b68a4a}@media (max-width:600px){.cx-workbench-trigger{right:12px;bottom:12px}.cx-workbench-trigger.is-open{right:12px;bottom:calc(100vh - 58px)}.cx-workbench{top:8px;right:8px;width:calc(100vw - 16px);height:calc(100vh - 16px);border-radius:14px}.cx-setting-row{grid-template-columns:1fr;gap:7px}.cx-workbench__content{padding:12px}.cx-workbench-settings__toolbar{top:-12px}.cx-log-item{grid-template-columns:52px minmax(0,1fr)}}@media (prefers-reduced-motion:reduce){.cx-workbench,.cx-workbench-trigger{transition:none}}");
   if (typeof GM_addStyle === "function") GM_addStyle(".cx-workbench{box-sizing:border-box;min-width:min(300px,calc(100vw - 16px));min-height:min(300px,calc(100vh - 16px));max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);transform:translateX(24px)}.cx-workbench-trigger.is-open{right:20px;bottom:20px}.cx-workbench__header{cursor:move;user-select:none;touch-action:none}.cx-workbench__actions{display:flex;align-items:center;flex:0 0 auto;gap:6px}.cx-workbench__resize-handle{position:absolute;right:0;bottom:0;width:22px;height:22px;padding:0;border:0;background:transparent;cursor:nwse-resize;touch-action:none}.cx-workbench__resize-handle::after{content:\"\";position:absolute;right:5px;bottom:5px;width:8px;height:8px;border-right:2px solid #b68a4a;border-bottom:2px solid #b68a4a;opacity:.75}@media (max-width:600px){.cx-workbench-trigger.is-open{right:12px;bottom:12px}.cx-workbench{top:8px;right:8px;min-width:calc(100vw - 16px);min-height:calc(100vh - 16px);max-width:calc(100vw - 16px);max-height:calc(100vh - 16px)}}");
   const markSettingsDialogs = () => {
     if (typeof document === "undefined") return;
@@ -70,7 +70,7 @@
       else if (dialog.querySelector(".demo-tabs")) dialog.classList.add("cx-runtime-dialog");
     });
   };
-  if (typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
+  if (_unsafeWindow === _unsafeWindow?.top && typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
     markSettingsDialogs();
     new MutationObserver(markSettingsDialogs).observe(document.body, { childList: true, subtree: true });
   }
@@ -396,7 +396,13 @@
   };
   const serializeLogArg = (value) => {
     if (typeof value === "string") return value;
-    if (value instanceof Error) return value.stack || value.message;
+    if (value && typeof value === "object" && (value instanceof Error || typeof value.name === "string" || typeof value.message === "string" || typeof value.stack === "string")) {
+      const name = typeof value.name === "string" ? value.name : "";
+      const message = typeof value.message === "string" ? value.message : "";
+      const code = typeof value.code === "string" || typeof value.code === "number" ? String(value.code) : "";
+      const details = [name, message, code].filter(Boolean);
+      return details.length > 0 ? details.join(": ") : "未知错误";
+    }
     if (value && typeof value === "object") {
       if (typeof value.question === "string") {
         const options = Array.isArray(value.options) && value.options.length > 0 ? ` 选项: ${JSON.stringify(value.options)}` : "";
@@ -2180,17 +2186,53 @@
     setTimeout(() => {
       resolve();
     }, 1e3 * randomTime);
-  }), waitIframeLoaded = (iframe) => new Promise((resolve) => {
-    const timer = setInterval(() => {
-      var _a;
-      iframe.contentDocument && "complete" === ((_a = iframe.contentDocument) == null ? void 0 : _a.readyState) ? (clearInterval(timer), resolve()) : iframe.addEventListener("load", () => {
-        clearInterval(timer), resolve();
-      });
-    }, 100);
-  }), waitElementLoaded = (iframeWindow, selector) => new Promise((resolve) => {
-    const timer = setInterval(() => {
-      iframeWindow.document.querySelector(selector) && (clearInterval(timer), resolve());
-    }, 100);
+  }), waitIframeLoaded = (iframe, timeoutMs = 15000) => new Promise((resolve) => {
+    if (!iframe) {
+      resolve(false);
+      return;
+    }
+    let settled = false;
+    let timeoutId = null;
+    const finish = (loaded) => {
+      if (settled) return;
+      settled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      if (typeof iframe.removeEventListener === "function") iframe.removeEventListener("load", onLoad);
+      resolve(loaded);
+    };
+    const onLoad = () => finish(true);
+    if (iframe.contentDocument && iframe.contentDocument.readyState !== "loading") {
+      finish(true);
+      return;
+    }
+    iframe.addEventListener("load", onLoad, { once: true });
+    timeoutId = setTimeout(() => finish(false), timeoutMs);
+  }), waitElementLoaded = (iframeWindow, selector, timeoutMs = 15000) => new Promise((resolve) => {
+    if (!iframeWindow?.document || !selector) {
+      resolve(false);
+      return;
+    }
+    let settled = false;
+    let timer = null;
+    let timeoutId = null;
+    const finish = (loaded) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearInterval(timer);
+      if (timeoutId) clearTimeout(timeoutId);
+      resolve(loaded);
+    };
+    const check = () => {
+      try {
+        if (iframeWindow.document.querySelector(selector)) finish(true);
+      } catch (error) {
+        finish(false);
+      }
+    };
+    check();
+    if (settled) return;
+    timer = setInterval(check, 100);
+    timeoutId = setTimeout(() => finish(false), timeoutMs);
   }), removeHtml = (html) => null == html ? "" : html.replace(/<((?!img|sub|sup|br)[^>]+)>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").replace(/<br\s*\/?>/g, "\n").replace(/<img.*?src="(.*?)".*?>/g, '<img src="$1"/>').trim(), cl = (str) => str.replace(/^【.*?】\s*/, "").replace(/\s*（\d+\.\d+分）$/, ""), getQuestion = (type, html) => {
     let questionHtml, questionText, questionTypeId, optionHtml, tokenHtml, workType, optionText, index;
     switch (type) {
@@ -2209,7 +2251,7 @@
           optionText.push(removeHtml(optionHtml[i].innerHTML));
         return { question: questionText, options: optionText, type: questionTypeId, questionData: tokenHtml, workType };
     }
-  }, decode = (iframeWindow) => {
+  }, decode = async (iframeWindow) => {
     var _a;
     const styleElements = iframeWindow.document.querySelectorAll("style");
     let tipElement = null;
@@ -2221,24 +2263,56 @@
     const fontMatch = (_a = tipElement.textContent) == null ? void 0 : _a.match(/base64,([\w\W]+?)'/);
     if (!fontMatch)
       return;
+    const secretElements = Array.from(iframeWindow.document.querySelectorAll(".font-cxsecret"));
+    if (secretElements.length === 0) return;
+    const yieldToBrowser = () => new Promise((resolve) => {
+      // 后台 iframe 可能长期不触发 requestAnimationFrame，使用定时器保证解码能继续。
+      setTimeout(resolve, 0);
+    });
+    const secretCharacters = new Set();
+    let scannedCharacters = 0;
+    for (const fontElement of secretElements) {
+      const content = fontElement.textContent || fontElement.innerHTML || "";
+      for (const character of content) {
+        secretCharacters.add(character);
+        scannedCharacters++ % 256 === 0 && await yieldToBrowser();
+      }
+    }
+    await yieldToBrowser();
     const fontData = ((base64) => {
       const decodedData = atob(base64), array = new Uint8Array(decodedData.length);
       for (let i = 0; i < decodedData.length; i++)
         array[i] = decodedData.charCodeAt(i);
       return array;
-    })(fontMatch[1]), font = Typr$1.parse(fontData), table = JSON.parse(_GM_getResourceText("ttf"));
+    })(fontMatch[1]);
+    await yieldToBrowser();
+    const font = Typr$1.parse(fontData), table = JSON.parse(_GM_getResourceText("ttf"));
     let text = {};
-    for (let i = 19968; i < 40870; i++) {
-      let t = Typr$1.U.codeToGlyph(font, i);
-      t && (t = Typr$1.U.glyphToPath(font, t), t = md5(JSON.stringify(t)).slice(24), text[i] = table[t]);
+    let glyphCount = 0;
+    for (const character of secretCharacters) {
+      const codePoint = character.codePointAt(0);
+      if (codePoint < 19968 || codePoint >= 40870) continue;
+      let t = Typr$1.U.codeToGlyph(font, codePoint);
+      if (t) {
+        t = Typr$1.U.glyphToPath(font, t);
+        t = table[md5(JSON.stringify(t)).slice(24)];
+        if (t) text[codePoint] = t;
+      }
+      glyphCount++ % 32 === 0 && await yieldToBrowser();
     }
-    iframeWindow.document.querySelectorAll(".font-cxsecret").forEach((fontElement) => {
+    for (const fontElement of secretElements) {
       let html = fontElement.innerHTML;
-      Object.keys(text).forEach((key) => {
+      const textKeys = Object.keys(text);
+      for (let i = 0; i < textKeys.length; i++) {
+        const key = textKeys[i];
         const regex = new RegExp(String.fromCharCode(key), "g");
         html = html.replace(regex, String.fromCharCode(text[key]));
-      }), fontElement.innerHTML = html, fontElement.classList.remove("font-cxsecret");
-    });
+        (i + 1) % 128 === 0 && await yieldToBrowser();
+      }
+      fontElement.innerHTML = html;
+      fontElement.classList.remove("font-cxsecret");
+      await yieldToBrowser();
+    }
   }, hasUsableAnswer = (answer) => {
     if (Array.isArray(answer)) return answer.some((item) => hasUsableAnswer(item));
     if (typeof answer !== "string") return Boolean(answer);
@@ -2511,7 +2585,9 @@
       const syncing = vue.ref(false);
       const revealedSecrets = vue.reactive({});
       const panelLayout = vue.reactive({ initialized: false, left: 0, top: 16, width: 400, height: 0 });
+      const triggerLayout = vue.reactive({ initialized: false, left: 0, top: 0 });
       const pointerState = { mode: "", pointerId: null, startX: 0, startY: 0, left: 0, top: 0, width: 0, height: 0 };
+      const triggerPointerState = { active: false, pointerId: null, startX: 0, startY: 0, left: 0, top: 0, moved: false, suppressClick: false, suppressClickTimer: null };
       const clampLayout = () => {
         if (typeof window === "undefined") return;
         const viewportWidth = Math.max(220, window.innerWidth - 16);
@@ -2534,6 +2610,37 @@
         panelLayout.height = Math.max(300, (window.innerHeight || 600) - 32);
         clampLayout();
         persistLayout();
+      };
+      const clampTriggerLayout = () => {
+        if (typeof window === "undefined") return;
+        const viewportWidth = Math.max(120, window.innerWidth || 120);
+        const viewportHeight = Math.max(100, window.innerHeight || 100);
+        const triggerWidth = Math.min(156, Math.max(96, viewportWidth - 16));
+        const triggerHeight = 48;
+        const maxLeft = Math.max(8, viewportWidth - triggerWidth - 8);
+        const maxTop = Math.max(8, viewportHeight - triggerHeight - 8);
+        triggerLayout.left = Math.max(8, Math.min(Math.round(Number(triggerLayout.left) || 0), maxLeft));
+        triggerLayout.top = Math.max(8, Math.min(Math.round(Number(triggerLayout.top) || 0), maxTop));
+      };
+      const persistTriggerLayout = () => {
+        clampTriggerLayout();
+        if (_GM_setValue) _GM_setValue("cx_workbench_trigger_layout", { left: triggerLayout.left, top: triggerLayout.top });
+      };
+      const resetTriggerLayout = () => {
+        triggerLayout.left = Math.max(8, (window.innerWidth || 800) - 164);
+        triggerLayout.top = Math.max(8, (window.innerHeight || 600) - 60);
+        persistTriggerLayout();
+      };
+      const loadTriggerLayout = () => {
+        const stored = _GM_getValue ? _GM_getValue("cx_workbench_trigger_layout", null) : null;
+        if (stored && typeof stored === "object") {
+          triggerLayout.left = Number(stored.left) || 0;
+          triggerLayout.top = Number(stored.top) || 0;
+        } else {
+          resetTriggerLayout();
+        }
+        clampTriggerLayout();
+        triggerLayout.initialized = true;
       };
       const loadLayout = () => {
         const stored = _GM_getValue ? _GM_getValue("cx_workbench_layout", null) : null;
@@ -2590,9 +2697,61 @@
         beginPointer("drag", event);
       };
       const beginResize = (event) => beginPointer("resize", event);
+      const endTriggerPointer = () => {
+        if (!triggerPointerState.active) return;
+        triggerPointerState.active = false;
+        triggerPointerState.pointerId = null;
+        if (triggerPointerState.moved) {
+          triggerPointerState.suppressClick = true;
+          if (triggerPointerState.suppressClickTimer) clearTimeout(triggerPointerState.suppressClickTimer);
+          triggerPointerState.suppressClickTimer = setTimeout(() => {
+            triggerPointerState.suppressClick = false;
+            triggerPointerState.suppressClickTimer = null;
+          }, 500);
+        }
+        persistTriggerLayout();
+        window.removeEventListener("pointermove", moveTriggerPointer);
+        window.removeEventListener("pointerup", endTriggerPointer);
+        window.removeEventListener("pointercancel", endTriggerPointer);
+      };
+      const moveTriggerPointer = (event) => {
+        if (!triggerPointerState.active || event.pointerId !== triggerPointerState.pointerId) return;
+        const deltaX = event.clientX - triggerPointerState.startX;
+        const deltaY = event.clientY - triggerPointerState.startY;
+        if (Math.abs(deltaX) >= 4 || Math.abs(deltaY) >= 4) triggerPointerState.moved = true;
+        triggerLayout.left = triggerPointerState.left + deltaX;
+        triggerLayout.top = triggerPointerState.top + deltaY;
+        clampTriggerLayout();
+        event.preventDefault();
+      };
+      const beginTriggerDrag = (event) => {
+        if (event.button !== 0 || triggerPointerState.active) return;
+        triggerPointerState.active = true;
+        triggerPointerState.pointerId = event.pointerId;
+        triggerPointerState.startX = event.clientX;
+        triggerPointerState.startY = event.clientY;
+        triggerPointerState.left = triggerLayout.left;
+        triggerPointerState.top = triggerLayout.top;
+        triggerPointerState.moved = false;
+        event.stopPropagation();
+        window.addEventListener("pointermove", moveTriggerPointer);
+        window.addEventListener("pointerup", endTriggerPointer);
+        window.addEventListener("pointercancel", endTriggerPointer);
+      };
+      const handleTriggerClick = () => {
+        if (triggerPointerState.suppressClick) {
+          triggerPointerState.suppressClick = false;
+          if (triggerPointerState.suppressClickTimer) clearTimeout(triggerPointerState.suppressClickTimer);
+          triggerPointerState.suppressClickTimer = null;
+          return;
+        }
+        panelOpen.value = !panelOpen.value;
+      };
       const handleViewportResize = () => {
         clampLayout();
         persistLayout();
+        clampTriggerLayout();
+        persistTriggerLayout();
       };
       const settingDependsOn = {
         customApiUrl: "customApiEnabled", customApiKey: "customApiEnabled",
@@ -2658,13 +2817,15 @@
       });
       vue.onMounted(() => {
         loadLayout();
+        loadTriggerLayout();
         window.addEventListener("resize", handleViewportResize);
       });
       vue.onBeforeUnmount(() => {
         endPointer();
+        endTriggerPointer();
         window.removeEventListener("resize", handleViewportResize);
       });
-      return { task, forminput, panelOpen, activeTab, settingsSearch, syncing, revealedSecrets, settingGroups, currentQuestion, isSecretSetting, openSettings, saveSettings, resetSettings, selectQuestion, panelLayout, beginDrag, beginResize, resetLayout, togglePanel: () => { panelOpen.value = !panelOpen.value; } };
+      return { task, forminput, panelOpen, activeTab, settingsSearch, syncing, revealedSecrets, settingGroups, currentQuestion, isSecretSetting, openSettings, saveSettings, resetSettings, selectQuestion, panelLayout, triggerLayout, beginDrag, beginResize, beginTriggerDrag, handleTriggerClick, resetLayout, togglePanel: () => { panelOpen.value = !panelOpen.value; } };
     },
     render() {
       const h = vue.h;
@@ -2717,7 +2878,7 @@
       const tabs = [["run", "运行"], ["questions", `题目 ${questionList.length}`], ["logs", "日志"], ["settings", "设置"]];
       const content = this.activeTab === "run" ? renderRun() : this.activeTab === "questions" ? renderQuestions() : this.activeTab === "logs" ? renderLogs() : renderSettings();
       return h(vue.Fragment, null, [
-        h("button", { id: "zeokdjg", type: "button", class: ["cx-workbench-trigger", this.panelOpen ? "is-open" : ""], title: this.panelOpen ? "收起工作台" : "打开学习通助手工作台", "aria-expanded": this.panelOpen, onClick: this.togglePanel }, [h("span", { class: "cx-workbench-trigger__icon", "aria-hidden": "true" }, "☰"), h("span", null, this.panelOpen ? "收起" : this.task.name === "暂未加载" ? "助手" : "查看进度")]),
+        h("button", { id: "zeokdjg", type: "button", class: ["cx-workbench-trigger", this.panelOpen ? "is-open" : ""], style: this.triggerLayout.initialized ? { left: `${this.triggerLayout.left}px`, top: `${this.triggerLayout.top}px`, right: "auto", bottom: "auto" } : undefined, title: this.panelOpen ? "收起工作台" : "打开学习通助手工作台", "aria-expanded": this.panelOpen, onPointerdown: this.beginTriggerDrag, onClick: this.handleTriggerClick }, [h("span", { class: "cx-workbench-trigger__icon", "aria-hidden": "true" }, "☰"), h("span", null, this.panelOpen ? "收起" : this.task.name === "暂未加载" ? "助手" : "查看进度")]),
         h("aside", { class: ["cx-workbench", this.panelOpen ? "is-open" : ""], style: this.panelLayout.initialized ? { left: `${this.panelLayout.left}px`, top: `${this.panelLayout.top}px`, width: `${this.panelLayout.width}px`, height: `${this.panelLayout.height}px`, right: "auto" } : undefined, "aria-hidden": !this.panelOpen }, [
           h("header", { class: "cx-workbench__header", onPointerdown: this.beginDrag }, [h("div", { class: "cx-workbench__identity" }, [h("span", { class: "cx-workbench__eyebrow" }, "学习通助手"), h("strong", null, this.task.name === "暂未加载" ? "等待任务" : this.task.name), h("span", { class: "cx-workbench__status" }, this.task.status || "准备就绪")]), h("div", { class: "cx-workbench__actions" }, [h("button", { type: "button", class: "cx-icon-button", title: "恢复窗口布局", onClick: this.resetLayout }, "↺"), h("button", { type: "button", class: "cx-icon-button", title: "收起工作台", onClick: this.togglePanel }, "×")])]),
           h("nav", { class: "cx-workbench__tabs", "aria-label": "插件工作台" }, tabs.map(([key, label]) => h("button", { key, type: "button", class: ["cx-workbench__tab", this.activeTab === key ? "is-active" : ""], "aria-current": this.activeTab === key ? "page" : undefined, onClick: key === "settings" ? this.openSettings : () => { this.activeTab = key; } }, label))),
@@ -2757,7 +2918,11 @@
       });
     }
     async video(iframeWindow) {
-      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api");
+      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0;
+      if (await waitElementLoaded(iframeWindow, "#video_html5_api") === false) {
+        this.askStore.task.status = "视频播放器加载超时，下一轮重试";
+        return false;
+      }
       try {
         await syncConfigFromServer();
       } catch (error) {
@@ -2767,7 +2932,6 @@
       const player = iframeWindow.videojs("video_html5_api");
       const config = getConfig();
       const stopVideoDiagnostics = installVideoDiagnostics(player);
-      mountVideoDiagnosticsPanel();
       player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => {
         const rate = player.playbackRate();
         this.askStore.task.video.status = rate > 1 ? 1 : 0;
@@ -2776,18 +2940,62 @@
           console.log(`[视频] 播放速率已恢复为 1 倍（原速率: ${rate}）`);
         }
       });
-      const startPlayback = () => {
-        const result = player.play();
-        if (result && typeof result.catch === "function") {
-          result.catch((error) => console.warn("[视频] 播放请求未成功", error));
+      const isPageVisible = () => iframeWindow.document?.visibilityState !== "hidden";
+      let playbackRequest = null;
+      let playbackRetryTimer = null;
+      let playbackRetryAttempt = 0;
+      let playbackFinished = false;
+      let randomPauseActive = false;
+      const describePlaybackError = (error) => {
+        const description = serializeLogArg(error);
+        return description === "{}" ? "未知播放错误" : description;
+      };
+      const canRetryPlayback = () => {
+        if (!isPageVisible() || playbackFinished || randomPauseActive) return false;
+        try {
+          return player.paused();
+        } catch (error) {
+          return false;
         }
-        return result;
+      };
+      let startPlayback;
+      const schedulePlaybackRetry = () => {
+        if (playbackRetryTimer || playbackRetryAttempt >= 3 || !canRetryPlayback()) return false;
+        const retryDelays = [250, 500, 1e3];
+        const delay = retryDelays[playbackRetryAttempt++];
+        playbackRetryTimer = setTimeout(() => {
+          playbackRetryTimer = null;
+          startPlayback();
+        }, delay);
+        return true;
+      };
+      const reportPlaybackFailure = (error) => {
+        if (schedulePlaybackRetry()) return false;
+        console.warn(`[视频] 播放请求未成功: ${describePlaybackError(error)}`);
+        playbackRetryAttempt = 0;
+        return false;
+      };
+      startPlayback = () => {
+        if (playbackRequest) return playbackRequest;
+        if (playbackRetryTimer) return Promise.resolve(false);
+        let result;
+        try {
+          result = player.play();
+        } catch (error) {
+          return Promise.resolve(reportPlaybackFailure(error));
+        }
+        const request = result && typeof result.then === "function" ? Promise.resolve(result) : Promise.resolve(true);
+        playbackRequest = request.then(() => {
+          playbackRetryAttempt = 0;
+          return true;
+        }).catch((error) => reportPlaybackFailure(error)).finally(() => {
+          playbackRequest = null;
+        });
+        return playbackRequest;
       };
       startPlayback();
       const pauseBase = player.pause;
       let allowPlayerPause = false;
-      let playbackFinished = false;
-      let randomPauseActive = false;
       let pauseTimer = null;
       let resumeTimer = null;
       let pauseDeadline = 0;
@@ -2795,6 +3003,7 @@
       let nextPauseAt = 0;
       let scheduledIntervalSeconds = 0;
       let mouseMoveTimer = null;
+      let visibilityResumeTimer = null;
       const pauseForRandomInterval = () => {
         allowPlayerPause = true;
         try {
@@ -2804,18 +3013,17 @@
         }
       };
       player.pause = function(...args) {
-        if (allowPlayerPause || randomPauseActive || playbackFinished) {
+        if (allowPlayerPause || randomPauseActive || playbackFinished || !isPageVisible()) {
           return pauseBase.apply(this, args);
         }
         return startPlayback();
       };
       const handleUnexpectedPause = () => {
-        if (!allowPlayerPause && !randomPauseActive && !playbackFinished) startPlayback();
+        if (isPageVisible() && !allowPlayerPause && !randomPauseActive && !playbackFinished) startPlayback();
       };
       player.on("pause", handleUnexpectedPause);
 
       // 随机暂停功能。暂停恢复以截止时间为准，并在页面重新可见时补偿后台计时器延迟。
-      const isPageVisible = () => iframeWindow.document?.visibilityState !== "hidden";
       const randomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
       const intervalMin = Math.max(1, Number(config.randomPauseIntervalMin) || 30);
       const intervalMax = Math.max(intervalMin, Number(config.randomPauseIntervalMax) || 93);
@@ -2832,9 +3040,16 @@
         }
         randomPauseActive = false;
         pauseDeadline = 0;
+        if (!isPageVisible()) {
+          pendingRandomPause = true;
+          scheduleRandomPause();
+          return;
+        }
         if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
-          startPlayback();
-          console.log(`[视频] 已恢复播放，实际暂停: ${Math.max(0, Math.round((Date.now() - pauseStartedAt) / 1000))}秒`);
+          const playbackRequestAfterPause = startPlayback();
+          playbackRequestAfterPause.then((succeeded) => {
+            if (succeeded) console.log(`[视频] 已恢复播放，实际暂停: ${Math.max(0, Math.round((Date.now() - pauseStartedAt) / 1000))}秒`);
+          });
         }
         scheduleRandomPause();
       };
@@ -2869,15 +3084,15 @@
       };
       const handleVisibilityChange = () => {
         if (!isPageVisible()) {
+          clearTimeout(visibilityResumeTimer);
+          visibilityResumeTimer = null;
+          playbackRequest = null;
           if (randomPauseActive) {
             randomPauseActive = false;
             pauseDeadline = 0;
             clearTimeout(resumeTimer);
             resumeTimer = null;
-            if (player.paused()) {
-              startPlayback();
-              console.log("[视频] 页面进入后台，已恢复播放，避免随机暂停计时被浏览器延迟");
-            }
+            pendingRandomPause = true;
           }
           return;
         }
@@ -2885,7 +3100,21 @@
           resumeRandomPause();
           return;
         }
-        if (pendingRandomPause || (nextPauseAt && Date.now() >= nextPauseAt)) {
+        clearTimeout(visibilityResumeTimer);
+        visibilityResumeTimer = setTimeout(() => {
+          visibilityResumeTimer = null;
+          if (isPageVisible() && !playbackFinished && !randomPauseActive && player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+            startPlayback();
+            console.log("[视频] 页面回到前台，已恢复播放");
+          }
+        }, 250);
+        if (pendingRandomPause) {
+          pendingRandomPause = false;
+          clearTimeout(pauseTimer);
+          pauseTimer = null;
+          nextPauseAt = 0;
+          scheduleRandomPause();
+        } else if (nextPauseAt && Date.now() >= nextPauseAt) {
           clearTimeout(pauseTimer);
           pauseTimer = null;
           nextPauseAt = 0;
@@ -2951,6 +3180,10 @@
           clearTimeout(pauseTimer);
           clearTimeout(resumeTimer);
           clearTimeout(mouseMoveTimer);
+          clearTimeout(visibilityResumeTimer);
+          clearTimeout(playbackRetryTimer);
+          playbackRetryTimer = null;
+          playbackRetryAttempt = 0;
           pauseDeadline = 0;
           pendingRandomPause = false;
           if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -2965,7 +3198,7 @@
         };
         const intervalId = setInterval(() => {
           if ("isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
-            if (!randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
+            if (isPageVisible() && !randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
               startPlayback();
             }
           } else {
@@ -2979,31 +3212,67 @@
     }
     work(iframeWindow) {
       return new Promise(async (resolve) => {
-        if (!this.defaultConfig.autoAnswer) {
-          this.askStore.task.status = "未开启自动答题，等待手动答题";
-          resolve();
-          return;
+        try {
+          if (!this.defaultConfig.autoAnswer) {
+            this.askStore.task.status = "未开启自动答题，等待手动答题";
+            resolve(true);
+            return;
+          }
+          if (!await waitElementLoaded(iframeWindow, ".TiMu")) {
+            this.askStore.task.status = "题目加载超时，下一轮重试";
+            resolve(false);
+            return;
+          }
+          await decode(iframeWindow);
+          const Timu = iframeWindow.document.querySelectorAll(".TiMu");
+          if (!Timu || Timu.length === 0) {
+            this.askStore.task.status = "题目仍在加载，等待下一轮重试";
+            resolve(false);
+            return;
+          }
+          let ques = [], succ = 0;
+          for (let i = 0; i < Timu.length; i++) {
+            let data = getQuestion("1", Timu[i]);
+            console.log(data), ques.push(data);
+          }
+          this.askStore.reset(), this.askStore.count = ques.length, this.askStore.task.name = "章节测验";
+          for (let i = 0; i < ques.length; i++) {
+            await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax), this.askStore.insert(ques[i]), this.askStore.task.work.inx = i;
+            let data = await getAnswers(ques[i], iframeWindow);
+            this.askStore.get(i).allAnswer = data;
+            let tmp = fillAnswer(data, ques[i], Timu[i], iframeWindow);
+            tmp ? (this.askStore.get(i).status = "primary", this.askStore.get(i).answer = tmp, succ++) : (this.askStore.get(i).status = "danger", this.askStore.get(i).answer = "暂无答案"), this.askStore.get(i).dom = Timu[i];
+          }
+          if (this.defaultConfig.autoSubmit) {
+            if (succ / ques.length < this.defaultConfig.minAccuracy) {
+              this.askStore.log("章节测验正确率不足，暂存", "error");
+              iframeWindow.alert = function(e) {
+                console.log("alert 方法被阻止", e);
+              };
+              iframeWindow.noSubmit();
+            } else {
+              await randomSleep(this.defaultConfig.submitDelayMin, this.defaultConfig.submitDelayMax);
+              iframeWindow.btnBlueSubmit();
+              await sleep(3);
+              iframeWindow.submitCheckTimes();
+              this.askStore.log("章节测验已完成", "success");
+              await randomSleep(5, 10);
+              this.askStore.log("正在刷新页面...", "info");
+              iframeWindow.location.reload();
+            }
+            this.askStore.task.status = `章节测验已完成，等待切换,正确率:${succ}/${ques.length}`;
+            resolve(true);
+            return;
+          }
+          this.askStore.log("已完成答题，未开启自动提交，等待手动提交中", "success");
+          this.askStore.task.status = `正在等待手动提交,正确率:${succ}/${ques.length}`;
+          resolve(true);
+        } catch (error) {
+          this.askStore.task.status = "章节测验处理失败，下一轮重试";
+          this.askStore.log("章节测验处理失败，下一轮重试", "error");
+          console.error("[章节答题] 处理失败", error);
+          resolve(false);
         }
-        decode(iframeWindow);
-        const Timu = iframeWindow.document.querySelectorAll(".TiMu");
-        if (!Timu)
-          return void resolve();
-        let ques = [], succ = 0;
-        for (let i = 0; i < Timu.length; i++) {
-          let data = getQuestion("1", Timu[i]);
-          console.log(data), ques.push(data);
-        }
-        this.askStore.reset(), this.askStore.count = ques.length, this.askStore.task.name = "章节测验";
-        for (let i = 0; i < ques.length; i++) {
-          await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax), this.askStore.insert(ques[i]), this.askStore.task.work.inx = i;
-          let data = await getAnswers(ques[i], iframeWindow);
-          this.askStore.get(i).allAnswer = data;
-          let tmp = fillAnswer(data, ques[i], Timu[i], iframeWindow);
-          tmp ? (this.askStore.get(i).status = "primary", this.askStore.get(i).answer = tmp, succ++) : (this.askStore.get(i).status = "danger", this.askStore.get(i).answer = "暂无答案"), this.askStore.get(i).dom = Timu[i];
-        }
-        this.defaultConfig.autoSubmit ? (succ / ques.length < this.defaultConfig.minAccuracy ? (this.askStore.log("章节测验正确率不足，暂存", "error"), iframeWindow.alert = function(e) {
-          console.log("alert 方法被阻止", e);
-        }, iframeWindow.noSubmit()) : (await randomSleep(this.defaultConfig.submitDelayMin, this.defaultConfig.submitDelayMax), iframeWindow.btnBlueSubmit(), await sleep(3), iframeWindow.submitCheckTimes(), this.askStore.log("章节测验已完成", "success"), await randomSleep(5, 10), this.askStore.log("正在刷新页面...", "info"), iframeWindow.location.reload()), this.askStore.task.status = `章节测验已完成，等待切换,正确率:${succ}/${ques.length}`, resolve()) : (this.askStore.log("已完成答题，未开启自动提交，等待手动提交中", "success"), this.askStore.task.status = `正在等待手动提交,正确率:${succ}/${ques.length}`);
       });
     }
     homework() {
@@ -3107,16 +3376,17 @@
       await this.ServerApi.s(questionList, iframeWindow.location.href);
     }
   }
-  const pinia = pinia$1.createPinia(), app = vue.createApp(WorkbenchApp).use(ElementPlus).use(pinia), _self = _unsafeWindow, top = _self.top, formStore = useformStore();
+  const pinia = pinia$1.createPinia(), _self = _unsafeWindow, top = _self.top, isTopWindow = _self === top, app = isTopWindow ? vue.createApp(WorkbenchApp).use(ElementPlus).use(pinia) : null, formStore = useformStore();
   var iframeCom = null;
-  switch (app.mount((() => {
+  const appMount = isTopWindow ? app.mount((() => {
     try {
       const div = top.document.createElement("div");
       return div.id = "cccxapp", top.document.getElementById(div.id) ? div : (top.document.body.append(div), div);
     } catch (e) {
       log(e, "error");
     }
-  })()), (() => {
+  })()) : null;
+  switch (appMount, (() => {
     document.body.oncopy = null, document.body.oncut = null, document.body.onpaste = null, document.body.onselectstart = null, document.body.ondragstart = null;
     const style = document.createElement("style");
     style.innerHTML = "\n       * {\n           -webkit-user-select: auto !important;\n           -moz-user-select: auto !important;\n           -o-user-select: auto !important;\n           user-select: auto !important;\n       }\n   ", document.head.appendChild(style);
@@ -3135,38 +3405,69 @@
       }
       const cxModel = new Cx();
       cxModel.askStore.log("脚本初始化成功！", "success");
+      let chapterWorkRunning = false;
+      let chapterPollRunning = false;
       const startWork = async () => {
+        if (chapterWorkRunning) return;
+        chapterWorkRunning = true;
+        try {
         var _a, _b, _c, _d, _e;
-        await waitElementLoaded(_self, "#iframe");
+        if (!await waitElementLoaded(_self, "#iframe")) return false;
         const cardsIframe = _self.document.querySelector("#iframe");
-        await waitIframeLoaded(cardsIframe);
+        if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return false;
         const _self1 = cardsIframe.contentWindow;
         top.scroll2Job();
         let jobList = _self1.document.querySelectorAll(".ans-job-icon") || [];
+        let allTasksReady = true;
         for (let i = 0; i < jobList.length; i++) {
           const item = jobList[i];
           if ((_a = item.parentElement) == null ? void 0 : _a.classList.contains("ans-job-finished")) {
             const iframe = (_b = item.parentElement) == null ? void 0 : _b.querySelector("iframe");
+            if (!iframe) {
+              allTasksReady = false;
+              cxModel.askStore.log("已完成任务点 iframe 尚未加载，跳过本轮", "warn");
+              continue;
+            }
             if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/work\/index.html/)) {
-              await waitIframeLoaded(iframe), JSON.parse(iframe.getAttribute("data"));
+              if (!await waitIframeLoaded(iframe) || !iframe.contentWindow) {
+                allTasksReady = false;
+                cxModel.askStore.log("已完成作业 iframe 尚未加载，下一轮重试", "warn");
+                continue;
+              }
               const workIframe = (_c = iframe.contentWindow) == null ? void 0 : _c.document.querySelector("iframe");
-              workIframe && (await waitIframeLoaded(workIframe), cxModel.s(workIframe.contentWindow));
+              if (!workIframe || !await waitIframeLoaded(workIframe) || !workIframe.contentWindow) {
+                allTasksReady = false;
+                cxModel.askStore.log("已完成作业题目尚未加载，下一轮重试", "warn");
+                continue;
+              }
+              await cxModel.s(workIframe.contentWindow);
             }
             console.log(iframe.src, "已完成"), cxModel.askStore.log("已完成的任务点,跳过");
           } else {
             const iframe = (_d = item.parentElement) == null ? void 0 : _d.querySelector("iframe");
-            await waitIframeLoaded(iframe);
+            if (!iframe || !await waitIframeLoaded(iframe)) {
+              allTasksReady = false;
+              cxModel.askStore.log("任务点 iframe 尚未加载，跳过本轮", "warn");
+              continue;
+            }
             const otherInfo = JSON.parse(iframe.getAttribute("data"));
             if (cxModel.askStore.log(`正在完成任务:${otherInfo.name || otherInfo.title}`), iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/video\/index\.html/)) {
               if (!formStore.forminput.autoVideo) {
                 cxModel.askStore.log("视频任务已跳过", "success");
                 continue;
               }
-              await cxModel.video(iframe.contentWindow), cxModel.askStore.log("视频任务已完成", "success");
+              const videoResult = await cxModel.video(iframe.contentWindow);
+              videoResult === false ? allTasksReady = false : cxModel.askStore.log("视频任务已完成", "success");
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/work\/index.html/)) {
               cxModel.askStore.log("即将开始做作业", "info");
               const workIframe = (_e = iframe.contentWindow) == null ? void 0 : _e.document.querySelector("iframe");
-              workIframe && (await waitIframeLoaded(workIframe), await cxModel.work(workIframe.contentWindow), cxModel.askStore.log("作业任务已完成", "success"));
+              if (!workIframe || !await waitIframeLoaded(workIframe) || !workIframe.contentWindow) {
+                allTasksReady = false;
+                cxModel.askStore.log("作业题目尚未加载，下一轮重试", "warn");
+                continue;
+              }
+              const workResult = await cxModel.work(workIframe.contentWindow);
+              workResult === false ? allTasksReady = false : cxModel.askStore.log("作业任务已完成", "success");
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/audio\/index.html/)) {
               if (log("音频", "error"), !formStore.forminput.autoVideo) {
                 cxModel.askStore.log("音频任务已跳过", "success");
@@ -3177,14 +3478,35 @@
               (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/pdf\/index.html/)) ? (log("文档", "error"), iframe && (await waitIframeLoaded(iframe), await cxModel.pdf(iframe.contentWindow), cxModel.askStore.log("pdf任务已完成", "success"))) : (console.log(iframe == null ? void 0 : iframe.src, "未知"), cxModel.askStore.log("未知任务跳过", "success"));
           }
         }
+        if (!allTasksReady) {
+          cxModel.askStore.task.status = "任务内容仍在加载，下一轮重试";
+          return false;
+        }
         await sleep(formStore.forminput.interval), !formStore.forminput.autoJump && cxModel.askStore.msg("由于未开启自动切换,请手动切换"), formStore.forminput.autoJump && (top == null ? void 0 : top.document.querySelector(".nextChapter").click());
+        return true;
+        } finally {
+          chapterWorkRunning = false;
+        }
       };
       setInterval(async () => {
-        await waitElementLoaded(_self, "#iframe");
-        const cardsIframe = _self.document.querySelector("#iframe");
-        await waitIframeLoaded(cardsIframe);
-        const _self1 = cardsIframe.contentWindow;
-        iframeCom != _self1.location.href && (iframeCom = _self1.location.href, cxModel.askStore.reset(), startWork());
+        if (chapterPollRunning) return;
+        chapterPollRunning = true;
+        try {
+          if (!await waitElementLoaded(_self, "#iframe")) return;
+          const cardsIframe = _self.document.querySelector("#iframe");
+          if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return;
+          const _self1 = cardsIframe.contentWindow;
+          if (iframeCom != _self1.location.href) {
+            cxModel.askStore.reset();
+            const started = await startWork();
+            if (started) iframeCom = _self1.location.href;
+          }
+        } catch (error) {
+          cxModel.askStore.log("章节任务初始化失败，下一轮将重试", "error");
+          console.error("[章节启动] 任务初始化失败", error);
+        } finally {
+          chapterPollRunning = false;
+        }
       }, 2e3);
       break;
     case "/mooc2-ans/mycourse/stu":

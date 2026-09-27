@@ -26,3 +26,5 @@ tiku/data/*.log
 Thumbs.db
 Desktop.ini
 .DS_Store
+# Playwright CLI output (may contain credentials)
+.playwright-cli/

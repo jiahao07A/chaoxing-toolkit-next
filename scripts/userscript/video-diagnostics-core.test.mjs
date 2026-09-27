@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const scriptPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "学习通脚本.js");
 const script = fs.readFileSync(scriptPath, "utf8");
+assert.doesNotMatch(script, /\n\s*mountVideoDiagnosticsPanel\(\);/, "视频播放不应再自动挂载诊断悬浮窗");
 const blockStart = script.indexOf('const VIDEO_DIAGNOSTICS_KEY = "videoDiagnostics"');
 const blockEnd = script.indexOf("  let runtimeLogSink = null;", blockStart);
 assert.ok(blockStart >= 0 && blockEnd > blockStart, "无法定位正式用户脚本中的诊断实现");

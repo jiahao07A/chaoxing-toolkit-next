@@ -17,8 +17,18 @@ test('userscript settings dialog stays inside the viewport and scrolls its body'
   assert.match(script, /this\.panelOpen/);
   assert.match(script, /const WorkbenchApp = vue\.defineComponent/);
   assert.match(script, /vue\.createApp\(WorkbenchApp\)/);
+  assert.match(script, /isTopWindow = _self === top/);
+  assert.match(script, /const appMount = isTopWindow \? app\.mount/);
+  assert.match(script, /_unsafeWindow === _unsafeWindow\?\.top && typeof MutationObserver/);
   assert.match(script, /panelLayout/);
   assert.match(script, /cx_workbench_layout/);
+  assert.match(script, /cx_workbench_trigger_layout/);
+  assert.match(script, /triggerLayout/);
+  assert.match(script, /beginTriggerDrag/);
+  assert.match(script, /moveTriggerPointer/);
+  assert.match(script, /pointercancel/);
+  assert.match(script, /suppressClick/);
+  assert.match(script, /touch-action:none/);
   assert.match(script, /beginDrag/);
   assert.match(script, /beginResize/);
   assert.match(script, /pointermove/);
