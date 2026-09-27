@@ -2233,7 +2233,17 @@
     if (settled) return;
     timer = setInterval(check, 100);
     timeoutId = setTimeout(() => finish(false), timeoutMs);
-  }), removeHtml = (html) => null == html ? "" : html.replace(/<((?!img|sub|sup|br)[^>]+)>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").replace(/<br\s*\/?>/g, "\n").replace(/<img.*?src="(.*?)".*?>/g, '<img src="$1"/>').trim(), cl = (str) => str.replace(/^【.*?】\s*/, "").replace(/\s*（\d+\.\d+分）$/, ""), getQuestion = (type, html) => {
+  }), parseChapterTaskInfo = (iframe) => {
+    if (!iframe || typeof iframe.getAttribute !== "function") return null;
+    const raw = iframe.getAttribute("data");
+    if (!raw || !String(raw).trim()) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }, removeHtml = (html) => null == html ? "" : html.replace(/<((?!img|sub|sup|br)[^>]+)>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").replace(/<br\s*\/?>/g, "\n").replace(/<img.*?src="(.*?)".*?>/g, '<img src="$1"/>').trim(), cl = (str) => str.replace(/^【.*?】\s*/, "").replace(/\s*（\d+\.\d+分）$/, ""), getQuestion = (type, html) => {
     let questionHtml, questionText, questionTypeId, optionHtml, tokenHtml, workType, optionText, index;
     switch (type) {
       case "1":
@@ -2300,16 +2310,20 @@
       }
       glyphCount++ % 32 === 0 && await yieldToBrowser();
     }
+    const replacementEntries = Object.entries(text).map(([codePoint, replacement]) => {
+      const source = String.fromCodePoint(Number(codePoint));
+      if (typeof replacement === "string" && replacement.length > 0) return [source, replacement];
+      const replacementCodePoint = Number(replacement);
+      return Number.isInteger(replacementCodePoint) && replacementCodePoint >= 0 && replacementCodePoint <= 1114111 ? [source, String.fromCodePoint(replacementCodePoint)] : [source, ""];
+    }).filter(([source, replacement]) => source && replacement);
+    const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const replacementPattern = replacementEntries.length ? new RegExp(replacementEntries.map(([source]) => escapeRegExp(source)).join("|"), "g") : null;
+    const replacements = new Map(replacementEntries);
     for (const fontElement of secretElements) {
-      let html = fontElement.innerHTML;
-      const textKeys = Object.keys(text);
-      for (let i = 0; i < textKeys.length; i++) {
-        const key = textKeys[i];
-        const regex = new RegExp(String.fromCharCode(key), "g");
-        html = html.replace(regex, String.fromCharCode(text[key]));
-        (i + 1) % 128 === 0 && await yieldToBrowser();
+      if (replacementPattern) {
+        const html = fontElement.innerHTML;
+        fontElement.innerHTML = html.replace(replacementPattern, (source) => replacements.get(source) || source);
       }
-      fontElement.innerHTML = html;
       fontElement.classList.remove("font-cxsecret");
       await yieldToBrowser();
     }
@@ -2588,6 +2602,22 @@
       const triggerLayout = vue.reactive({ initialized: false, left: 0, top: 0 });
       const pointerState = { mode: "", pointerId: null, startX: 0, startY: 0, left: 0, top: 0, width: 0, height: 0 };
       const triggerPointerState = { active: false, pointerId: null, startX: 0, startY: 0, left: 0, top: 0, moved: false, suppressClick: false, suppressClickTimer: null };
+      const pointerFrameState = { id: null, usesRaf: false, event: null };
+      const triggerFrameState = { id: null, usesRaf: false, event: null };
+      const requestPointerFrame = (callback, state) => {
+        if (typeof window.requestAnimationFrame === "function") {
+          state.usesRaf = true;
+          return window.requestAnimationFrame(callback);
+        }
+        state.usesRaf = false;
+        return window.setTimeout(callback, 16);
+      };
+      const cancelPointerFrame = (state) => {
+        if (state.id === null) return;
+        state.usesRaf && typeof window.cancelAnimationFrame === "function" ? window.cancelAnimationFrame(state.id) : window.clearTimeout(state.id);
+        state.id = null;
+        state.event = null;
+      };
       const clampLayout = () => {
         if (typeof window === "undefined") return;
         const viewportWidth = Math.max(220, window.innerWidth - 16);
@@ -2655,16 +2685,7 @@
         clampLayout();
         panelLayout.initialized = true;
       };
-      const endPointer = () => {
-        if (!pointerState.mode) return;
-        pointerState.mode = "";
-        pointerState.pointerId = null;
-        persistLayout();
-        window.removeEventListener("pointermove", movePointer);
-        window.removeEventListener("pointerup", endPointer);
-        window.removeEventListener("pointercancel", endPointer);
-      };
-      const movePointer = (event) => {
+      const applyPointerMove = (event) => {
         if (!pointerState.mode || event.pointerId !== pointerState.pointerId) return;
         const deltaX = event.clientX - pointerState.startX;
         const deltaY = event.clientY - pointerState.startY;
@@ -2677,6 +2698,31 @@
         }
         clampLayout();
       };
+      const flushPointerMove = () => {
+        pointerFrameState.id = null;
+        const event = pointerFrameState.event;
+        pointerFrameState.event = null;
+        event && applyPointerMove(event);
+      };
+      const movePointer = (event) => {
+        if (!pointerState.mode || event.pointerId !== pointerState.pointerId) return;
+        pointerFrameState.event = event;
+        if (pointerFrameState.id === null) pointerFrameState.id = requestPointerFrame(flushPointerMove, pointerFrameState);
+        event.preventDefault();
+      };
+      const endPointer = () => {
+        if (!pointerState.mode) return;
+        if (pointerFrameState.event) applyPointerMove(pointerFrameState.event);
+        cancelPointerFrame(pointerFrameState);
+        const pointerTarget = pointerState.pointerId;
+        pointerState.mode = "";
+        pointerState.pointerId = null;
+        persistLayout();
+        pointerTarget !== null && document.querySelector(".cx-workbench")?.releasePointerCapture?.(pointerTarget);
+        window.removeEventListener("pointermove", movePointer);
+        window.removeEventListener("pointerup", endPointer);
+        window.removeEventListener("pointercancel", endPointer);
+      };
       const beginPointer = (mode, event) => {
         if (event.button !== 0) return;
         pointerState.mode = mode;
@@ -2688,6 +2734,7 @@
         pointerState.width = panelLayout.width;
         pointerState.height = panelLayout.height;
         event.preventDefault();
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
         window.addEventListener("pointermove", movePointer);
         window.addEventListener("pointerup", endPointer);
         window.addEventListener("pointercancel", endPointer);
@@ -2697,8 +2744,32 @@
         beginPointer("drag", event);
       };
       const beginResize = (event) => beginPointer("resize", event);
+      const applyTriggerPointerMove = (event) => {
+        if (!triggerPointerState.active || event.pointerId !== triggerPointerState.pointerId) return;
+        const deltaX = event.clientX - triggerPointerState.startX;
+        const deltaY = event.clientY - triggerPointerState.startY;
+        if (Math.abs(deltaX) >= 4 || Math.abs(deltaY) >= 4) triggerPointerState.moved = true;
+        triggerLayout.left = triggerPointerState.left + deltaX;
+        triggerLayout.top = triggerPointerState.top + deltaY;
+        clampTriggerLayout();
+      };
+      const flushTriggerPointerMove = () => {
+        triggerFrameState.id = null;
+        const event = triggerFrameState.event;
+        triggerFrameState.event = null;
+        event && applyTriggerPointerMove(event);
+      };
+      const moveTriggerPointer = (event) => {
+        if (!triggerPointerState.active || event.pointerId !== triggerPointerState.pointerId) return;
+        triggerFrameState.event = event;
+        if (triggerFrameState.id === null) triggerFrameState.id = requestPointerFrame(flushTriggerPointerMove, triggerFrameState);
+        event.preventDefault();
+      };
       const endTriggerPointer = () => {
         if (!triggerPointerState.active) return;
+        if (triggerFrameState.event) applyTriggerPointerMove(triggerFrameState.event);
+        cancelPointerFrame(triggerFrameState);
+        const pointerTarget = triggerPointerState.pointerId;
         triggerPointerState.active = false;
         triggerPointerState.pointerId = null;
         if (triggerPointerState.moved) {
@@ -2710,19 +2781,10 @@
           }, 500);
         }
         persistTriggerLayout();
+        pointerTarget !== null && document.querySelector(".cx-workbench-trigger")?.releasePointerCapture?.(pointerTarget);
         window.removeEventListener("pointermove", moveTriggerPointer);
         window.removeEventListener("pointerup", endTriggerPointer);
         window.removeEventListener("pointercancel", endTriggerPointer);
-      };
-      const moveTriggerPointer = (event) => {
-        if (!triggerPointerState.active || event.pointerId !== triggerPointerState.pointerId) return;
-        const deltaX = event.clientX - triggerPointerState.startX;
-        const deltaY = event.clientY - triggerPointerState.startY;
-        if (Math.abs(deltaX) >= 4 || Math.abs(deltaY) >= 4) triggerPointerState.moved = true;
-        triggerLayout.left = triggerPointerState.left + deltaX;
-        triggerLayout.top = triggerPointerState.top + deltaY;
-        clampTriggerLayout();
-        event.preventDefault();
       };
       const beginTriggerDrag = (event) => {
         if (event.button !== 0 || triggerPointerState.active) return;
@@ -2734,6 +2796,8 @@
         triggerPointerState.top = triggerLayout.top;
         triggerPointerState.moved = false;
         event.stopPropagation();
+        event.preventDefault();
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
         window.addEventListener("pointermove", moveTriggerPointer);
         window.addEventListener("pointerup", endTriggerPointer);
         window.addEventListener("pointercancel", endTriggerPointer);
@@ -2901,20 +2965,60 @@
     }
     async audio(iframeWindow) {
       this.askStore.reset(), this.askStore.task.name = "视频音频";
-      const audio = iframeWindow.document.getElementById("audio_html5_api");
-      return audio.muted = true, audio.autoplay = true, audio.volume = 0, audio.play().then(function() {
-        console.log("播放成功");
-      }).catch(function(error) {
-        "NotAllowedError" === error.name ? ElementPlus.ElMessageBox.alert("由于自动播放需要用户点击过浏览器，请确认即可", "温馨提示", { confirmButtonText: "确认", callback: () => {
-          audio.play();
-        } }) : console.error("视频播放失败，原因：", error);
-      }), new Promise((resolve) => {
+      if (await waitElementLoaded(iframeWindow, "#audio_html5_api") === false) {
+        this.askStore.task.status = "音频播放器加载超时，下一轮重试";
+        return false;
+      }
+      const audio = iframeWindow?.document?.getElementById("audio_html5_api");
+      if (!audio) {
+        this.askStore.task.status = "音频播放器不存在，下一轮重试";
+        return false;
+      }
+      audio.muted = true, audio.autoplay = true, audio.volume = 0;
+      let playRequest = null;
+      let promptShown = false;
+      const ensurePlaying = () => {
+        if (audio.ended || !audio.paused || playRequest) return playRequest;
+        try {
+          const result = audio.play();
+          playRequest = Promise.resolve(result).then(() => {
+            console.log("播放成功");
+            return true;
+          }).catch((error) => {
+            if (error?.name === "NotAllowedError" && !promptShown) {
+              promptShown = true;
+              ElementPlus.ElMessageBox.alert("由于自动播放需要用户点击过浏览器，请确认即可", "温馨提示", { confirmButtonText: "确认", callback: () => {
+                promptShown = false;
+                ensurePlaying();
+              } });
+            } else if (error?.name !== "AbortError") {
+              console.error("视频播放失败，原因：", error);
+            }
+            return false;
+          }).finally(() => {
+            playRequest = null;
+          });
+          return playRequest;
+        } catch (error) {
+          return Promise.resolve(false);
+        }
+      };
+      return ensurePlaying(), new Promise((resolve) => {
+        let settled = false;
+        const finish = (result) => {
+          if (settled) return;
+          settled = true;
+          clearInterval(intervalId);
+          audio.removeEventListener("ended", handleEnded);
+          resolve(result);
+        };
+        const handleEnded = () => {
+          log("监听到音频已完成", "success"), finish(true);
+        };
         const intervalId = setInterval(() => {
-          audio.ended ? (clearInterval(intervalId), log("监听到音频已完成", "success"), resolve()) : audio.paused && audio.play();
+          audio.ended ? finish(true) : ensurePlaying();
         }, 1e3);
-        audio.addEventListener("ended", function() {
-          log("监听到音频已完成1", "success"), audio.pause(), clearInterval(intervalId), resolve();
-        });
+        audio.addEventListener("ended", handleEnded, { once: true });
       });
     }
     async video(iframeWindow) {
@@ -2929,7 +3033,11 @@
         console.warn("⚠️ [配置] 视频开始前同步失败，继续使用本地配置", error);
       }
       console.log("视频加载完成");
-      const player = iframeWindow.videojs("video_html5_api");
+      const player = typeof iframeWindow?.videojs === "function" ? iframeWindow.videojs("video_html5_api") : null;
+      if (!player || typeof player.play !== "function" || typeof player.pause !== "function") {
+        this.askStore.task.status = "视频播放器尚未就绪，下一轮重试";
+        return false;
+      }
       const config = getConfig();
       const stopVideoDiagnostics = installVideoDiagnostics(player);
       player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => {
@@ -2994,7 +3102,15 @@
         return playbackRequest;
       };
       startPlayback();
-      const pauseBase = player.pause;
+      const isVideoUnfinished = () => {
+        try {
+          if (typeof iframeWindow.isUnFinishJob === "function") return Boolean(iframeWindow.isUnFinishJob());
+          const ended = typeof player.ended === "function" ? player.ended() : player.ended;
+          return !ended;
+        } catch (error) {
+          return true;
+        }
+      };
       let allowPlayerPause = false;
       let pauseTimer = null;
       let resumeTimer = null;
@@ -3007,19 +3123,18 @@
       const pauseForRandomInterval = () => {
         allowPlayerPause = true;
         try {
-          return pauseBase.call(player);
+          return player.pause();
         } finally {
           allowPlayerPause = false;
         }
       };
-      player.pause = function(...args) {
-        if (allowPlayerPause || randomPauseActive || playbackFinished || !isPageVisible()) {
-          return pauseBase.apply(this, args);
-        }
-        return startPlayback();
-      };
       const handleUnexpectedPause = () => {
-        if (isPageVisible() && !allowPlayerPause && !randomPauseActive && !playbackFinished) startPlayback();
+        if (isPageVisible() && !allowPlayerPause && !randomPauseActive && !playbackFinished) {
+          const playbackRequestAfterPause = startPlayback();
+          playbackRequestAfterPause.then((succeeded) => {
+            if (succeeded) console.log("[视频] 检测到意外暂停，已恢复播放");
+          });
+        }
       };
       player.on("pause", handleUnexpectedPause);
 
@@ -3033,6 +3148,8 @@
       let pauseStartedAt = 0;
       const resumeRandomPause = () => {
         if (!randomPauseActive) return;
+        clearTimeout(resumeTimer);
+        resumeTimer = null;
         const remaining = pauseDeadline - Date.now();
         if (remaining > 0) {
           resumeTimer = setTimeout(resumeRandomPause, Math.min(remaining, 250));
@@ -3045,7 +3162,7 @@
           scheduleRandomPause();
           return;
         }
-        if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+        if (player.paused() && isVideoUnfinished()) {
           const playbackRequestAfterPause = startPlayback();
           playbackRequestAfterPause.then((succeeded) => {
             if (succeeded) console.log(`[视频] 已恢复播放，实际暂停: ${Math.max(0, Math.round((Date.now() - pauseStartedAt) / 1000))}秒`);
@@ -3086,7 +3203,9 @@
         if (!isPageVisible()) {
           clearTimeout(visibilityResumeTimer);
           visibilityResumeTimer = null;
-          playbackRequest = null;
+          clearTimeout(playbackRetryTimer);
+          playbackRetryTimer = null;
+          playbackRetryAttempt = 0;
           if (randomPauseActive) {
             randomPauseActive = false;
             pauseDeadline = 0;
@@ -3103,9 +3222,11 @@
         clearTimeout(visibilityResumeTimer);
         visibilityResumeTimer = setTimeout(() => {
           visibilityResumeTimer = null;
-          if (isPageVisible() && !playbackFinished && !randomPauseActive && player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
-            startPlayback();
-            console.log("[视频] 页面回到前台，已恢复播放");
+          if (isPageVisible() && !playbackFinished && !randomPauseActive && player.paused() && isVideoUnfinished()) {
+            const playbackRequestAfterVisibility = startPlayback();
+            playbackRequestAfterVisibility.then((succeeded) => {
+              if (succeeded) console.log("[视频] 页面回到前台，已恢复播放");
+            });
           }
         }, 250);
         if (pendingRandomPause) {
@@ -3166,7 +3287,7 @@
         const delay = Math.floor(Math.random() * (8 - 3 + 1) + 3) * 1000;
         mouseMoveTimer = setTimeout(() => {
           simulateMouseMovement();
-          if ("isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+          if (isVideoUnfinished()) {
             scheduleMouseMovement();
           }
         }, delay);
@@ -3188,7 +3309,6 @@
           pendingRandomPause = false;
           if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
           if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
-          player.pause = pauseBase;
           stopVideoDiagnostics();
         };
         const finish = (message) => {
@@ -3197,7 +3317,7 @@
           resolve();
         };
         const intervalId = setInterval(() => {
-          if ("isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+          if (isVideoUnfinished()) {
             if (isPageVisible() && !randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
               startPlayback();
             }
@@ -3321,11 +3441,13 @@
           this.askStore.task.status = "未开启自动切换，等待手动切换";
       });
     }
-    pdf(iframeWindow) {
-      return new Promise(async (resolve) => {
-        const contentWindow = iframeWindow.document.querySelector("#panView").contentWindow;
-        contentWindow.scrollTo(0, contentWindow.document.body.scrollHeight), resolve();
-      });
+    async pdf(iframeWindow) {
+      if (await waitElementLoaded(iframeWindow, "#panView") === false) return false;
+      const view = iframeWindow?.document?.querySelector("#panView");
+      const contentWindow = view?.contentWindow;
+      if (!contentWindow?.document?.body) return false;
+      contentWindow.scrollTo(0, contentWindow.document.body.scrollHeight);
+      return true;
     }
     async s(iframeWindow) {
       const questionList = $(iframeWindow.document).find(".TiMu").map(function(index, element) {
@@ -3407,6 +3529,37 @@
       cxModel.askStore.log("脚本初始化成功！", "success");
       let chapterWorkRunning = false;
       let chapterPollRunning = false;
+      let chapterBlockedHref = null;
+      let chapterNavigationTimer = null;
+      let chapterNavigationAttempts = 0;
+      const scheduleNextChapter = () => {
+        if (!formStore.forminput.autoJump) {
+          cxModel.askStore.msg("由于未开启自动切换,请手动切换");
+          return true;
+        }
+        const tryClick = () => {
+          const nextButton = top?.document?.querySelector?.(".nextChapter");
+          if (nextButton && typeof nextButton.click === "function") {
+            chapterNavigationAttempts = 0;
+            chapterNavigationTimer = null;
+            nextButton.click();
+            return;
+          }
+          chapterNavigationAttempts += 1;
+          if (chapterNavigationAttempts < 10) {
+            chapterNavigationTimer = setTimeout(tryClick, 500);
+            return;
+          }
+          chapterNavigationAttempts = 0;
+          chapterNavigationTimer = null;
+          cxModel.askStore.task.status = "未找到下一章节按钮，请手动切换";
+          cxModel.askStore.log("未找到下一章节按钮，请手动切换", "warn");
+        };
+        clearTimeout(chapterNavigationTimer);
+        chapterNavigationAttempts = 0;
+        tryClick();
+        return true;
+      };
       const startWork = async () => {
         if (chapterWorkRunning) return;
         chapterWorkRunning = true;
@@ -3416,7 +3569,7 @@
         const cardsIframe = _self.document.querySelector("#iframe");
         if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return false;
         const _self1 = cardsIframe.contentWindow;
-        top.scroll2Job();
+        if (typeof top?.scroll2Job === "function") top.scroll2Job();
         let jobList = _self1.document.querySelectorAll(".ans-job-icon") || [];
         let allTasksReady = true;
         for (let i = 0; i < jobList.length; i++) {
@@ -3445,13 +3598,18 @@
             console.log(iframe.src, "已完成"), cxModel.askStore.log("已完成的任务点,跳过");
           } else {
             const iframe = (_d = item.parentElement) == null ? void 0 : _d.querySelector("iframe");
-            if (!iframe || !await waitIframeLoaded(iframe)) {
+            if (!iframe || !await waitIframeLoaded(iframe) || !iframe.contentWindow) {
               allTasksReady = false;
               cxModel.askStore.log("任务点 iframe 尚未加载，跳过本轮", "warn");
               continue;
             }
-            const otherInfo = JSON.parse(iframe.getAttribute("data"));
-            if (cxModel.askStore.log(`正在完成任务:${otherInfo.name || otherInfo.title}`), iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/video\/index\.html/)) {
+            const taskInfo = parseChapterTaskInfo(iframe);
+            if (!taskInfo) {
+              allTasksReady = false;
+              cxModel.askStore.log("任务点元数据无效，下一轮重试", "warn");
+              continue;
+            }
+            if (cxModel.askStore.log(`正在完成任务:${taskInfo.name || taskInfo.title || "未命名任务"}`), iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/video\/index\.html/)) {
               if (!formStore.forminput.autoVideo) {
                 cxModel.askStore.log("视频任务已跳过", "success");
                 continue;
@@ -3469,20 +3627,21 @@
               const workResult = await cxModel.work(workIframe.contentWindow);
               workResult === false ? allTasksReady = false : cxModel.askStore.log("作业任务已完成", "success");
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/audio\/index.html/)) {
-              if (log("音频", "error"), !formStore.forminput.autoVideo) {
+              if (!formStore.forminput.autoVideo) {
                 cxModel.askStore.log("音频任务已跳过", "success");
                 continue;
               }
-              iframe && (await waitIframeLoaded(iframe), await cxModel.audio(iframe.contentWindow), cxModel.askStore.log("音频任务已完成", "success"));
+              const audioResult = await cxModel.audio(iframe.contentWindow);
+              audioResult === false ? allTasksReady = false : cxModel.askStore.log("音频任务已完成", "success");
             } else
-              (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/pdf\/index.html/)) ? (log("文档", "error"), iframe && (await waitIframeLoaded(iframe), await cxModel.pdf(iframe.contentWindow), cxModel.askStore.log("pdf任务已完成", "success"))) : (console.log(iframe == null ? void 0 : iframe.src, "未知"), cxModel.askStore.log("未知任务跳过", "success"));
+              (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/pdf\/index.html/)) ? (await waitIframeLoaded(iframe), await cxModel.pdf(iframe.contentWindow) === false ? allTasksReady = false : cxModel.askStore.log("pdf任务已完成", "success")) : (console.log(iframe == null ? void 0 : iframe.src, "未知"), chapterBlockedHref = _self1.location.href, allTasksReady = false, cxModel.askStore.log("未知任务待人工确认，暂停自动切换", "warn"));
           }
         }
         if (!allTasksReady) {
           cxModel.askStore.task.status = "任务内容仍在加载，下一轮重试";
           return false;
         }
-        await sleep(formStore.forminput.interval), !formStore.forminput.autoJump && cxModel.askStore.msg("由于未开启自动切换,请手动切换"), formStore.forminput.autoJump && (top == null ? void 0 : top.document.querySelector(".nextChapter").click());
+        await sleep(formStore.forminput.interval), scheduleNextChapter();
         return true;
         } finally {
           chapterWorkRunning = false;
@@ -3496,7 +3655,7 @@
           const cardsIframe = _self.document.querySelector("#iframe");
           if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return;
           const _self1 = cardsIframe.contentWindow;
-          if (iframeCom != _self1.location.href) {
+          if (iframeCom != _self1.location.href && chapterBlockedHref !== _self1.location.href) {
             cxModel.askStore.reset();
             const started = await startWork();
             if (started) iframeCom = _self1.location.href;

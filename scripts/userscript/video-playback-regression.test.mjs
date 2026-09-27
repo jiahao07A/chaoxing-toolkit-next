@@ -37,8 +37,7 @@ test('video playback path defines its config before scheduling random pauses', (
     'video must sync configuration before reading it and scheduling random pauses'
   );
 
-  assert.match(videoSource, /const pauseBase = player\.pause/);
-  assert.match(videoSource, /player\.pause = function/);
+  assert.doesNotMatch(videoSource, /player\.pause\s*=\s*function/);
   assert.match(videoSource, /player\.on\("pause"/);
   assert.match(videoSource, /const pauseForRandomInterval/);
   assert.match(videoSource, /pauseDeadline/);
@@ -47,13 +46,14 @@ test('video playback path defines its config before scheduling random pauses', (
   assert.match(videoSource, /页面回到前台，已恢复播放/);
   assert.match(videoSource, /!isPageVisible\(\)/);
   assert.match(videoSource, /playbackRequest/);
+  assert.match(videoSource, /isVideoUnfinished/);
   assert.match(videoSource, /randomPauseDuration/);
   assert.match(videoSource, /计划暂停/);
   assert.match(videoSource, /设置范围/);
   assert.doesNotMatch(videoSource, /startPlayback\(\);\s*playerButton\?\.click\(\)/);
 });
 
-test('video guard restarts an unexpected pause and restores the native method on finish', async () => {
+test('video guard restarts an unexpected pause without replacing the native method', async () => {
   let syncCalls = 0;
   const videoMethod = new Function(
     'waitElementLoaded',
@@ -114,12 +114,12 @@ test('video guard restarts an unexpected pause and restores the native method on
   const videoPromise = videoMethod.call(context, iframeWindow);
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(syncCalls, 1, 'video must refresh server settings before playback control starts');
-  const guardedPause = player.pause;
-  guardedPause.call(player);
+  assert.equal(player.pause, nativePause);
+  player.pause.call(player);
   await new Promise((resolve) => setTimeout(resolve, 0));
 
-  assert.notEqual(guardedPause, nativePause);
-  assert.equal(nativePauseCalls, 0);
+  assert.equal(player.pause, nativePause);
+  assert.equal(nativePauseCalls, 1);
   assert.equal(paused, false);
   assert.ok(playCalls >= 2);
 

@@ -9,8 +9,9 @@ assert.ok(waitIframeStart >= 0 && waitElementStart > waitIframeStart, "无法定
 const waitIframeSource = script.slice(waitIframeStart, waitElementStart).replace(/\),\s*$/, ")").replace(/^waitIframeLoaded = /, "");
 const waitIframeLoaded = new Function(`return ${waitIframeSource}`)();
 const removeHtmlStart = script.indexOf("removeHtml =", waitElementStart);
+const waitElementEnd = script.indexOf(", parseChapterTaskInfo =", waitElementStart);
 assert.ok(removeHtmlStart > waitElementStart, "无法定位元素等待函数结束位置");
-const waitElementSource = script.slice(waitElementStart, removeHtmlStart).replace(/,\s*$/, "").replace(/^waitElementLoaded = /, "");
+const waitElementSource = script.slice(waitElementStart, Math.min(removeHtmlStart, waitElementEnd > waitElementStart ? waitElementEnd : removeHtmlStart)).replace(/,\s*$/, "").replace(/^waitElementLoaded = /, "");
 const waitElementLoaded = new Function(`return ${waitElementSource}`)();
 const decodeStart = script.indexOf("decode = async (iframeWindow) => {");
 const decodeEnd = script.indexOf("}, hasUsableAnswer", decodeStart);
