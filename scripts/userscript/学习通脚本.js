@@ -60,10 +60,14 @@
   })("element-plus");
   var _GM_getResourceText = (() => "undefined" != typeof GM_getResourceText ? GM_getResourceText : void 0)(), _GM_getValue = (() => "undefined" != typeof GM_getValue ? GM_getValue : void 0)(), _GM_info = (() => "undefined" != typeof GM_info ? GM_info : void 0)(), _GM_setValue = (() => "undefined" != typeof GM_setValue ? GM_setValue : void 0)(), _GM_xmlhttpRequest = (() => "undefined" != typeof GM_xmlhttpRequest ? GM_xmlhttpRequest : void 0)(), _unsafeWindow = (() => "undefined" != typeof unsafeWindow ? unsafeWindow : void 0)();
   if (typeof GM_addStyle === "function") GM_addStyle(".cx-settings-dialog{width:min(720px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-settings-dialog .el-dialog__header{flex:0 0 auto}.cx-settings-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 150px);overflow-y:auto;overflow-x:hidden;padding:8px 24px 16px}.cx-settings-dialog .el-dialog__footer{flex:0 0 auto;padding-top:12px}.cx-settings-dialog .el-form{min-width:0}@media (max-width:600px){.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}}");
+  if (typeof GM_addStyle === "function") GM_addStyle("#csbutton[data-v-6ed29f7f]{position:fixed;right:20px;bottom:20px;z-index:99999;width:44px;height:44px;border:1px solid rgba(255,255,255,.24);box-shadow:0 8px 24px rgba(0,0,0,.18)}#zeokdjg[data-v-c3c6b09f]{position:fixed;right:20px;left:auto;bottom:76px;z-index:9999;max-width:calc(100vw - 40px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.14)}.cx-settings-dialog .el-dialog__header{padding:18px 24px 12px;border-bottom:1px solid #ebeef5}.cx-settings-dialog .el-dialog__title{font-size:18px;font-weight:600}.cx-settings-dialog .el-tabs__header{margin-bottom:16px}.cx-settings-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-settings-dialog .el-tabs__nav{white-space:nowrap}.cx-settings-dialog .el-form-item{margin-bottom:18px}.cx-settings-dialog .el-form-item__label{line-height:1.5}.cx-settings-dialog .el-input,.cx-settings-dialog .el-input-number,.cx-settings-dialog .el-select{width:100%;max-width:100%}.cx-runtime-dialog{width:min(520px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-runtime-dialog .el-dialog__header{flex:0 0 auto;padding:16px 20px 12px}.cx-runtime-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 142px);overflow-y:auto;overflow-x:hidden;padding:8px 20px 16px}.cx-runtime-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-runtime-dialog .el-tabs__nav{white-space:nowrap}.cx-runtime-dialog .question_btn{width:36px;height:36px;margin:4px;border-radius:8px}.cx-runtime-dialog .question_div{height:auto;min-height:160px}.cx-runtime-dialog .question_ti{margin:8px 0 16px;line-height:1.6;overflow-wrap:anywhere}.cx-runtime-dialog .cx_log{margin:0;padding:6px 0;border-bottom:1px solid #f0f0f0;line-height:1.5;overflow-wrap:anywhere}.cx-runtime-dialog .el-dialog__footer{flex:0 0 auto;padding:10px 20px 16px}@media (max-width:600px){#csbutton[data-v-6ed29f7f]{right:12px;bottom:12px}.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}.cx-runtime-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-runtime-dialog .el-dialog__body{max-height:calc(100vh - 124px);padding-left:12px;padding-right:12px}#zeokdjg[data-v-c3c6b09f]{right:12px;bottom:66px;max-width:calc(100vw - 24px)}}");
+  if (typeof GM_addStyle === "function") GM_addStyle("#csbutton{display:none !important}.cx-workbench-trigger{position:fixed;right:20px;bottom:20px;z-index:99999;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border:1px solid #d8c5a8;border-radius:12px;background:#fffdfa;color:#76572f;box-shadow:0 8px 22px rgba(67,49,28,.16);font:600 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;transition:all .2s ease}.cx-workbench-trigger:hover{border-color:#b68a4a;background:#fbf5ea}.cx-workbench-trigger.is-open{right:calc(420px + 28px)}.cx-workbench-trigger__icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:16px;line-height:1}.cx-workbench{position:fixed;top:16px;right:16px;z-index:99998;display:flex;flex-direction:column;width:min(400px,calc(100vw - 32px));height:calc(100vh - 32px);overflow:hidden;border:1px solid #e5ddd1;border-radius:16px;background:#fffdfa;color:#2f2b26;box-shadow:0 16px 48px rgba(51,39,23,.2);font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}.cx-workbench.is-open{transform:translateX(0);opacity:1;pointer-events:auto}.cx-workbench__header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid #eee7dc;background:#fffdfa}.cx-workbench__identity{display:flex;min-width:0;flex-direction:column;gap:2px}.cx-workbench__eyebrow{color:#a07b4c;font-size:10px;letter-spacing:2px}.cx-workbench__identity strong{overflow:hidden;color:#302a24;font-size:16px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.cx-workbench__status{overflow:hidden;color:#998f82;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.cx-icon-button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f8374;font-size:20px;line-height:1;cursor:pointer}.cx-icon-button:hover{border-color:#b68a4a;color:#76572f}.cx-workbench__tabs{display:flex;flex:0 0 auto;gap:4px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid #eee7dc;background:#fcfaf6}.cx-workbench__tab{flex:0 0 auto;height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#998f82;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;white-space:nowrap}.cx-workbench__tab:hover{background:#f5eee3;color:#76572f}.cx-workbench__tab.is-active{background:#b68a4a;color:#fff}.cx-workbench__content{min-height:0;flex:1;overflow:auto;padding:16px}.cx-workbench__content::-webkit-scrollbar{width:6px}.cx-workbench__content::-webkit-scrollbar-thumb{background:#ded3c5;border-radius:8px}.cx-run-content{display:flex;flex-direction:column;gap:12px}.cx-progress-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid #eee3d4;border-radius:9px;background:#fbf5ea;color:#8f7553;font-size:11px}.cx-current-card{padding:16px;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-card-kicker,.cx-section-heading{display:flex;align-items:center;justify-content:space-between;color:#a07b4c;font-size:10px;letter-spacing:1px}.cx-current-card h3{margin:8px 0 14px;color:#2f2b26;font-size:15px;font-weight:600;line-height:1.65;overflow-wrap:anywhere}.cx-answer-block{padding-top:12px;border-top:1px solid #f0e9df}.cx-answer-block pre{margin:7px 0 0;padding:10px;border-radius:8px;background:#f7f3ec;color:#4d402f;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.cx-answer-pending{padding:12px;border-radius:8px;background:#faf8f4;color:#a69b8d;font-size:12px}.cx-sources{padding:14px;border:1px solid #eee5da;border-radius:12px;background:#fff}.cx-section-heading{margin-bottom:8px}.cx-section-heading span{font-weight:400;letter-spacing:0}.cx-answer-source{border-top:1px solid #f0e9df}.cx-answer-source summary{padding:10px 0;color:#76572f;font-size:12px;font-weight:600;cursor:pointer}.cx-source-body{padding:0 0 9px;color:#53483c;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.cx-source-meta{padding:7px 0 10px;color:#a69b8d;font-size:10px}.cx-video-status{padding:12px;border:1px solid #ecd8ba;border-radius:9px;background:#fff7e9;color:#94682d;font-size:12px}.cx-empty-state{display:flex;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:20px;color:#a69b8d;text-align:center}.cx-empty-state strong{color:#66594b;font-size:14px;font-weight:600}.cx-empty-state span{font-size:12px}.cx-question-list{display:flex;flex-direction:column;gap:8px}.cx-question-item{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid #ece4d9;border-radius:10px;background:#fff;color:#685c4f;text-align:left;cursor:pointer}.cx-question-item:hover{border-color:#c7a878;background:#fffbf4}.cx-question-item.is-current{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-question-index{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#f3eee6;color:#8f7553;font-size:12px;font-weight:700}.cx-question-item.is-primary .cx-question-index{background:#e8f4ec;color:#3e8257}.cx-question-item.is-danger .cx-question-index{background:#fbe9e5;color:#b4594b}.cx-question-state{margin-left:auto;color:#a69b8d;font-size:11px}.cx-log-list{display:flex;flex-direction:column;gap:0}.cx-log-item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:9px 0;border-bottom:1px solid #f0e9df;color:#65594d;font-size:12px;line-height:1.5}.cx-log-item time{color:#a69b8d;font-variant-numeric:tabular-nums}.cx-log-item span{overflow-wrap:anywhere}.cx-log-item.is-error span{color:#b4594b}.cx-log-item.is-success span{color:#3e8257}.cx-workbench-settings{display:flex;flex-direction:column;gap:12px}.cx-workbench-settings__toolbar{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;z-index:2;padding:0 0 10px;background:#fffdfa}.cx-workbench-settings__toolbar input{min-width:0;flex:1;height:34px;padding:0 10px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#4b4035;outline:0;font:12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif}.cx-workbench-settings__toolbar input:focus{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-link-button{flex:0 0 auto;height:34px;padding:0 9px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f7553;font-size:11px;cursor:pointer}.cx-link-button:hover{border-color:#b68a4a;color:#76572f}.cx-link-button:disabled{opacity:.5;cursor:wait}.cx-settings-group{overflow:hidden;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-settings-group__heading{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid #f0e9df;background:#fcfaf6}.cx-settings-group__heading strong{color:#4d4033;font-size:13px}.cx-settings-group__heading span{color:#a69b8d;font-size:10px}.cx-setting-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:12px;align-items:center;padding:12px 13px;border-bottom:1px solid #f4eee6}.cx-setting-row:last-child{border-bottom:0}.cx-setting-copy{min-width:0}.cx-setting-copy>span{display:block;color:#65594d;font-size:12px}.cx-setting-copy small{display:block;margin-top:3px;color:#a69b8d;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.cx-setting-control{min-width:0}.cx-setting-control>.el-input,.cx-setting-control>.el-input-number,.cx-setting-control>.el-select{width:100%}.cx-setting-control .el-input__wrapper,.cx-setting-control .el-select__wrapper{min-height:32px;border-radius:8px;box-shadow:0 0 0 1px #e5ddd1 inset}.cx-setting-control .el-input-number{width:100%}.cx-setting-secret{display:flex;min-width:0;border:1px solid #e5ddd1;border-radius:8px;background:#fff;overflow:hidden}.cx-setting-secret>.el-input{flex:1;min-width:0}.cx-setting-secret .el-input__wrapper{box-shadow:none}.cx-setting-secret__toggle{flex:0 0 auto;padding:0 8px;border:0;border-left:1px solid #eee7dc;background:#fff;color:#8f7553;font-size:10px;cursor:pointer}.cx-workbench__footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #eee7dc;background:#fffdfa}.cx-primary-button,.cx-secondary-button{height:34px;padding:0 13px;border-radius:8px;font-size:12px;cursor:pointer}.cx-primary-button{border:1px solid #b68a4a;background:#b68a4a;color:#fff}.cx-secondary-button{border:1px solid #e5ddd1;background:#fff;color:#76572f}.cx-primary-button:hover{background:#9f743c}.cx-secondary-button:hover{border-color:#b68a4a}@media (max-width:600px){.cx-workbench-trigger{right:12px;bottom:12px}.cx-workbench-trigger.is-open{right:12px;bottom:calc(100vh - 58px)}.cx-workbench{top:8px;right:8px;width:calc(100vw - 16px);height:calc(100vh - 16px);border-radius:14px}.cx-setting-row{grid-template-columns:1fr;gap:7px}.cx-workbench__content{padding:12px}.cx-workbench-settings__toolbar{top:-12px}.cx-log-item{grid-template-columns:52px minmax(0,1fr)}}@media (prefers-reduced-motion:reduce){.cx-workbench,.cx-workbench-trigger{transition:none}}");
+  if (typeof GM_addStyle === "function") GM_addStyle(".cx-workbench{box-sizing:border-box;min-width:min(300px,calc(100vw - 16px));min-height:min(300px,calc(100vh - 16px));max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);transform:translateX(24px)}.cx-workbench-trigger.is-open{right:20px;bottom:20px}.cx-workbench__header{cursor:move;user-select:none;touch-action:none}.cx-workbench__actions{display:flex;align-items:center;flex:0 0 auto;gap:6px}.cx-workbench__resize-handle{position:absolute;right:0;bottom:0;width:22px;height:22px;padding:0;border:0;background:transparent;cursor:nwse-resize;touch-action:none}.cx-workbench__resize-handle::after{content:\"\";position:absolute;right:5px;bottom:5px;width:8px;height:8px;border-right:2px solid #b68a4a;border-bottom:2px solid #b68a4a;opacity:.75}@media (max-width:600px){.cx-workbench-trigger.is-open{right:12px;bottom:12px}.cx-workbench{top:8px;right:8px;min-width:calc(100vw - 16px);min-height:calc(100vh - 16px);max-width:calc(100vw - 16px);max-height:calc(100vh - 16px)}}");
   const markSettingsDialogs = () => {
     if (typeof document === "undefined") return;
     document.querySelectorAll(".el-dialog").forEach((dialog) => {
       if (dialog.querySelector(".demo-ruleForm")) dialog.classList.add("cx-settings-dialog");
+      else if (dialog.querySelector(".demo-tabs")) dialog.classList.add("cx-runtime-dialog");
     });
   };
   if (typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
@@ -2494,16 +2498,243 @@
     const _component_el_button = vue.resolveComponent("el-button"), _component_el_switch = vue.resolveComponent("el-switch"), _component_el_input = vue.resolveComponent("el-input"), _component_el_input_number = vue.resolveComponent("el-input-number"), _component_el_option = vue.resolveComponent("el-option"), _component_el_select = vue.resolveComponent("el-select"), _component_el_checkbox = vue.resolveComponent("el-checkbox"), _component_el_checkbox_group = vue.resolveComponent("el-checkbox-group"), _component_el_tooltip = vue.resolveComponent("el-tooltip"), _component_el_form_item = vue.resolveComponent("el-form-item"), _component_el_tab_pane = vue.resolveComponent("el-tab-pane"), _component_el_tabs = vue.resolveComponent("el-tabs"), _component_el_form = vue.resolveComponent("el-form"), _component_el_dialog = vue.resolveComponent("el-dialog"), _component_el_text = vue.resolveComponent("el-text"), _component_el_skeleton = vue.resolveComponent("el-skeleton"), _component_el_card = vue.resolveComponent("el-card"), _component_el_divider = vue.resolveComponent("el-divider"), _component_el_col = vue.resolveComponent("el-col"), _component_el_row = vue.resolveComponent("el-row"), _component_el_scrollbar = vue.resolveComponent("el-scrollbar"), _component_el_tag = vue.resolveComponent("el-tag"), _component_el_alert = vue.resolveComponent("el-alert"), _component_el_empty = vue.resolveComponent("el-empty");
     return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [vue.createVNode(_component_el_button, { type: "danger", id: "csbutton", icon: _ctx.Setting, circle: "", onClick: _cache[0] || (_cache[0] = ($event) => _ctx.dialogV = !_ctx.dialogV) }, null, 8, ["icon"]), vue.createVNode(_component_el_dialog, { modelValue: _ctx.dialogV, "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => _ctx.dialogV = $event), title: "💯超星学习通满分助手", width: "30%", modal: false, center: "", draggable: "" }, { footer: vue.withCtx(() => [vue.createElementVNode("span", _hoisted_1, [vue.createVNode(_component_el_button, { onClick: _cache[2] || (_cache[2] = ($event) => _ctx.dialogV = false) }, { default: vue.withCtx(() => [vue.createTextVNode("取消")]), _: 1 }), vue.createVNode(_component_el_button, { type: "primary", onClick: _cache[3] || (_cache[3] = ($event) => _ctx.submitForm(_ctx.ruleFormRef)) }, { default: vue.withCtx(() => [vue.createTextVNode("保存")]), _: 1 })])]), default: vue.withCtx(() => [vue.createVNode(_component_el_form, { ref: "ruleFormRef", rules: _ctx.rules, model: _ctx.forminput, class: "demo-ruleForm" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_tabs, { class: "demo-tabs", modelValue: _ctx.activeName, "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => _ctx.activeName = $event) }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.userConfig, (item) => (vue.openBlock(), vue.createBlock(_component_el_tab_pane, { key: item.name, label: item.label, name: item.name }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item.config, (item1) => (vue.openBlock(), vue.createBlock(_component_el_form_item, { label: item1.label, prop: item1.name }, { default: vue.withCtx(() => [vue.createVNode(_component_el_tooltip, { class: "box-item", effect: "dark", content: item1.desc || "", placement: "top" }, { default: vue.withCtx(() => ["switch" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_switch, { key: 0, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "input" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_input, { key: 1, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "number" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_input_number, { key: 2, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "select" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_select, { key: 3, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event, placeholder: "请选择" }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item1.options, (item2) => (vue.openBlock(), vue.createBlock(_component_el_option, { key: item2.value, label: item2.label, value: item2.value }, null, 8, ["label", "value"]))), 128))]), _: 2 }, 1032, ["modelValue", "onUpdate:modelValue"])) : "checkbox" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_checkbox_group, { key: 4, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item1.options, (item2) => (vue.openBlock(), vue.createBlock(_component_el_checkbox, { key: item2.value, label: item2.value, name: item2.value }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(item2.label), 1)]), _: 2 }, 1032, ["label", "name"]))), 128))]), _: 2 }, 1032, ["modelValue", "onUpdate:modelValue"])) : vue.createCommentVNode("", true)]), _: 2 }, 1032, ["content"])]), _: 2 }, 1032, ["label", "prop"]))), 256))]), _: 2 }, 1032, ["label", "name"]))), 128))]), _: 1 }, 8, ["modelValue"])]), _: 1 }, 8, ["rules", "model"])]), _: 1 }, 8, ["modelValue"]), (vue.openBlock(), vue.createBlock(vue.Teleport, { to: "body" }, [vue.createVNode(_component_el_button, { id: "zeokdjg", type: "success", plain: "", round: "", icon: _ctx.Aim, onClick: _cache[5] || (_cache[5] = ($event) => _ctx.dialogVisible = !_ctx.dialogVisible) }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString("暂未加载" == _ctx.task.name ? "等待任务加载" : "正在完成:" + _ctx.task.name), 1)]), _: 1 }, 8, ["icon"]), vue.createVNode(_component_el_dialog, { modelValue: _ctx.dialogVisible, "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => _ctx.dialogVisible = $event), width: "400px", title: "💯超星学习通满分助手", modal: false, "append-to-body": false, "lock-scroll": false, center: "", draggable: "" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_button, { style: { "margin-bottom": "20px" }, type: "primary", onClick: _cache[6] || (_cache[6] = ($event) => _ctx.dialogV = !_ctx.dialogV), plain: "" }, { default: vue.withCtx(() => [vue.createTextVNode("打开配置")]), _: 1 }), vue.createVNode(_component_el_text, { class: "mx-1", size: "large", type: "danger" }, { default: vue.withCtx(() => [vue.createTextVNode("题库秘钥配置请点击这个按钮")]), _: 1 }), vue.createVNode(_component_el_tabs, { modelValue: _ctx.askActiveName, "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => _ctx.askActiveName = $event), class: "demo-tabs" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_tab_pane, { label: "运行框", name: "first" }, { default: vue.withCtx(() => [_ctx.task.work.questionList.length > 0 ? (vue.openBlock(), vue.createElementBlock("div", _hoisted_2, [vue.createElementVNode("div", _hoisted_3, [vue.createVNode(_component_el_card, { shadow: "hover" }, { default: vue.withCtx(() => [vue.createElementVNode("h1", _hoisted_4, [vue.createVNode(_component_el_text, { size: "large", truncated: "" }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(_ctx.task.work.inx + 1 + "." + _ctx.task.work.questionList[_ctx.task.work.inx].question), 1)]), _: 1 })]), _ctx.task.work.questionList[_ctx.task.work.inx].answer ? (vue.openBlock(), vue.createElementBlock("p", _hoisted_6, [vue.createElementVNode("p", null, [vue.createElementVNode("pre", null, vue.toDisplayString(_ctx.task.work.questionList[_ctx.task.work.inx].answer), 1)])])) : (vue.openBlock(), vue.createElementBlock("p", _hoisted_5, [vue.createVNode(_component_el_skeleton, { rows: 3, animated: "" })]))]), _: 1 })]), "考试" != _ctx.task.name ? (vue.openBlock(), vue.createBlock(_component_el_divider, { key: 0 }, { default: vue.withCtx(() => [vue.createTextVNode(" 题号 ")]), _: 1 })) : vue.createCommentVNode("", true), "考试" != _ctx.task.name ? (vue.openBlock(), vue.createBlock(_component_el_scrollbar, { key: 1, height: "100px" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_row, null, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.task.work.questionList, (item, index) => (vue.openBlock(), vue.createBlock(_component_el_col, { span: 4, key: index }, { default: vue.withCtx(() => [vue.createVNode(_component_el_button, { type: item.status || "info", plain: "", class: "question_btn", onClick: ($event) => _ctx.handleClick(index) }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(index + 1), 1)]), _: 2 }, 1032, ["type", "onClick"])]), _: 2 }, 1024))), 128))]), _: 1 })]), _: 1 })) : vue.createCommentVNode("", true), _ctx.task.work.questionList[_ctx.task.work.inx].allAnswer ? (vue.openBlock(), vue.createElementBlock("div", _hoisted_7, [vue.createVNode(_component_el_divider, null, { default: vue.withCtx(() => [vue.createTextVNode(" 接口返回 ")]), _: 1 }), vue.createVNode(_component_el_tabs, { "tab-position": "left", style: { height: "200px" }, class: "demo-tabs" }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.task.work.questionList[_ctx.task.work.inx].allAnswer, (item, index) => (vue.openBlock(), vue.createBlock(_component_el_tab_pane, { label: item.form }, { default: vue.withCtx(() => [vue.createElementVNode("div", null, [vue.createElementVNode("div", { innerHTML: (item.answer || "暂无答案") + "<br><p style = 'color:red;'>如果要填写付费秘钥，在本悬浮窗最上方的打开配置中填入秘钥，切记填写完要刷新页面才会生效</p>" }, null, 8, _hoisted_8), null != item.num ? (vue.openBlock(), vue.createElementBlock("div", _hoisted_9, [vue.createElementVNode("div", null, [vue.createVNode(_component_el_tag, { class: "ml-2", type: "info" }, { default: vue.withCtx(() => [vue.createTextVNode("已用次数:" + vue.toDisplayString(item.usenum), 1)]), _: 2 }, 1024)]), vue.createElementVNode("div", null, [vue.createVNode(_component_el_tag, { class: "ml-2", type: "success" }, { default: vue.withCtx(() => [vue.createTextVNode("剩余次数:" + vue.toDisplayString(item.num), 1)]), _: 2 }, 1024)])])) : vue.createCommentVNode("", true)])]), _: 2 }, 1032, ["label"]))), 256))]), _: 1 })])) : vue.createCommentVNode("", true)])) : _ctx.task.video.status ? (vue.openBlock(), vue.createElementBlock("div", _hoisted_10, [vue.createVNode(_component_el_alert, { title: "倍速有风险，挂科两行泪", type: "error", center: "", "show-icon": "" }), vue.createVNode(_component_el_text, { class: "mx-1", size: "large", type: "danger" }, { default: vue.withCtx(() => [vue.createTextVNode(" 正在完成视频任务 ")]), _: 1 })])) : (vue.openBlock(), vue.createElementBlock("div", _hoisted_11, [vue.createElementVNode("div", _hoisted_12, [vue.createVNode(_component_el_empty, { description: _ctx.task.name }, null, 8, ["description"])])]))]), _: 1 }), vue.createVNode(_component_el_tab_pane, { label: "运行日志", name: "second" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_scrollbar, { height: "200px" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_row, null, { default: vue.withCtx(() => [vue.createVNode(_component_el_col, { span: 24 }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.task.log, (item, index) => (vue.openBlock(), vue.createElementBlock("p", { key: index, class: "cx_log" }, [vue.createVNode(_component_el_text, { size: "small", type: "info", class: "mx-1" }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(item.time), 1)]), _: 2 }, 1024), vue.createVNode(_component_el_text, { class: "mx-1", type: "info" == item.type ? "" : item.type }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(" " + item.msg), 1)]), _: 2 }, 1032, ["type"])]))), 128))]), _: 1 })]), _: 1 })]), _: 1 })]), _: 1 }), vue.createVNode(_component_el_tab_pane, { label: "公告", name: "msg" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_card, { shadow: "hover" }, { default: vue.withCtx(() => [vue.createElementVNode("div", { innerHTML: _ctx.msg }, null, 8, _hoisted_13)]), _: 1 })]), _: 1 })]), _: 1 }, 8, ["modelValue"]), vue.createElementVNode("p", null, [_ctx.task.status ? (vue.openBlock(), vue.createBlock(_component_el_tag, { key: 0 }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(_ctx.task.status), 1)]), _: 1 })) : vue.createCommentVNode("", true)])]), _: 1 }, 8, ["modelValue"])]))], 64);
   }], ["__scopeId", "data-v-c3c6b09f"]]);
+  const WorkbenchApp = vue.defineComponent({
+    name: "ChaoxingWorkbench",
+    setup() {
+      const askstore = useAskStore();
+      const formstoreObj = useformStore();
+      const { task } = pinia$1.storeToRefs(askstore);
+      const { forminput } = pinia$1.storeToRefs(formstoreObj);
+      const panelOpen = vue.ref(false);
+      const activeTab = vue.ref("run");
+      const settingsSearch = vue.ref("");
+      const syncing = vue.ref(false);
+      const revealedSecrets = vue.reactive({});
+      const panelLayout = vue.reactive({ initialized: false, left: 0, top: 16, width: 400, height: 0 });
+      const pointerState = { mode: "", pointerId: null, startX: 0, startY: 0, left: 0, top: 0, width: 0, height: 0 };
+      const clampLayout = () => {
+        if (typeof window === "undefined") return;
+        const viewportWidth = Math.max(220, window.innerWidth - 16);
+        const viewportHeight = Math.max(260, window.innerHeight - 16);
+        const minWidth = Math.min(300, viewportWidth);
+        const minHeight = Math.min(300, viewportHeight);
+        panelLayout.width = Math.max(minWidth, Math.min(Math.round(panelLayout.width || 400), Math.min(620, viewportWidth)));
+        panelLayout.height = Math.max(minHeight, Math.min(Math.round(panelLayout.height || viewportHeight - 16), viewportHeight));
+        panelLayout.left = Math.max(8, Math.min(Math.round(panelLayout.left), window.innerWidth - panelLayout.width - 8));
+        panelLayout.top = Math.max(8, Math.min(Math.round(panelLayout.top), window.innerHeight - panelLayout.height - 8));
+      };
+      const persistLayout = () => {
+        clampLayout();
+        if (_GM_setValue) _GM_setValue("cx_workbench_layout", { left: panelLayout.left, top: panelLayout.top, width: panelLayout.width, height: panelLayout.height });
+      };
+      const resetLayout = () => {
+        panelLayout.left = Math.max(8, (window.innerWidth || 800) - 416);
+        panelLayout.top = 16;
+        panelLayout.width = 400;
+        panelLayout.height = Math.max(300, (window.innerHeight || 600) - 32);
+        clampLayout();
+        persistLayout();
+      };
+      const loadLayout = () => {
+        const stored = _GM_getValue ? _GM_getValue("cx_workbench_layout", null) : null;
+        if (stored && typeof stored === "object") {
+          panelLayout.left = Number(stored.left) || 0;
+          panelLayout.top = Number(stored.top) || 16;
+          panelLayout.width = Number(stored.width) || 400;
+          panelLayout.height = Number(stored.height) || 0;
+        } else {
+          resetLayout();
+        }
+        clampLayout();
+        panelLayout.initialized = true;
+      };
+      const endPointer = () => {
+        if (!pointerState.mode) return;
+        pointerState.mode = "";
+        pointerState.pointerId = null;
+        persistLayout();
+        window.removeEventListener("pointermove", movePointer);
+        window.removeEventListener("pointerup", endPointer);
+        window.removeEventListener("pointercancel", endPointer);
+      };
+      const movePointer = (event) => {
+        if (!pointerState.mode || event.pointerId !== pointerState.pointerId) return;
+        const deltaX = event.clientX - pointerState.startX;
+        const deltaY = event.clientY - pointerState.startY;
+        if (pointerState.mode === "drag") {
+          panelLayout.left = pointerState.left + deltaX;
+          panelLayout.top = pointerState.top + deltaY;
+        } else {
+          panelLayout.width = pointerState.width + deltaX;
+          panelLayout.height = pointerState.height + deltaY;
+        }
+        clampLayout();
+      };
+      const beginPointer = (mode, event) => {
+        if (event.button !== 0) return;
+        pointerState.mode = mode;
+        pointerState.pointerId = event.pointerId;
+        pointerState.startX = event.clientX;
+        pointerState.startY = event.clientY;
+        pointerState.left = panelLayout.left;
+        pointerState.top = panelLayout.top;
+        pointerState.width = panelLayout.width;
+        pointerState.height = panelLayout.height;
+        event.preventDefault();
+        window.addEventListener("pointermove", movePointer);
+        window.addEventListener("pointerup", endPointer);
+        window.addEventListener("pointercancel", endPointer);
+      };
+      const beginDrag = (event) => {
+        if (event.target?.closest?.("button, input, select, textarea, a")) return;
+        beginPointer("drag", event);
+      };
+      const beginResize = (event) => beginPointer("resize", event);
+      const handleViewportResize = () => {
+        clampLayout();
+        persistLayout();
+      };
+      const settingDependsOn = {
+        customApiUrl: "customApiEnabled", customApiKey: "customApiEnabled",
+        tikuHaiEnabled: "questionBankEnabled", yiZhiEnabled: "questionBankEnabled",
+        yanXiEnabled: "questionBankEnabled", mukeEnabled: "questionBankEnabled",
+        aiApiUrl: "aiEnabled", aiModel: "aiEnabled", aiApiKey: "aiEnabled",
+        aiRetryCount: "aiEnabled", aiRetryDelay: "aiEnabled", jevEnabled: "aiEnabled",
+        jevApiUrl: "jevEnabled", jevModel: "jevEnabled", jevApiKey: "jevEnabled",
+        jevMinConfidence: "jevEnabled", gptKey: "gpt", gptModel: "gpt", gptType: "gpt",
+        deepseekKey: "deepseekEnabled", deepseekModel: "deepseekEnabled",
+        logLevel: "logEnabled", logShowQuestion: "logEnabled", logShowAnswer: "logEnabled",
+        logShowRequests: "logEnabled", logShowConfig: "logEnabled", logShowAi: "logEnabled",
+        logShowJev: "logEnabled", logShowLegacy: "logEnabled", logShowTiming: "logEnabled",
+        logShowWarnings: "logEnabled", logShowErrors: "logEnabled",
+        logQuestionPreviewLength: "logEnabled", logAnswerPreviewLength: "logEnabled"
+      };
+      const isSecretSetting = (item) => /key|token|secret|password/i.test(item.name);
+      const isSettingVisible = (item) => {
+        const dependency = settingDependsOn[item.name];
+        return !dependency || Boolean(forminput.value[dependency]);
+      };
+      const settingGroups = vue.computed(() => [...userConfig, ...extendedUserConfig].map((group) => ({
+        ...group,
+        config: group.config.filter((item) => isSettingVisible(item) && (!settingsSearch.value || [item.name, item.label, item.desc].some((value) => String(value || "").toLowerCase().includes(settingsSearch.value.toLowerCase()))))
+      })).filter((group) => group.config.length > 0));
+      const currentQuestion = vue.computed(() => task.value.work.questionList[task.value.work.inx] || null);
+      const openSettings = async () => {
+        syncing.value = true;
+        try {
+          await syncConfigFromServer(formstoreObj);
+          activeTab.value = "settings";
+          panelOpen.value = true;
+        } finally {
+          syncing.value = false;
+        }
+      };
+      const saveSettings = () => {
+        const saved = formstoreObj.saveConfig(forminput.value);
+        if (saved) {
+          ElementPlus.ElNotification({ title: "配置已保存", message: "刷新学习通页面后生效", type: "success" });
+        } else {
+          ElementPlus.ElNotification({ title: "配置无效", message: "请检查随机暂停的范围和最小值、最大值关系", type: "error" });
+        }
+      };
+      const resetSettings = async () => {
+        try {
+          await ElementPlus.ElMessageBox.confirm("当前未保存的修改会被覆盖。", "恢复默认配置", { type: "warning", confirmButtonText: "恢复默认", cancelButtonText: "取消" });
+          Object.assign(forminput.value, JSON.parse(JSON.stringify({ ...defaultConfig$1, ...extendedConfigDefaults })));
+          ElementPlus.ElNotification({ title: "已恢复默认", message: "请点击保存配置使其生效", type: "success" });
+        } catch (error) {
+          if (error !== "cancel" && error !== "close") ElementPlus.ElNotification({ title: "恢复失败", message: "默认配置未能应用", type: "error" });
+        }
+      };
+      const selectQuestion = (index) => {
+        askstore.select(index);
+        activeTab.value = "run";
+      };
+      vue.watch(() => task.value.name, (name) => {
+        if (name && name !== "暂未加载") {
+          panelOpen.value = true;
+          activeTab.value = "run";
+        }
+      });
+      vue.onMounted(() => {
+        loadLayout();
+        window.addEventListener("resize", handleViewportResize);
+      });
+      vue.onBeforeUnmount(() => {
+        endPointer();
+        window.removeEventListener("resize", handleViewportResize);
+      });
+      return { task, forminput, panelOpen, activeTab, settingsSearch, syncing, revealedSecrets, settingGroups, currentQuestion, isSecretSetting, openSettings, saveSettings, resetSettings, selectQuestion, panelLayout, beginDrag, beginResize, resetLayout, togglePanel: () => { panelOpen.value = !panelOpen.value; } };
+    },
+    render() {
+      const h = vue.h;
+      const ElInput = vue.resolveComponent("el-input");
+      const ElInputNumber = vue.resolveComponent("el-input-number");
+      const ElSelect = vue.resolveComponent("el-select");
+      const ElOption = vue.resolveComponent("el-option");
+      const ElSwitch = vue.resolveComponent("el-switch");
+      const ElCheckboxGroup = vue.resolveComponent("el-checkbox-group");
+      const ElCheckbox = vue.resolveComponent("el-checkbox");
+      const modelFor = (key) => ({ modelValue: this.forminput[key], "onUpdate:modelValue": (value) => { this.forminput[key] = value; } });
+      const renderSettingControl = (item) => {
+        const model = modelFor(item.name);
+        let control;
+        if (item.type === "switch") control = h(ElSwitch, model);
+        else if (item.type === "number") control = h(ElInputNumber, { ...model, controlsPosition: "right", class: "cx-setting-number" });
+        else if (item.type === "select") control = h(ElSelect, { ...model, placeholder: "请选择" }, { default: () => (item.options || []).map((option) => h(ElOption, { key: option.value, label: option.label, value: option.value })) });
+        else if (item.type === "checkbox") control = h(ElCheckboxGroup, model, { default: () => (item.options || []).map((option) => h(ElCheckbox, { key: option.value, label: option.value }, { default: () => option.label })) });
+        else control = h(ElInput, { ...model, type: this.isSecretSetting(item) && !this.revealedSecrets[item.name] ? "password" : "text", autocomplete: "off" });
+        if (!this.isSecretSetting(item) || item.type !== "input") return control;
+        return h("div", { class: "cx-setting-secret" }, [control, h("button", { type: "button", class: "cx-setting-secret__toggle", title: this.revealedSecrets[item.name] ? "隐藏内容" : "显示内容", onClick: () => { this.revealedSecrets[item.name] = !this.revealedSecrets[item.name]; } }, this.revealedSecrets[item.name] ? "隐藏" : "显示")]);
+      };
+      const renderSettings = () => h("div", { class: "cx-workbench-settings" }, [
+        h("div", { class: "cx-workbench-settings__toolbar" }, [
+          h("input", { value: this.settingsSearch, type: "search", placeholder: "搜索设置名称或说明", onInput: (event) => { this.settingsSearch = event.target.value; } }),
+          h("button", { type: "button", class: "cx-link-button", onClick: this.openSettings, disabled: this.syncing }, this.syncing ? "同步中" : "从服务端同步")
+        ]),
+        ...this.settingGroups.map((group) => h("section", { key: group.name, class: "cx-settings-group" }, [
+          h("div", { class: "cx-settings-group__heading" }, [h("strong", null, group.label), h("span", null, `${group.config.length} 项`)]),
+          ...group.config.map((item) => h("div", { key: item.name, class: "cx-setting-row" }, [
+            h("div", { class: "cx-setting-copy" }, [h("span", null, item.label), h("small", null, item.desc || "")]),
+            h("div", { class: "cx-setting-control" }, [renderSettingControl(item)])
+          ]))
+        ]))
+      ]);
+      const questionList = this.task.work.questionList || [];
+      const question = this.currentQuestion;
+      const answerSources = question && Array.isArray(question.allAnswer) ? question.allAnswer : [];
+      const renderRun = () => {
+        if (!question) return h("div", { class: "cx-empty-state" }, [h("strong", null, this.task.name === "暂未加载" ? "等待任务开始" : "正在处理任务"), h("span", null, this.task.status || "插件会在任务开始后显示进度")]);
+        return h("div", { class: "cx-run-content" }, [
+          h("div", { class: "cx-progress-strip" }, [h("span", null, `第 ${this.task.work.inx + 1} / ${questionList.length} 题`), h("span", null, this.task.status || "正在处理")]),
+          h("article", { class: "cx-current-card" }, [h("span", { class: "cx-card-kicker" }, "当前题目"), h("h3", null, question.question || "未读取到题目"), question.answer ? h("div", { class: "cx-answer-block" }, [h("span", { class: "cx-card-kicker" }, "当前答案"), h("pre", null, question.answer)]) : h("div", { class: "cx-answer-pending" }, "答案生成中...")]),
+          answerSources.length ? h("section", { class: "cx-sources" }, [h("div", { class: "cx-section-heading" }, [h("strong", null, "答案来源"), h("span", null, "点击展开查看")]), ...answerSources.map((source, index) => h("details", { key: `${source.form || "source"}-${index}`, class: "cx-answer-source" }, [h("summary", null, source.form || `来源 ${index + 1}`), h("div", { class: "cx-source-body", innerHTML: source.answer || "暂无答案" }), source.num != null ? h("div", { class: "cx-source-meta" }, `已用 ${source.usenum || 0} 次 · 剩余 ${source.num} 次`) : null]))]) : null,
+          this.task.video && this.task.video.status ? h("div", { class: "cx-video-status" }, "正在完成视频任务") : null
+        ]);
+      };
+      const renderQuestions = () => questionList.length ? h("div", { class: "cx-question-list" }, questionList.map((item, index) => h("button", { key: index, type: "button", class: ["cx-question-item", item.status ? `is-${item.status}` : "", index === this.task.work.inx ? "is-current" : ""], onClick: () => this.selectQuestion(index) }, [h("span", { class: "cx-question-index" }, String(index + 1)), h("span", { class: "cx-question-state" }, item.status === "primary" ? "已完成" : item.status === "danger" ? "异常" : index === this.task.work.inx ? "处理中" : "待处理")])) ) : h("div", { class: "cx-empty-state" }, [h("strong", null, "还没有题目"), h("span", null, "开始任务后，题目会按顺序出现在这里")]);
+      const renderLogs = () => this.task.log && this.task.log.length ? h("div", { class: "cx-log-list" }, this.task.log.map((item, index) => h("div", { key: index, class: ["cx-log-item", `is-${item.type || "info"}`] }, [h("time", null, item.time), h("span", null, item.msg)]))) : h("div", { class: "cx-empty-state" }, [h("strong", null, "暂无日志"), h("span", null, "插件运行后会在这里显示过程信息")]);
+      const tabs = [["run", "运行"], ["questions", `题目 ${questionList.length}`], ["logs", "日志"], ["settings", "设置"]];
+      const content = this.activeTab === "run" ? renderRun() : this.activeTab === "questions" ? renderQuestions() : this.activeTab === "logs" ? renderLogs() : renderSettings();
+      return h(vue.Fragment, null, [
+        h("button", { id: "zeokdjg", type: "button", class: ["cx-workbench-trigger", this.panelOpen ? "is-open" : ""], title: this.panelOpen ? "收起工作台" : "打开学习通助手工作台", "aria-expanded": this.panelOpen, onClick: this.togglePanel }, [h("span", { class: "cx-workbench-trigger__icon", "aria-hidden": "true" }, "☰"), h("span", null, this.panelOpen ? "收起" : this.task.name === "暂未加载" ? "助手" : "查看进度")]),
+        h("aside", { class: ["cx-workbench", this.panelOpen ? "is-open" : ""], style: this.panelLayout.initialized ? { left: `${this.panelLayout.left}px`, top: `${this.panelLayout.top}px`, width: `${this.panelLayout.width}px`, height: `${this.panelLayout.height}px`, right: "auto" } : undefined, "aria-hidden": !this.panelOpen }, [
+          h("header", { class: "cx-workbench__header", onPointerdown: this.beginDrag }, [h("div", { class: "cx-workbench__identity" }, [h("span", { class: "cx-workbench__eyebrow" }, "学习通助手"), h("strong", null, this.task.name === "暂未加载" ? "等待任务" : this.task.name), h("span", { class: "cx-workbench__status" }, this.task.status || "准备就绪")]), h("div", { class: "cx-workbench__actions" }, [h("button", { type: "button", class: "cx-icon-button", title: "恢复窗口布局", onClick: this.resetLayout }, "↺"), h("button", { type: "button", class: "cx-icon-button", title: "收起工作台", onClick: this.togglePanel }, "×")])]),
+          h("nav", { class: "cx-workbench__tabs", "aria-label": "插件工作台" }, tabs.map(([key, label]) => h("button", { key, type: "button", class: ["cx-workbench__tab", this.activeTab === key ? "is-active" : ""], "aria-current": this.activeTab === key ? "page" : undefined, onClick: key === "settings" ? this.openSettings : () => { this.activeTab = key; } }, label))),
+          h("main", { class: "cx-workbench__content" }, [content]),
+          this.activeTab === "settings" ? h("footer", { class: "cx-workbench__footer" }, [h("button", { type: "button", class: "cx-secondary-button", onClick: this.resetSettings }, "恢复默认"), h("button", { type: "button", class: "cx-primary-button", onClick: this.saveSettings }, "保存配置")]) : null,
+          h("button", { type: "button", class: "cx-workbench__resize-handle", title: "拖动调整工作台大小", "aria-label": "调整工作台大小", onPointerdown: this.beginResize }, "")
+        ])
+      ]);
+    }
+  });
   class Cx {
     constructor() {
       __publicField(this, "app");
       __publicField(this, "askStore");
       __publicField(this, "ServerApi");
       __publicField(this, "defaultConfig");
-      this.app = vue.createApp(Ask).use(ElementPlus).use(pinia$1.createPinia()), this.askStore = useAskStore(), setRuntimeLogSink((message, level) => this.askStore.log(message, level)), this.ServerApi = new ServerApi(), this.defaultConfig = getConfig(), this.app.mount((() => {
-        const div = _unsafeWindow.top.document.createElement("div");
-        return div.id = "xxxxzx", _unsafeWindow.top.document.getElementById(div.id) || _unsafeWindow.top.document.body.append(div), div;
-      })());
+      this.app = null, this.askStore = useAskStore(), setRuntimeLogSink((message, level) => this.askStore.log(message, level)), this.ServerApi = new ServerApi(), this.defaultConfig = getConfig();
     }
     innerbook() {
     }
@@ -2526,7 +2757,13 @@
       });
     }
     async video(iframeWindow) {
-      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api"), console.log("视频加载完成");
+      this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0, await waitElementLoaded(iframeWindow, "#video_html5_api");
+      try {
+        await syncConfigFromServer();
+      } catch (error) {
+        console.warn("⚠️ [配置] 视频开始前同步失败，继续使用本地配置", error);
+      }
+      console.log("视频加载完成");
       const player = iframeWindow.videojs("video_html5_api");
       const config = getConfig();
       const stopVideoDiagnostics = installVideoDiagnostics(player);
@@ -2553,6 +2790,10 @@
       let randomPauseActive = false;
       let pauseTimer = null;
       let resumeTimer = null;
+      let pauseDeadline = 0;
+      let pendingRandomPause = false;
+      let nextPauseAt = 0;
+      let scheduledIntervalSeconds = 0;
       let mouseMoveTimer = null;
       const pauseForRandomInterval = () => {
         allowPlayerPause = true;
@@ -2573,32 +2814,88 @@
       };
       player.on("pause", handleUnexpectedPause);
 
-      // 随机暂停功能
-      const scheduleRandomPause = () => {
-        if (config.randomPauseEnabled === false) return;
-        const intervalMin = Math.max(1, Number(config.randomPauseIntervalMin) || 30);
-        const intervalMax = Math.max(intervalMin, Number(config.randomPauseIntervalMax) || 93);
-        const durationMin = Math.max(1, Number(config.randomPauseDurationMin) || 2);
-        const durationMax = Math.max(durationMin, Number(config.randomPauseDurationMax) || 5);
-        const delay = Math.floor(Math.random() * (intervalMax - intervalMin + 1) + intervalMin) * 1000;
+      // 随机暂停功能。暂停恢复以截止时间为准，并在页面重新可见时补偿后台计时器延迟。
+      const isPageVisible = () => iframeWindow.document?.visibilityState !== "hidden";
+      const randomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+      const intervalMin = Math.max(1, Number(config.randomPauseIntervalMin) || 30);
+      const intervalMax = Math.max(intervalMin, Number(config.randomPauseIntervalMax) || 93);
+      const durationMin = Math.max(1, Number(config.randomPauseDurationMin) || 2);
+      const durationMax = Math.max(durationMin, Number(config.randomPauseDurationMax) || 5);
+      let scheduleRandomPause;
+      let pauseStartedAt = 0;
+      const resumeRandomPause = () => {
+        if (!randomPauseActive) return;
+        const remaining = pauseDeadline - Date.now();
+        if (remaining > 0) {
+          resumeTimer = setTimeout(resumeRandomPause, Math.min(remaining, 250));
+          return;
+        }
+        randomPauseActive = false;
+        pauseDeadline = 0;
+        if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
+          startPlayback();
+          console.log(`[视频] 已恢复播放，实际暂停: ${Math.max(0, Math.round((Date.now() - pauseStartedAt) / 1000))}秒`);
+        }
+        scheduleRandomPause();
+      };
+      const triggerRandomPause = (triggerIntervalSeconds = scheduledIntervalSeconds) => {
+        pendingRandomPause = false;
+        if (!isPageVisible()) {
+          pendingRandomPause = true;
+          return;
+        }
+        if (player.paused()) {
+          scheduleRandomPause();
+          return;
+        }
+        pauseStartedAt = Date.now();
+        const pauseDuration = randomInteger(durationMin, durationMax);
+        randomPauseActive = true;
+        pauseDeadline = pauseStartedAt + pauseDuration * 1000;
+        pauseForRandomInterval();
+        console.log(`[视频] 已随机暂停，触发间隔: ${triggerIntervalSeconds || "未知"}秒，计划暂停: ${pauseDuration}秒（设置范围 ${intervalMin}-${intervalMax} 秒）`);
+        resumeRandomPause();
+      };
+      scheduleRandomPause = () => {
+        if (config.randomPauseEnabled === false || playbackFinished) return;
+        scheduledIntervalSeconds = randomInteger(intervalMin, intervalMax);
+        const delay = scheduledIntervalSeconds * 1000;
+        nextPauseAt = Date.now() + delay;
         pauseTimer = setTimeout(() => {
-          if (!player.paused()) {
-            const pausedAt = Date.now();
-            randomPauseActive = true;
-            pauseForRandomInterval();
-            console.log(`[视频] 已随机暂停，触发间隔: ${delay / 1000}秒`);
-            // 使用配置的范围暂停后恢复播放
-           resumeTimer = setTimeout(() => {
-              randomPauseActive = false;
-             if (player.paused() && "isUnFinishJob" in iframeWindow && iframeWindow.isUnFinishJob()) {
-                startPlayback();
-                console.log(`[视频] 已恢复播放，实际暂停: ${Math.round((Date.now() - pausedAt) / 1000)}秒`);
-                scheduleRandomPause();
-              }
-            }, Math.floor(Math.random() * (durationMax - durationMin + 1) + durationMin) * 1000);
-          }
+          pauseTimer = null;
+          nextPauseAt = 0;
+          triggerRandomPause(scheduledIntervalSeconds);
         }, delay);
       };
+      const handleVisibilityChange = () => {
+        if (!isPageVisible()) {
+          if (randomPauseActive) {
+            randomPauseActive = false;
+            pauseDeadline = 0;
+            clearTimeout(resumeTimer);
+            resumeTimer = null;
+            if (player.paused()) {
+              startPlayback();
+              console.log("[视频] 页面进入后台，已恢复播放，避免随机暂停计时被浏览器延迟");
+            }
+          }
+          return;
+        }
+        if (randomPauseActive) {
+          resumeRandomPause();
+          return;
+        }
+        if (pendingRandomPause || (nextPauseAt && Date.now() >= nextPauseAt)) {
+          clearTimeout(pauseTimer);
+          pauseTimer = null;
+          nextPauseAt = 0;
+          triggerRandomPause(scheduledIntervalSeconds);
+        } else if (!nextPauseAt) {
+          scheduleRandomPause();
+        }
+      };
+      const visibilityTarget = iframeWindow.document;
+      if (visibilityTarget && typeof visibilityTarget.addEventListener === "function") visibilityTarget.addEventListener("visibilitychange", handleVisibilityChange);
       scheduleRandomPause();
 
       // 模拟鼠标滑动功能
@@ -2654,6 +2951,9 @@
           clearTimeout(pauseTimer);
           clearTimeout(resumeTimer);
           clearTimeout(mouseMoveTimer);
+          pauseDeadline = 0;
+          pendingRandomPause = false;
+          if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
           if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
           player.pause = pauseBase;
           stopVideoDiagnostics();
@@ -2807,7 +3107,7 @@
       await this.ServerApi.s(questionList, iframeWindow.location.href);
     }
   }
-  const pinia = pinia$1.createPinia(), app = vue.createApp(App).use(ElementPlus).use(pinia), _self = _unsafeWindow, top = _self.top, formStore = useformStore();
+  const pinia = pinia$1.createPinia(), app = vue.createApp(WorkbenchApp).use(ElementPlus).use(pinia), _self = _unsafeWindow, top = _self.top, formStore = useformStore();
   var iframeCom = null;
   switch (app.mount((() => {
     try {

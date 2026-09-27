@@ -12,32 +12,44 @@ test('video playback path defines its config before scheduling random pauses', (
   assert.notEqual(videoEnd, -1, 'video method boundary must exist');
 
   const configDeclaration = videoSource.indexOf('const config = getConfig()');
+  const syncCall = videoSource.indexOf('await syncConfigFromServer()');
   const scheduleCall = videoSource.indexOf('scheduleRandomPause();');
   const guardRead = videoSource.indexOf('config.randomPauseEnabled');
 
+  assert.notEqual(syncCall, -1, 'video must refresh the shared server configuration before reading it');
   assert.notEqual(guardRead, -1, 'random pause guard must read the shared configuration');
   assert.notEqual(scheduleCall, -1, 'video must schedule random pauses');
   assert.ok(
-    configDeclaration !== -1 && configDeclaration < guardRead && configDeclaration < scheduleCall,
-    'video must define config before the first random-pause read and call'
+    configDeclaration !== -1 && syncCall < configDeclaration && configDeclaration < guardRead && configDeclaration < scheduleCall,
+    'video must sync configuration before reading it and scheduling random pauses'
   );
 
   assert.match(videoSource, /const pauseBase = player\.pause/);
   assert.match(videoSource, /player\.pause = function/);
   assert.match(videoSource, /player\.on\("pause"/);
   assert.match(videoSource, /const pauseForRandomInterval/);
+  assert.match(videoSource, /pauseDeadline/);
+  assert.match(videoSource, /pendingRandomPause/);
+  assert.match(videoSource, /visibilitychange/);
+  assert.match(videoSource, /页面进入后台/);
+  assert.match(videoSource, /randomPauseDuration/);
+  assert.match(videoSource, /计划暂停/);
+  assert.match(videoSource, /设置范围/);
   assert.doesNotMatch(videoSource, /startPlayback\(\);\s*playerButton\?\.click\(\)/);
 });
 
 test('video guard restarts an unexpected pause and restores the native method on finish', async () => {
+  let syncCalls = 0;
   const videoMethod = new Function(
     'waitElementLoaded',
+    'syncConfigFromServer',
     'getConfig',
     'installVideoDiagnostics',
     'mountVideoDiagnosticsPanel',
     `return ${videoSource.replace(/^async video/, 'async function video')}`
   )(
     async () => {},
+    async () => { syncCalls += 1; },
     () => ({
       videoDiagnosticsEnabled: false,
       randomPauseEnabled: false,
@@ -86,6 +98,7 @@ test('video guard restarts an unexpected pause and restores the native method on
 
   const videoPromise = videoMethod.call(context, iframeWindow);
   await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(syncCalls, 1, 'video must refresh server settings before playback control starts');
   const guardedPause = player.pause;
   guardedPause.call(player);
   await new Promise((resolve) => setTimeout(resolve, 0));

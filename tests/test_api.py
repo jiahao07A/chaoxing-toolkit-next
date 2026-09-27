@@ -55,6 +55,22 @@ async def test_config_contract_fills_random_pause_defaults_for_legacy_config(iso
 
 
 @pytest.mark.anyio
+async def test_config_defaults_api_returns_the_server_default_contract(isolated_app):
+    app = isolated_app
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.get("/api/config/defaults")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["code"] == 1
+    assert body["data"]["config"]["autoVideo"] is True
+    assert body["data"]["config"]["randomPauseIntervalMin"] == 30
+    assert body["data"]["config"]["thtoken"] == ""
+
+
+@pytest.mark.anyio
 async def test_config_contract_rejects_random_pause_out_of_range_and_reversed_bounds(isolated_app):
     app = isolated_app
     async with app.router.lifespan_context(app):

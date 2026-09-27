@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from ..config_service import ConfigService
+from ..config_service import ConfigService, DEFAULT_CONFIG
 
 router = APIRouter()
 
@@ -28,6 +28,12 @@ async def get_config(req: Request):
     )
     visible_config = config if is_userscript else ConfigService.redact(config)
     return {"code": 1, "data": {"version": version, "config": visible_config}}
+
+
+@router.get("/api/config/defaults")
+async def get_config_defaults():
+    """返回可用于设置页恢复操作的默认配置，敏感值始终脱敏。"""
+    return {"code": 1, "data": {"config": ConfigService.redact(DEFAULT_CONFIG)}}
 
 
 @router.put("/api/config")

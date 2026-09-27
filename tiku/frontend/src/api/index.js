@@ -15,6 +15,7 @@ api.interceptors.response.use(
 
 export const searchQuestion = (data) => api.post('/search', data)
 export const getConfig = () => api.get('/config')
+export const getConfigDefaults = () => api.get('/config/defaults')
 export const updateConfig = (data) => api.put('/config', data)
 
 export const getQuestions = (params) => api.get('/questions', { params })
