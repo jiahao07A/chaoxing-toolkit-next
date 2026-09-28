@@ -59,6 +59,36 @@
     GM_addStyle(t);
   })("element-plus");
   var _GM_getResourceText = (() => "undefined" != typeof GM_getResourceText ? GM_getResourceText : void 0)(), _GM_getValue = (() => "undefined" != typeof GM_getValue ? GM_getValue : void 0)(), _GM_info = (() => "undefined" != typeof GM_info ? GM_info : void 0)(), _GM_setValue = (() => "undefined" != typeof GM_setValue ? GM_setValue : void 0)(), _GM_xmlhttpRequest = (() => "undefined" != typeof GM_xmlhttpRequest ? GM_xmlhttpRequest : void 0)(), _unsafeWindow = (() => "undefined" != typeof unsafeWindow ? unsafeWindow : void 0)();
+  const RUNTIME_KEY = "__chaoxingToolkitRuntimeV219";
+  const runtimeHost = _unsafeWindow || globalThis;
+  const previousRuntime = runtimeHost?.[RUNTIME_KEY];
+  if (previousRuntime && typeof previousRuntime.destroy === "function") previousRuntime.destroy();
+  const runtime = {
+    destroyed: false,
+    cleanupHandlers: new Set(),
+    register(handler) {
+      if (typeof handler !== "function") return () => {};
+      if (this.destroyed) {
+        handler();
+        return () => {};
+      }
+      this.cleanupHandlers.add(handler);
+      return () => this.cleanupHandlers.delete(handler);
+    },
+    destroy() {
+      if (this.destroyed) return;
+      this.destroyed = true;
+      for (const handler of Array.from(this.cleanupHandlers)) {
+        try {
+          handler();
+        } catch (error) {
+          console.warn("[生命周期] 清理旧脚本实例失败", error);
+        }
+      }
+      this.cleanupHandlers.clear();
+    }
+  };
+  runtimeHost[RUNTIME_KEY] = runtime;
   if (typeof GM_addStyle === "function") GM_addStyle(".cx-settings-dialog{width:min(720px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-settings-dialog .el-dialog__header{flex:0 0 auto}.cx-settings-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 150px);overflow-y:auto;overflow-x:hidden;padding:8px 24px 16px}.cx-settings-dialog .el-dialog__footer{flex:0 0 auto;padding-top:12px}.cx-settings-dialog .el-form{min-width:0}@media (max-width:600px){.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}}");
   if (typeof GM_addStyle === "function") GM_addStyle("#csbutton[data-v-6ed29f7f]{position:fixed;right:20px;bottom:20px;z-index:99999;width:44px;height:44px;border:1px solid rgba(255,255,255,.24);box-shadow:0 8px 24px rgba(0,0,0,.18)}#zeokdjg[data-v-c3c6b09f]{position:fixed;right:20px;left:auto;bottom:76px;z-index:9999;max-width:calc(100vw - 40px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.14)}.cx-settings-dialog .el-dialog__header{padding:18px 24px 12px;border-bottom:1px solid #ebeef5}.cx-settings-dialog .el-dialog__title{font-size:18px;font-weight:600}.cx-settings-dialog .el-tabs__header{margin-bottom:16px}.cx-settings-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-settings-dialog .el-tabs__nav{white-space:nowrap}.cx-settings-dialog .el-form-item{margin-bottom:18px}.cx-settings-dialog .el-form-item__label{line-height:1.5}.cx-settings-dialog .el-input,.cx-settings-dialog .el-input-number,.cx-settings-dialog .el-select{width:100%;max-width:100%}.cx-runtime-dialog{width:min(520px,calc(100vw - 24px)) !important;max-height:calc(100vh - 24px);margin:12px auto;display:flex;flex-direction:column}.cx-runtime-dialog .el-dialog__header{flex:0 0 auto;padding:16px 20px 12px}.cx-runtime-dialog .el-dialog__body{min-height:0;max-height:calc(100vh - 142px);overflow-y:auto;overflow-x:hidden;padding:8px 20px 16px}.cx-runtime-dialog .el-tabs__nav-wrap{overflow-x:auto}.cx-runtime-dialog .el-tabs__nav{white-space:nowrap}.cx-runtime-dialog .question_btn{width:36px;height:36px;margin:4px;border-radius:8px}.cx-runtime-dialog .question_div{height:auto;min-height:160px}.cx-runtime-dialog .question_ti{margin:8px 0 16px;line-height:1.6;overflow-wrap:anywhere}.cx-runtime-dialog .cx_log{margin:0;padding:6px 0;border-bottom:1px solid #f0f0f0;line-height:1.5;overflow-wrap:anywhere}.cx-runtime-dialog .el-dialog__footer{flex:0 0 auto;padding:10px 20px 16px}@media (max-width:600px){#csbutton[data-v-6ed29f7f]{right:12px;bottom:12px}.cx-settings-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-settings-dialog .el-dialog__body{max-height:calc(100vh - 132px);padding-left:12px;padding-right:12px}.cx-runtime-dialog{width:calc(100vw - 16px) !important;margin:8px auto}.cx-runtime-dialog .el-dialog__body{max-height:calc(100vh - 124px);padding-left:12px;padding-right:12px}#zeokdjg[data-v-c3c6b09f]{right:12px;bottom:66px;max-width:calc(100vw - 24px)}}");
   if (typeof GM_addStyle === "function") GM_addStyle("#csbutton{display:none !important}.cx-workbench-trigger{position:fixed;right:20px;bottom:20px;z-index:99999;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border:1px solid #d8c5a8;border-radius:12px;background:#fffdfa;color:#76572f;box-shadow:0 8px 22px rgba(67,49,28,.16);font:600 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:move;touch-action:none;user-select:none;transition:all .2s ease}.cx-workbench-trigger:hover{border-color:#b68a4a;background:#fbf5ea}.cx-workbench-trigger.is-open{right:calc(420px + 28px)}.cx-workbench-trigger__icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:16px;line-height:1}.cx-workbench{position:fixed;top:16px;right:16px;z-index:99998;display:flex;flex-direction:column;width:min(400px,calc(100vw - 32px));height:calc(100vh - 32px);overflow:hidden;border:1px solid #e5ddd1;border-radius:16px;background:#fffdfa;color:#2f2b26;box-shadow:0 16px 48px rgba(51,39,23,.2);font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}.cx-workbench.is-open{transform:translateX(0);opacity:1;pointer-events:auto}.cx-workbench__header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid #eee7dc;background:#fffdfa}.cx-workbench__identity{display:flex;min-width:0;flex-direction:column;gap:2px}.cx-workbench__eyebrow{color:#a07b4c;font-size:10px;letter-spacing:2px}.cx-workbench__identity strong{overflow:hidden;color:#302a24;font-size:16px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.cx-workbench__status{overflow:hidden;color:#998f82;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.cx-icon-button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f8374;font-size:20px;line-height:1;cursor:pointer}.cx-icon-button:hover{border-color:#b68a4a;color:#76572f}.cx-workbench__tabs{display:flex;flex:0 0 auto;gap:4px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid #eee7dc;background:#fcfaf6}.cx-workbench__tab{flex:0 0 auto;height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#998f82;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;cursor:pointer;white-space:nowrap}.cx-workbench__tab:hover{background:#f5eee3;color:#76572f}.cx-workbench__tab.is-active{background:#b68a4a;color:#fff}.cx-workbench__content{min-height:0;flex:1;overflow:auto;padding:16px}.cx-workbench__content::-webkit-scrollbar{width:6px}.cx-workbench__content::-webkit-scrollbar-thumb{background:#ded3c5;border-radius:8px}.cx-run-content{display:flex;flex-direction:column;gap:12px}.cx-progress-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid #eee3d4;border-radius:9px;background:#fbf5ea;color:#8f7553;font-size:11px}.cx-current-card{padding:16px;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-card-kicker,.cx-section-heading{display:flex;align-items:center;justify-content:space-between;color:#a07b4c;font-size:10px;letter-spacing:1px}.cx-current-card h3{margin:8px 0 14px;color:#2f2b26;font-size:15px;font-weight:600;line-height:1.65;overflow-wrap:anywhere}.cx-answer-block{padding-top:12px;border-top:1px solid #f0e9df}.cx-answer-block pre{margin:7px 0 0;padding:10px;border-radius:8px;background:#f7f3ec;color:#4d402f;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.cx-answer-pending{padding:12px;border-radius:8px;background:#faf8f4;color:#a69b8d;font-size:12px}.cx-sources{padding:14px;border:1px solid #eee5da;border-radius:12px;background:#fff}.cx-section-heading{margin-bottom:8px}.cx-section-heading span{font-weight:400;letter-spacing:0}.cx-answer-source{border-top:1px solid #f0e9df}.cx-answer-source summary{padding:10px 0;color:#76572f;font-size:12px;font-weight:600;cursor:pointer}.cx-source-body{padding:0 0 9px;color:#53483c;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.cx-source-meta{padding:7px 0 10px;color:#a69b8d;font-size:10px}.cx-video-status{padding:12px;border:1px solid #ecd8ba;border-radius:9px;background:#fff7e9;color:#94682d;font-size:12px}.cx-empty-state{display:flex;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:20px;color:#a69b8d;text-align:center}.cx-empty-state strong{color:#66594b;font-size:14px;font-weight:600}.cx-empty-state span{font-size:12px}.cx-question-list{display:flex;flex-direction:column;gap:8px}.cx-question-item{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid #ece4d9;border-radius:10px;background:#fff;color:#685c4f;text-align:left;cursor:pointer}.cx-question-item:hover{border-color:#c7a878;background:#fffbf4}.cx-question-item.is-current{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-question-index{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#f3eee6;color:#8f7553;font-size:12px;font-weight:700}.cx-question-item.is-primary .cx-question-index{background:#e8f4ec;color:#3e8257}.cx-question-item.is-danger .cx-question-index{background:#fbe9e5;color:#b4594b}.cx-question-state{margin-left:auto;color:#a69b8d;font-size:11px}.cx-log-list{display:flex;flex-direction:column;gap:0}.cx-log-item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:9px 0;border-bottom:1px solid #f0e9df;color:#65594d;font-size:12px;line-height:1.5}.cx-log-item time{color:#a69b8d;font-variant-numeric:tabular-nums}.cx-log-item span{overflow-wrap:anywhere}.cx-log-item.is-error span{color:#b4594b}.cx-log-item.is-success span{color:#3e8257}.cx-workbench-settings{display:flex;flex-direction:column;gap:12px}.cx-workbench-settings__toolbar{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;z-index:2;padding:0 0 10px;background:#fffdfa}.cx-workbench-settings__toolbar input{min-width:0;flex:1;height:34px;padding:0 10px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#4b4035;outline:0;font:12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif}.cx-workbench-settings__toolbar input:focus{border-color:#b68a4a;box-shadow:0 0 0 2px rgba(182,138,74,.12)}.cx-link-button{flex:0 0 auto;height:34px;padding:0 9px;border:1px solid #e5ddd1;border-radius:8px;background:#fff;color:#8f7553;font-size:11px;cursor:pointer}.cx-link-button:hover{border-color:#b68a4a;color:#76572f}.cx-link-button:disabled{opacity:.5;cursor:wait}.cx-settings-group{overflow:hidden;border:1px solid #e9dfd2;border-radius:12px;background:#fff}.cx-settings-group__heading{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid #f0e9df;background:#fcfaf6}.cx-settings-group__heading strong{color:#4d4033;font-size:13px}.cx-settings-group__heading span{color:#a69b8d;font-size:10px}.cx-setting-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:12px;align-items:center;padding:12px 13px;border-bottom:1px solid #f4eee6}.cx-setting-row:last-child{border-bottom:0}.cx-setting-copy{min-width:0}.cx-setting-copy>span{display:block;color:#65594d;font-size:12px}.cx-setting-copy small{display:block;margin-top:3px;color:#a69b8d;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.cx-setting-control{min-width:0}.cx-setting-control>.el-input,.cx-setting-control>.el-input-number,.cx-setting-control>.el-select{width:100%}.cx-setting-control .el-input__wrapper,.cx-setting-control .el-select__wrapper{min-height:32px;border-radius:8px;box-shadow:0 0 0 1px #e5ddd1 inset}.cx-setting-control .el-input-number{width:100%}.cx-setting-secret{display:flex;min-width:0;border:1px solid #e5ddd1;border-radius:8px;background:#fff;overflow:hidden}.cx-setting-secret>.el-input{flex:1;min-width:0}.cx-setting-secret .el-input__wrapper{box-shadow:none}.cx-setting-secret__toggle{flex:0 0 auto;padding:0 8px;border:0;border-left:1px solid #eee7dc;background:#fff;color:#8f7553;font-size:10px;cursor:pointer}.cx-workbench__footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #eee7dc;background:#fffdfa}.cx-primary-button,.cx-secondary-button{height:34px;padding:0 13px;border-radius:8px;font-size:12px;cursor:pointer}.cx-primary-button{border:1px solid #b68a4a;background:#b68a4a;color:#fff}.cx-secondary-button{border:1px solid #e5ddd1;background:#fff;color:#76572f}.cx-primary-button:hover{background:#9f743c}.cx-secondary-button:hover{border-color:#b68a4a}@media (max-width:600px){.cx-workbench-trigger{right:12px;bottom:12px}.cx-workbench-trigger.is-open{right:12px;bottom:calc(100vh - 58px)}.cx-workbench{top:8px;right:8px;width:calc(100vw - 16px);height:calc(100vh - 16px);border-radius:14px}.cx-setting-row{grid-template-columns:1fr;gap:7px}.cx-workbench__content{padding:12px}.cx-workbench-settings__toolbar{top:-12px}.cx-log-item{grid-template-columns:52px minmax(0,1fr)}}@media (prefers-reduced-motion:reduce){.cx-workbench,.cx-workbench-trigger{transition:none}}");
@@ -70,9 +100,12 @@
       else if (dialog.querySelector(".demo-tabs")) dialog.classList.add("cx-runtime-dialog");
     });
   };
+  let settingsDialogObserver = null;
   if (_unsafeWindow === _unsafeWindow?.top && typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
     markSettingsDialogs();
-    new MutationObserver(markSettingsDialogs).observe(document.body, { childList: true, subtree: true });
+    settingsDialogObserver = new MutationObserver(markSettingsDialogs);
+    settingsDialogObserver.observe(document.body, { childList: true, subtree: true });
+    runtime.register(() => settingsDialogObserver?.disconnect());
   }
   const GENERATED_CONFIG_CONTRACT = {"schemaVersion":1,"sourceSchemaSha256":"317199fbf6671a2b737b0e885771f928db0c6df5b1f8ad3293eb600aad77eb36","defaults":{"videoDiagnosticsEnabled":true,"randomPauseEnabled":true,"randomPauseIntervalMin":30,"randomPauseIntervalMax":93,"randomPauseDurationMin":2,"randomPauseDurationMax":5},"rules":{"videoDiagnosticsEnabled":{"type":"boolean"},"randomPauseEnabled":{"type":"boolean"},"randomPauseIntervalMin":{"type":"integer","minimum":1,"maximum":86400},"randomPauseIntervalMax":{"type":"integer","minimum":1,"maximum":86400},"randomPauseDurationMin":{"type":"integer","minimum":1,"maximum":3600},"randomPauseDurationMax":{"type":"integer","minimum":1,"maximum":3600}},"constraints":[["randomPauseIntervalMin","<=","randomPauseIntervalMax"],["randomPauseDurationMin","<=","randomPauseDurationMax"]]};
   const applyGeneratedConfigContract = (input) => {
@@ -457,7 +490,19 @@
     console.info = (...args) => forward("info", "info", args);
     console.warn = (...args) => forward("warn", "warn", args);
     console.error = (...args) => forward("error", "error", args);
-    if (_unsafeWindow) _unsafeWindow.__chaoxingToolkitLogFilterInstalled = true;
+    if (_unsafeWindow) {
+      _unsafeWindow.__chaoxingToolkitLogFilterInstalled = true;
+      _unsafeWindow.__chaoxingToolkitLogFilterOwner = runtime;
+      runtime.register(() => {
+        if (_unsafeWindow.__chaoxingToolkitLogFilterOwner !== runtime) return;
+        console.log = original.log;
+        console.info = original.info;
+        console.warn = original.warn;
+        console.error = original.error;
+        delete _unsafeWindow.__chaoxingToolkitLogFilterInstalled;
+        delete _unsafeWindow.__chaoxingToolkitLogFilterOwner;
+      });
+    }
   };
   installLogFilter();
   const syncConfigFromServer = (formstore) => new Promise((resolve) => {
@@ -2187,20 +2232,24 @@
       resolve();
     }, 1e3 * randomTime);
   }), waitIframeLoaded = (iframe, timeoutMs = 15000) => new Promise((resolve) => {
-    if (!iframe) {
+    if (!iframe || runtime.destroyed) {
       resolve(false);
       return;
     }
     let settled = false;
     let timeoutId = null;
+    let unregisterRuntime = null;
     const finish = (loaded) => {
       if (settled) return;
       settled = true;
       if (timeoutId) clearTimeout(timeoutId);
       if (typeof iframe.removeEventListener === "function") iframe.removeEventListener("load", onLoad);
+      if (unregisterRuntime) unregisterRuntime();
       resolve(loaded);
     };
     const onLoad = () => finish(true);
+    unregisterRuntime = runtime.register(() => finish(false));
+    if (runtime.destroyed) return;
     if (iframe.contentDocument && iframe.contentDocument.readyState !== "loading") {
       finish(true);
       return;
@@ -2215,13 +2264,17 @@
     let settled = false;
     let timer = null;
     let timeoutId = null;
+    let unregisterRuntime = null;
     const finish = (loaded) => {
       if (settled) return;
       settled = true;
       if (timer) clearInterval(timer);
       if (timeoutId) clearTimeout(timeoutId);
+      if (unregisterRuntime) unregisterRuntime();
       resolve(loaded);
     };
+    unregisterRuntime = runtime.register(() => finish(false));
+    if (runtime.destroyed) return;
     const check = () => {
       try {
         if (iframeWindow.document.querySelector(selector)) finish(true);
@@ -2233,6 +2286,58 @@
     if (settled) return;
     timer = setInterval(check, 100);
     timeoutId = setTimeout(() => finish(false), timeoutMs);
+  }), findVideoPlayerContext = (iframeWindow, depth = 0) => {
+    if (!iframeWindow?.document || depth > 2) return null;
+    try {
+      const video = iframeWindow.document.querySelector('video#video_html5_api, video[id*="video_html5"], video.video-js, video');
+      if (video && typeof iframeWindow.videojs === "function") return { window: iframeWindow, video };
+      for (const frame of iframeWindow.document.querySelectorAll("iframe")) {
+        try {
+          const nested = findVideoPlayerContext(frame.contentWindow, depth + 1);
+          if (nested) return nested;
+        } catch (error) {
+          // 跨域或已销毁的 iframe 不能继续探测，保留主流程重试。
+        }
+      }
+    } catch (error) {
+      return null;
+    }
+    return null;
+  }, waitVideoPlayerContext = (iframeWindow, timeoutMs = 15000) => new Promise((resolve) => {
+    if (!iframeWindow?.document) {
+      resolve(null);
+      return;
+    }
+    let settled = false;
+    let timer = null;
+    let timeoutId = null;
+    let unregisterRuntime = null;
+    const finish = (context) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearInterval(timer);
+      if (timeoutId) clearTimeout(timeoutId);
+      if (unregisterRuntime) unregisterRuntime();
+      resolve(context);
+    };
+    unregisterRuntime = runtime.register(() => finish(null));
+    if (runtime.destroyed) return;
+    const check = () => {
+      const context = findVideoPlayerContext(iframeWindow);
+      if (!context || typeof context.window?.videojs !== "function") return;
+      try {
+        const player = context.video.id ? context.window.videojs(context.video.id) : context.window.videojs(context.video);
+        if (player && typeof player.play === "function" && typeof player.pause === "function") {
+          finish({ ...context, player });
+        }
+      } catch (error) {
+        // video 元素可能已加载，但播放器实例仍在初始化，继续等待。
+      }
+    };
+    check();
+    if (settled) return;
+    timer = setInterval(check, 100);
+    timeoutId = setTimeout(() => finish(null), timeoutMs);
   }), parseChapterTaskInfo = (iframe) => {
     if (!iframe || typeof iframe.getAttribute !== "function") return null;
     const raw = iframe.getAttribute("data");
@@ -2889,6 +2994,15 @@
         endTriggerPointer();
         window.removeEventListener("resize", handleViewportResize);
       });
+      runtime.register(() => {
+        endPointer();
+        endTriggerPointer();
+        cancelPointerFrame(pointerFrameState);
+        cancelPointerFrame(triggerFrameState);
+        if (triggerPointerState.suppressClickTimer) clearTimeout(triggerPointerState.suppressClickTimer);
+        triggerPointerState.suppressClickTimer = null;
+        window.removeEventListener("resize", handleViewportResize);
+      });
       return { task, forminput, panelOpen, activeTab, settingsSearch, syncing, revealedSecrets, settingGroups, currentQuestion, isSecretSetting, openSettings, saveSettings, resetSettings, selectQuestion, panelLayout, triggerLayout, beginDrag, beginResize, beginTriggerDrag, handleTriggerClick, resetLayout, togglePanel: () => { panelOpen.value = !panelOpen.value; } };
     },
     render() {
@@ -2965,7 +3079,8 @@
     }
     async audio(iframeWindow) {
       this.askStore.reset(), this.askStore.task.name = "视频音频";
-      if (await waitElementLoaded(iframeWindow, "#audio_html5_api") === false) {
+      if (runtime.destroyed) return false;
+      if (await waitElementLoaded(iframeWindow, "#audio_html5_api") === false || runtime.destroyed) {
         this.askStore.task.status = "音频播放器加载超时，下一轮重试";
         return false;
       }
@@ -2978,13 +3093,14 @@
       let playRequest = null;
       let promptShown = false;
       const ensurePlaying = () => {
-        if (audio.ended || !audio.paused || playRequest) return playRequest;
+        if (runtime.destroyed || audio.ended || !audio.paused || playRequest) return playRequest;
         try {
           const result = audio.play();
           playRequest = Promise.resolve(result).then(() => {
             console.log("播放成功");
             return true;
           }).catch((error) => {
+            if (runtime.destroyed) return false;
             if (error?.name === "NotAllowedError" && !promptShown) {
               promptShown = true;
               ElementPlus.ElMessageBox.alert("由于自动播放需要用户点击过浏览器，请确认即可", "温馨提示", { confirmButtonText: "确认", callback: () => {
@@ -3005,17 +3121,22 @@
       };
       return ensurePlaying(), new Promise((resolve) => {
         let settled = false;
-        const finish = (result) => {
-          if (settled) return;
-          settled = true;
-          clearInterval(intervalId);
-          audio.removeEventListener("ended", handleEnded);
-          resolve(result);
-        };
+        let intervalId = null;
+        let unregisterRuntime = null;
         const handleEnded = () => {
           log("监听到音频已完成", "success"), finish(true);
         };
-        const intervalId = setInterval(() => {
+        const finish = (result) => {
+          if (settled) return;
+          settled = true;
+          if (intervalId !== null) clearInterval(intervalId);
+          try { audio.removeEventListener("ended", handleEnded); } catch (error) {}
+          if (unregisterRuntime) unregisterRuntime();
+          resolve(result);
+        };
+        unregisterRuntime = runtime.register(() => finish(false));
+        if (runtime.destroyed) return;
+        intervalId = setInterval(() => {
           audio.ended ? finish(true) : ensurePlaying();
         }, 1e3);
         audio.addEventListener("ended", handleEnded, { once: true });
@@ -3023,32 +3144,40 @@
     }
     async video(iframeWindow) {
       this.askStore.reset(), this.askStore.task.name = "视频", this.askStore.task.video.status = 0;
-      if (await waitElementLoaded(iframeWindow, "#video_html5_api") === false) {
+      const videoContext = await waitVideoPlayerContext(iframeWindow);
+      if (!videoContext || runtime.destroyed) {
         this.askStore.task.status = "视频播放器加载超时，下一轮重试";
         return false;
       }
+      const playerWindow = videoContext.window;
+      if (runtime.destroyed) return false;
       try {
         await syncConfigFromServer();
       } catch (error) {
         console.warn("⚠️ [配置] 视频开始前同步失败，继续使用本地配置", error);
       }
       console.log("视频加载完成");
-      const player = typeof iframeWindow?.videojs === "function" ? iframeWindow.videojs("video_html5_api") : null;
+      const player = videoContext.player;
       if (!player || typeof player.play !== "function" || typeof player.pause !== "function") {
         this.askStore.task.status = "视频播放器尚未就绪，下一轮重试";
         return false;
       }
       const config = getConfig();
       const stopVideoDiagnostics = installVideoDiagnostics(player);
-      player.muted(true), player.playbackRate(1), this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0, player.on("ratechange", () => {
+      const unregisterDiagnostics = runtime.register(() => { try { stopVideoDiagnostics(); } catch (error) {} });
+      const handleRateChange = () => {
+        if (runtime.destroyed) return;
         const rate = player.playbackRate();
         this.askStore.task.video.status = rate > 1 ? 1 : 0;
         if (rate !== 1) {
           player.playbackRate(1);
           console.log(`[视频] 播放速率已恢复为 1 倍（原速率: ${rate}）`);
         }
-      });
-      const isPageVisible = () => iframeWindow.document?.visibilityState !== "hidden";
+      };
+      player.muted(true);
+      player.playbackRate(1);
+      this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0;
+      player.on("ratechange", handleRateChange);
       let playbackRequest = null;
       let playbackRetryTimer = null;
       let playbackRetryAttempt = 0;
@@ -3059,7 +3188,7 @@
         return description === "{}" ? "未知播放错误" : description;
       };
       const canRetryPlayback = () => {
-        if (!isPageVisible() || playbackFinished || randomPauseActive) return false;
+        if (playbackFinished || randomPauseActive || runtime.destroyed) return false;
         try {
           return player.paused();
         } catch (error) {
@@ -3104,7 +3233,8 @@
       startPlayback();
       const isVideoUnfinished = () => {
         try {
-          if (typeof iframeWindow.isUnFinishJob === "function") return Boolean(iframeWindow.isUnFinishJob());
+          const taskWindow = typeof iframeWindow?.isUnFinishJob === "function" ? iframeWindow : playerWindow;
+          if (typeof taskWindow?.isUnFinishJob === "function") return Boolean(taskWindow.isUnFinishJob());
           const ended = typeof player.ended === "function" ? player.ended() : player.ended;
           return !ended;
         } catch (error) {
@@ -3115,11 +3245,25 @@
       let pauseTimer = null;
       let resumeTimer = null;
       let pauseDeadline = 0;
-      let pendingRandomPause = false;
       let nextPauseAt = 0;
       let scheduledIntervalSeconds = 0;
       let mouseMoveTimer = null;
-      let visibilityResumeTimer = null;
+      let lastObservedCurrentTime = Number(typeof player.currentTime === "function" ? player.currentTime() : 0) || 0;
+      let lastProgressAt = Date.now();
+      let lastProgressRecoveryAt = 0;
+      const readCurrentTime = () => {
+        try {
+          const value = typeof player.currentTime === "function" ? player.currentTime() : player.currentTime;
+          return Number(value);
+        } catch (error) {
+          return Number.NaN;
+        }
+      };
+      const notePlaybackProgress = (currentTime, now = Date.now()) => {
+        if (!Number.isFinite(currentTime)) return;
+        if (currentTime > lastObservedCurrentTime + 0.01) lastProgressAt = now;
+        lastObservedCurrentTime = currentTime;
+      };
       const pauseForRandomInterval = () => {
         allowPlayerPause = true;
         try {
@@ -3129,7 +3273,7 @@
         }
       };
       const handleUnexpectedPause = () => {
-        if (isPageVisible() && !allowPlayerPause && !randomPauseActive && !playbackFinished) {
+        if (!allowPlayerPause && !randomPauseActive && !playbackFinished && !runtime.destroyed) {
           const playbackRequestAfterPause = startPlayback();
           playbackRequestAfterPause.then((succeeded) => {
             if (succeeded) console.log("[视频] 检测到意外暂停，已恢复播放");
@@ -3137,8 +3281,17 @@
         }
       };
       player.on("pause", handleUnexpectedPause);
+      const handlePlaybackStall = (eventName) => {
+        if (playbackFinished || randomPauseActive || runtime.destroyed) return;
+        lastProgressAt = Math.min(lastProgressAt, Date.now() - 7000);
+        console.info(`[视频] 检测到${eventName}，等待无进度看门狗恢复`);
+      };
+      const handleWaiting = () => handlePlaybackStall("waiting");
+      const handleStalled = () => handlePlaybackStall("stalled");
+      player.on("waiting", handleWaiting);
+      player.on("stalled", handleStalled);
 
-      // 随机暂停功能。暂停恢复以截止时间为准，并在页面重新可见时补偿后台计时器延迟。
+      // 随机暂停功能。前后台均按真实截止时间执行，后台计时器若被浏览器降频则在下一次回调补偿。
       const randomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
       const intervalMin = Math.max(1, Number(config.randomPauseIntervalMin) || 30);
       const intervalMax = Math.max(intervalMin, Number(config.randomPauseIntervalMax) || 93);
@@ -3157,11 +3310,6 @@
         }
         randomPauseActive = false;
         pauseDeadline = 0;
-        if (!isPageVisible()) {
-          pendingRandomPause = true;
-          scheduleRandomPause();
-          return;
-        }
         if (player.paused() && isVideoUnfinished()) {
           const playbackRequestAfterPause = startPlayback();
           playbackRequestAfterPause.then((succeeded) => {
@@ -3171,11 +3319,6 @@
         scheduleRandomPause();
       };
       const triggerRandomPause = (triggerIntervalSeconds = scheduledIntervalSeconds) => {
-        pendingRandomPause = false;
-        if (!isPageVisible()) {
-          pendingRandomPause = true;
-          return;
-        }
         if (player.paused()) {
           scheduleRandomPause();
           return;
@@ -3199,43 +3342,31 @@
           triggerRandomPause(scheduledIntervalSeconds);
         }, delay);
       };
-      const handleVisibilityChange = () => {
-        if (!isPageVisible()) {
-          clearTimeout(visibilityResumeTimer);
-          visibilityResumeTimer = null;
-          clearTimeout(playbackRetryTimer);
-          playbackRetryTimer = null;
-          playbackRetryAttempt = 0;
-          if (randomPauseActive) {
-            randomPauseActive = false;
-            pauseDeadline = 0;
-            clearTimeout(resumeTimer);
-            resumeTimer = null;
-            pendingRandomPause = true;
-          }
-          return;
-        }
-        if (randomPauseActive) {
-          resumeRandomPause();
-          return;
-        }
-        clearTimeout(visibilityResumeTimer);
-        visibilityResumeTimer = setTimeout(() => {
-          visibilityResumeTimer = null;
-          if (isPageVisible() && !playbackFinished && !randomPauseActive && player.paused() && isVideoUnfinished()) {
-            const playbackRequestAfterVisibility = startPlayback();
-            playbackRequestAfterVisibility.then((succeeded) => {
-              if (succeeded) console.log("[视频] 页面回到前台，已恢复播放");
-            });
-          }
-        }, 250);
-        if (pendingRandomPause) {
-          pendingRandomPause = false;
+      const handleTimeUpdate = () => {
+        if (playbackFinished || randomPauseActive || runtime.destroyed) return;
+        const now = Date.now();
+        notePlaybackProgress(readCurrentTime(), now);
+        if (nextPauseAt && now >= nextPauseAt) {
           clearTimeout(pauseTimer);
           pauseTimer = null;
           nextPauseAt = 0;
-          scheduleRandomPause();
-        } else if (nextPauseAt && Date.now() >= nextPauseAt) {
+          triggerRandomPause(scheduledIntervalSeconds);
+        }
+      };
+      player.on("timeupdate", handleTimeUpdate);
+      const handleVisibilityChange = () => {
+        if (runtime.destroyed || playbackFinished) return;
+        if (randomPauseActive) {
+          resumeRandomPause();
+        } else if (player.paused() && isVideoUnfinished()) {
+          const playbackRequestAfterVisibility = startPlayback();
+          playbackRequestAfterVisibility.then((succeeded) => {
+            if (succeeded) console.log("[视频] 页面状态变化后已恢复播放");
+          });
+        }
+        scheduleMouseMovement();
+        if (randomPauseActive) return;
+        if (nextPauseAt && Date.now() >= nextPauseAt) {
           clearTimeout(pauseTimer);
           pauseTimer = null;
           nextPauseAt = 0;
@@ -3244,106 +3375,172 @@
           scheduleRandomPause();
         }
       };
-      const visibilityTarget = iframeWindow.document;
+      const visibilityTarget = playerWindow.document;
       if (visibilityTarget && typeof visibilityTarget.addEventListener === "function") visibilityTarget.addEventListener("visibilitychange", handleVisibilityChange);
       scheduleRandomPause();
 
-      // 模拟鼠标滑动功能
+      // 模拟鼠标滑动功能，仅作用于当前视频 iframe 内的视频元素。
       const simulateMouseMovement = () => {
-        const doc = iframeWindow.document;
-        const videoElement = doc.querySelector("#video_html5_api") || doc.body;
+        if (playbackFinished || runtime.destroyed || !isVideoUnfinished()) return;
+        const videoElement = videoContext.video;
+        if (!videoElement) return;
 
-        // 生成随机位置
         const rect = videoElement.getBoundingClientRect();
-        const x = Math.floor(Math.random() * rect.width) + rect.left;
-        const y = Math.floor(Math.random() * rect.height) + rect.top;
-
-        // 创建并分发鼠标事件
+        const left = Math.max(0, rect.left);
+        const top = Math.max(0, rect.top);
+        const right = Math.min(playerWindow.innerWidth, rect.right);
+        const bottom = Math.min(playerWindow.innerHeight, rect.bottom);
+        const width = right - left;
+        const height = bottom - top;
+        if (width <= 0 || height <= 0) return;
+        const x = Math.floor(Math.random() * width) + left;
+        const y = Math.floor(Math.random() * height) + top;
         const events = ["mousemove", "mouseover", "mouseenter"];
-        events.forEach(eventType => {
-          const event = new MouseEvent(eventType, {
+        events.forEach((eventType) => {
+          const event = new playerWindow.MouseEvent(eventType, {
             bubbles: true,
             cancelable: true,
-            view: iframeWindow,
+            view: playerWindow,
             clientX: x,
             clientY: y,
-            screenX: x + (iframeWindow.screenX || 0),
-            screenY: y + (iframeWindow.screenY || 0),
+            screenX: x + (playerWindow.screenX || 0),
+            screenY: y + (playerWindow.screenY || 0),
             movementX: Math.floor(Math.random() * 10) - 5,
             movementY: Math.floor(Math.random() * 10) - 5
           });
           videoElement.dispatchEvent(event);
         });
-
-        // 随机滚动页面
-        if (Math.random() > 0.7) {
-          const scrollAmount = Math.floor(Math.random() * 100) - 50;
-          iframeWindow.scrollBy(0, scrollAmount);
-        }
       };
 
-      // 每3-8秒模拟一次鼠标活动
+      // 每3-8秒模拟一次鼠标活动，前后台均持续调度；浏览器可能对后台计时器降频。
       const scheduleMouseMovement = () => {
+        clearTimeout(mouseMoveTimer);
+        mouseMoveTimer = null;
+        if (playbackFinished || !isVideoUnfinished()) return;
         const delay = Math.floor(Math.random() * (8 - 3 + 1) + 3) * 1000;
         mouseMoveTimer = setTimeout(() => {
-          simulateMouseMovement();
-          if (isVideoUnfinished()) {
+          mouseMoveTimer = null;
+          if (!playbackFinished && isVideoUnfinished()) {
+            simulateMouseMovement();
             scheduleMouseMovement();
           }
         }, delay);
       };
       scheduleMouseMovement();
+      let unregisterRuntimeVideo = null;
 
-      await new Promise((resolve) => {
+      const videoResult = await new Promise((resolve) => {
+        const isActive = () => !runtime.destroyed;
+        let intervalId = null;
+        let handleEnded = null;
+        let settled = false;
+        let cleaned = false;
         const cleanup = () => {
+          if (cleaned) return;
+          cleaned = true;
           playbackFinished = true;
-          clearInterval(intervalId);
-          clearTimeout(pauseTimer);
-          clearTimeout(resumeTimer);
-          clearTimeout(mouseMoveTimer);
-          clearTimeout(visibilityResumeTimer);
-          clearTimeout(playbackRetryTimer);
+          try { clearInterval(intervalId); } catch (error) {}
+          try { clearTimeout(pauseTimer); } catch (error) {}
+          try { clearTimeout(resumeTimer); } catch (error) {}
+          try { clearTimeout(mouseMoveTimer); } catch (error) {}
+          try { clearTimeout(playbackRetryTimer); } catch (error) {}
           playbackRetryTimer = null;
           playbackRetryAttempt = 0;
           pauseDeadline = 0;
-          pendingRandomPause = false;
-          if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
-          if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
-          stopVideoDiagnostics();
+          try {
+            if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
+          } catch (error) {}
+          try {
+            if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
+          } catch (error) {}
+          try {
+            if (typeof player.off === "function") player.off("waiting", handleWaiting);
+          } catch (error) {}
+          try {
+            if (typeof player.off === "function") player.off("stalled", handleStalled);
+          } catch (error) {}
+          try {
+            if (typeof player.off === "function") player.off("timeupdate", handleTimeUpdate);
+          } catch (error) {}
+          try {
+            if (typeof player.off === "function") player.off("ratechange", handleRateChange);
+          } catch (error) {}
+          try {
+            if (handleEnded && typeof player.off === "function") player.off("ended", handleEnded);
+          } catch (error) {}
+          if (unregisterRuntimeVideo) {
+            unregisterRuntimeVideo();
+            unregisterRuntimeVideo = null;
+          }
+          unregisterDiagnostics();
+          try { stopVideoDiagnostics(); } catch (error) {}
         };
-        const finish = (message) => {
-          cleanup();
-          console.log(message);
-          resolve();
+        const finish = (message, result = undefined) => {
+          if (settled) return;
+          settled = true;
+          try {
+            cleanup();
+            console.log(message);
+          } finally {
+            resolve(result);
+          }
         };
-        const intervalId = setInterval(() => {
-          if (isVideoUnfinished()) {
-            if (isPageVisible() && !randomPauseActive && player.paused() && player.currentTime() < player.duration()) {
-              startPlayback();
-            }
-          } else {
+        unregisterRuntimeVideo = runtime.register(() => finish("脚本实例已停止", false));
+        if (runtime.destroyed) return;
+        intervalId = setInterval(() => {
+          if (!isVideoUnfinished()) {
             finish("视频任务状态已完成");
+            return;
+          }
+
+          const now = Date.now();
+          const currentTime = readCurrentTime();
+          notePlaybackProgress(currentTime, now);
+          if (randomPauseActive) {
+            lastProgressAt = now;
+            return;
+          }
+
+          const ended = typeof player.ended === "function" ? player.ended() : player.ended;
+          const duration = Number(typeof player.duration === "function" ? player.duration() : player.duration);
+          const hasRemaining = !Number.isFinite(duration) || !Number.isFinite(currentTime) || currentTime < duration;
+          if (player.paused() && !ended && hasRemaining) {
+            startPlayback();
+            return;
+          }
+
+          if (!ended && Number.isFinite(currentTime) && now - lastProgressAt >= 7000 && now - lastProgressRecoveryAt >= 1500) {
+            lastProgressRecoveryAt = now;
+            lastProgressAt = now;
+            console.warn("[视频] 检测到视频无进度，尝试恢复播放");
+            startPlayback().then((succeeded) => {
+              if (succeeded) console.log("[视频] 无进度恢复请求已完成");
+            });
           }
         }, 1e3);
-        player.on("ended", () => {
-          finish("视频播放完成");
-        });
-      }), console.log("任务点完成");
+        handleEnded = () => finish("视频播放完成");
+        player.on("ended", handleEnded);
+      });
+      if (videoResult === false) return false;
+      console.log("任务点完成");
+      return true;
     }
     work(iframeWindow) {
       return new Promise(async (resolve) => {
         try {
+          if (runtime.destroyed) { resolve(false); return; }
           if (!this.defaultConfig.autoAnswer) {
             this.askStore.task.status = "未开启自动答题，等待手动答题";
             resolve(true);
             return;
           }
-          if (!await waitElementLoaded(iframeWindow, ".TiMu")) {
+          if (!await waitElementLoaded(iframeWindow, ".TiMu") || runtime.destroyed) {
             this.askStore.task.status = "题目加载超时，下一轮重试";
             resolve(false);
             return;
           }
           await decode(iframeWindow);
+          if (runtime.destroyed) { resolve(false); return; }
           const Timu = iframeWindow.document.querySelectorAll(".TiMu");
           if (!Timu || Timu.length === 0) {
             this.askStore.task.status = "题目仍在加载，等待下一轮重试";
@@ -3357,13 +3554,19 @@
           }
           this.askStore.reset(), this.askStore.count = ques.length, this.askStore.task.name = "章节测验";
           for (let i = 0; i < ques.length; i++) {
-            await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax), this.askStore.insert(ques[i]), this.askStore.task.work.inx = i;
+            if (runtime.destroyed) { resolve(false); return; }
+            await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax);
+            if (runtime.destroyed) { resolve(false); return; }
+            this.askStore.insert(ques[i]);
+            this.askStore.task.work.inx = i;
             let data = await getAnswers(ques[i], iframeWindow);
+            if (runtime.destroyed) { resolve(false); return; }
             this.askStore.get(i).allAnswer = data;
             let tmp = fillAnswer(data, ques[i], Timu[i], iframeWindow);
             tmp ? (this.askStore.get(i).status = "primary", this.askStore.get(i).answer = tmp, succ++) : (this.askStore.get(i).status = "danger", this.askStore.get(i).answer = "暂无答案"), this.askStore.get(i).dom = Timu[i];
           }
           if (this.defaultConfig.autoSubmit) {
+            if (runtime.destroyed) { resolve(false); return; }
             if (succ / ques.length < this.defaultConfig.minAccuracy) {
               this.askStore.log("章节测验正确率不足，暂存", "error");
               iframeWindow.alert = function(e) {
@@ -3372,11 +3575,14 @@
               iframeWindow.noSubmit();
             } else {
               await randomSleep(this.defaultConfig.submitDelayMin, this.defaultConfig.submitDelayMax);
+              if (runtime.destroyed) { resolve(false); return; }
               iframeWindow.btnBlueSubmit();
               await sleep(3);
+              if (runtime.destroyed) { resolve(false); return; }
               iframeWindow.submitCheckTimes();
               this.askStore.log("章节测验已完成", "success");
               await randomSleep(5, 10);
+              if (runtime.destroyed) { resolve(false); return; }
               this.askStore.log("正在刷新页面...", "info");
               iframeWindow.location.reload();
             }
@@ -3407,13 +3613,19 @@
           return void resolve();
         let ques = [];
         for (let i = 0; i < Timu.length; i++) {
+          if (runtime.destroyed) { resolve(false); return; }
           let data = getQuestion("2", Timu[i]);
           ques.push(data);
         }
         this.askStore.reset(), this.askStore.count = ques.length, this.askStore.task.name = "作业";
         for (let i = 0; i < ques.length; i++) {
-          await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax), this.askStore.insert(ques[i]), this.askStore.task.work.inx = i;
+          if (runtime.destroyed) { resolve(false); return; }
+          await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax);
+          if (runtime.destroyed) { resolve(false); return; }
+          this.askStore.insert(ques[i]);
+          this.askStore.task.work.inx = i;
           let data = await getAnswers(ques[i]);
+          if (runtime.destroyed) { resolve(false); return; }
           this.askStore.get(i).allAnswer = data;
           let tmp = fillAnswer(data, ques[i], Timu[i], _unsafeWindow);
           tmp ? (this.askStore.get(i).status = "primary", this.askStore.get(i).answer = tmp) : (this.askStore.get(i).status = "danger", this.askStore.get(i).answer = "暂无答案"), this.askStore.get(i).dom = Timu[i];
@@ -3422,6 +3634,7 @@
     }
     exam() {
       return new Promise(async (resolve) => {
+        if (runtime.destroyed) { resolve(false); return; }
         if (!this.defaultConfig.autoAnswer) {
           this.askStore.task.status = "未开启自动答题，等待手动答题";
           resolve();
@@ -3431,10 +3644,12 @@
         let data = getQuestion("3", _unsafeWindow.document.body);
         this.askStore.insert(data), this.askStore.task.work.inx = 0;
         let data1 = await getAnswers(data);
+        if (runtime.destroyed) { resolve(false); return; }
         this.askStore.get(0).allAnswer = data1;
         let tmp = fillAnswer(data1, data, document.getElementsByClassName("mark_table")[0], _unsafeWindow);
         if (tmp ? (this.askStore.get(0).status = "primary", this.askStore.get(0).answer = tmp) : (this.askStore.get(0).status = "danger", this.askStore.get(0).answer = "暂无答案"), this.defaultConfig.autoExam) {
           await randomSleep(this.defaultConfig.answerIntervalMin, this.defaultConfig.answerIntervalMax);
+          if (runtime.destroyed) { resolve(false); return; }
           const nextButton = $('.nextDiv .jb_btn:contains("下一题")');
           nextButton ? nextButton.click() : (this.askStore.log("已完成答题，请自行检查答案填写后自行提交", "success"), this.askStore.task.status = "已完成答题，请自行检查答案填写后自行提交");
         } else
@@ -3508,10 +3723,23 @@
       log(e, "error");
     }
   })()) : null;
+  runtime.register(() => {
+    try { if (isTopWindow) app?.unmount(); } catch (error) {}
+    try { if (isTopWindow) top.document.getElementById("cccxapp")?.remove(); } catch (error) {}
+  });
+  const previousBodyHandlers = document.body ? {
+    oncopy: document.body.oncopy,
+    oncut: document.body.oncut,
+    onpaste: document.body.onpaste,
+    onselectstart: document.body.onselectstart,
+    ondragstart: document.body.ondragstart
+  } : null;
+  let selectionStyle = null;
   switch (appMount, (() => {
+    if (!document.body) return;
     document.body.oncopy = null, document.body.oncut = null, document.body.onpaste = null, document.body.onselectstart = null, document.body.ondragstart = null;
-    const style = document.createElement("style");
-    style.innerHTML = "\n       * {\n           -webkit-user-select: auto !important;\n           -moz-user-select: auto !important;\n           -o-user-select: auto !important;\n           user-select: auto !important;\n       }\n   ", document.head.appendChild(style);
+    selectionStyle = document.createElement("style");
+    selectionStyle.innerHTML = "\n       * {\n           -webkit-user-select: auto !important;\n           -moz-user-select: auto !important;\n           -o-user-select: auto !important;\n           user-select: auto !important;\n       }\n   ", document.head.appendChild(selectionStyle);
   })(), _self.location.pathname) {
     case "/work/doHomeWorkNew":
     case "/mooc-ans/work/doHomeWorkNew":
@@ -3532,12 +3760,27 @@
       let chapterBlockedHref = null;
       let chapterNavigationTimer = null;
       let chapterNavigationAttempts = 0;
+      let chapterPollTimer = null;
+      runtime.register(() => {
+        if (chapterPollTimer) {
+          clearInterval(chapterPollTimer);
+          chapterPollTimer = null;
+        }
+        if (chapterNavigationTimer) {
+          clearTimeout(chapterNavigationTimer);
+          chapterNavigationTimer = null;
+        }
+        chapterWorkRunning = false;
+        chapterPollRunning = false;
+      });
       const scheduleNextChapter = () => {
+        if (runtime.destroyed) return false;
         if (!formStore.forminput.autoJump) {
           cxModel.askStore.msg("由于未开启自动切换,请手动切换");
           return true;
         }
         const tryClick = () => {
+          if (runtime.destroyed) return;
           const nextButton = top?.document?.querySelector?.(".nextChapter");
           if (nextButton && typeof nextButton.click === "function") {
             chapterNavigationAttempts = 0;
@@ -3561,18 +3804,20 @@
         return true;
       };
       const startWork = async () => {
-        if (chapterWorkRunning) return;
+        if (runtime.destroyed) return false;
+        if (chapterWorkRunning) return false;
         chapterWorkRunning = true;
         try {
         var _a, _b, _c, _d, _e;
-        if (!await waitElementLoaded(_self, "#iframe")) return false;
-        const cardsIframe = _self.document.querySelector("#iframe");
-        if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return false;
+          if (!await waitElementLoaded(_self, "#iframe") || runtime.destroyed) return false;
+          const cardsIframe = _self.document.querySelector("#iframe");
+          if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || runtime.destroyed || !cardsIframe.contentWindow) return false;
         const _self1 = cardsIframe.contentWindow;
         if (typeof top?.scroll2Job === "function") top.scroll2Job();
         let jobList = _self1.document.querySelectorAll(".ans-job-icon") || [];
         let allTasksReady = true;
         for (let i = 0; i < jobList.length; i++) {
+          if (runtime.destroyed) return false;
           const item = jobList[i];
           if ((_a = item.parentElement) == null ? void 0 : _a.classList.contains("ans-job-finished")) {
             const iframe = (_b = item.parentElement) == null ? void 0 : _b.querySelector("iframe");
@@ -3582,7 +3827,7 @@
               continue;
             }
             if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/work\/index.html/)) {
-              if (!await waitIframeLoaded(iframe) || !iframe.contentWindow) {
+          if (!await waitIframeLoaded(iframe) || runtime.destroyed || !iframe.contentWindow) {
                 allTasksReady = false;
                 cxModel.askStore.log("已完成作业 iframe 尚未加载，下一轮重试", "warn");
                 continue;
@@ -3594,11 +3839,12 @@
                 continue;
               }
               await cxModel.s(workIframe.contentWindow);
+              if (runtime.destroyed) return false;
             }
             console.log(iframe.src, "已完成"), cxModel.askStore.log("已完成的任务点,跳过");
           } else {
             const iframe = (_d = item.parentElement) == null ? void 0 : _d.querySelector("iframe");
-            if (!iframe || !await waitIframeLoaded(iframe) || !iframe.contentWindow) {
+              if (!await waitIframeLoaded(iframe) || runtime.destroyed || !iframe.contentWindow) {
               allTasksReady = false;
               cxModel.askStore.log("任务点 iframe 尚未加载，跳过本轮", "warn");
               continue;
@@ -3615,6 +3861,7 @@
                 continue;
               }
               const videoResult = await cxModel.video(iframe.contentWindow);
+              if (runtime.destroyed) return false;
               videoResult === false ? allTasksReady = false : cxModel.askStore.log("视频任务已完成", "success");
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/work\/index.html/)) {
               cxModel.askStore.log("即将开始做作业", "info");
@@ -3625,6 +3872,7 @@
                 continue;
               }
               const workResult = await cxModel.work(workIframe.contentWindow);
+              if (runtime.destroyed) return false;
               workResult === false ? allTasksReady = false : cxModel.askStore.log("作业任务已完成", "success");
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/audio\/index.html/)) {
               if (!formStore.forminput.autoVideo) {
@@ -3632,6 +3880,7 @@
                 continue;
               }
               const audioResult = await cxModel.audio(iframe.contentWindow);
+              if (runtime.destroyed) return false;
               audioResult === false ? allTasksReady = false : cxModel.askStore.log("音频任务已完成", "success");
             } else
               (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/pdf\/index.html/)) ? (await waitIframeLoaded(iframe), await cxModel.pdf(iframe.contentWindow) === false ? allTasksReady = false : cxModel.askStore.log("pdf任务已完成", "success")) : (console.log(iframe == null ? void 0 : iframe.src, "未知"), chapterBlockedHref = _self1.location.href, allTasksReady = false, cxModel.askStore.log("未知任务待人工确认，暂停自动切换", "warn"));
@@ -3641,24 +3890,29 @@
           cxModel.askStore.task.status = "任务内容仍在加载，下一轮重试";
           return false;
         }
-        await sleep(formStore.forminput.interval), scheduleNextChapter();
+        if (runtime.destroyed) return false;
+        await sleep(formStore.forminput.interval);
+        if (runtime.destroyed) return false;
+        scheduleNextChapter();
         return true;
         } finally {
           chapterWorkRunning = false;
         }
       };
-      setInterval(async () => {
+      chapterPollTimer = setInterval(async () => {
+        if (runtime.destroyed) return;
         if (chapterPollRunning) return;
         chapterPollRunning = true;
         try {
-          if (!await waitElementLoaded(_self, "#iframe")) return;
+          if (!await waitElementLoaded(_self, "#iframe") || runtime.destroyed) return;
           const cardsIframe = _self.document.querySelector("#iframe");
-          if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || !cardsIframe.contentWindow) return;
+          if (!cardsIframe || !await waitIframeLoaded(cardsIframe) || runtime.destroyed || !cardsIframe.contentWindow) return;
           const _self1 = cardsIframe.contentWindow;
           if (iframeCom != _self1.location.href && chapterBlockedHref !== _self1.location.href) {
             cxModel.askStore.reset();
-            const started = await startWork();
-            if (started) iframeCom = _self1.location.href;
+          if (runtime.destroyed) return;
+          const started = await startWork();
+          if (!runtime.destroyed && started) iframeCom = _self1.location.href;
           }
         } catch (error) {
           cxModel.askStore.log("章节任务初始化失败，下一轮将重试", "error");
@@ -3686,12 +3940,28 @@
       const cxModel2 = new Cx();
       await( cxModel2.exam()), cxModel2.askStore.log("脚本初始化成功！", "success");
   }
+  runtime.register(() => {
+    try {
+      selectionStyle?.remove();
+      if (document.body && previousBodyHandlers) {
+        document.body.oncopy = previousBodyHandlers.oncopy;
+        document.body.oncut = previousBodyHandlers.oncut;
+        document.body.onpaste = previousBodyHandlers.onpaste;
+        document.body.onselectstart = previousBodyHandlers.onselectstart;
+        document.body.ondragstart = previousBodyHandlers.ondragstart;
+      }
+    } catch (error) {}
+  });
 
 })(Vue, Pinia, ElementPlus, md5, $);
 
 // ==================== 微信扫码验证弹窗检测功能 ====================
 (function() {
     'use strict';
+
+    const RUNTIME_KEY = '__chaoxingToolkitRuntimeV219';
+    const runtimeHost = typeof unsafeWindow !== 'undefined' ? unsafeWindow : globalThis;
+    const lifecycleRuntime = runtimeHost?.[RUNTIME_KEY];
 
     // 配置
     const CONFIG = {
@@ -3706,6 +3976,9 @@
 
     let isProcessing = false;
     let checkTimer = null;
+    let pendingRefreshTimer = null;
+    let observer = null;
+    let startDetectionHandler = null;
 
     // 生成随机延迟时间（5-10秒）
     function getRandomDelay() {
@@ -3762,6 +4035,22 @@
     }
 
     // 执行刷新操作
+    function stopCheckTimer() {
+        if (checkTimer !== null) clearInterval(checkTimer);
+        checkTimer = null;
+    }
+
+    function scheduleRefresh() {
+        if (isProcessing || pendingRefreshTimer !== null) return;
+
+        const delay = getRandomDelay();
+        console.log(`[微信扫码检测] 将在 ${delay / 1000} 秒后执行刷新操作`);
+        pendingRefreshTimer = setTimeout(() => {
+            pendingRefreshTimer = null;
+            executeRefresh();
+        }, delay);
+    }
+
     function executeRefresh() {
         if (isProcessing) return;
         isProcessing = true;
@@ -3806,38 +4095,26 @@
         checkTimer = setInterval(() => {
             if (checkWechatVerifyPopup()) {
                 console.log('[微信扫码检测] 检测到微信扫码验证弹窗！');
-                clearInterval(checkTimer);
-
-                // 生成随机延迟（5-10秒）
-                const delay = getRandomDelay();
-                console.log(`[微信扫码检测] 将在 ${delay / 1000} 秒后执行刷新操作`);
-
-                setTimeout(() => {
-                    executeRefresh();
-                }, delay);
+                stopCheckTimer();
+                scheduleRefresh();
             }
         }, CONFIG.checkInterval);
     }
 
     // 页面加载完成后启动检测
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startDetection);
+        startDetectionHandler = startDetection;
+        document.addEventListener('DOMContentLoaded', startDetectionHandler, { once: true });
     } else {
         startDetection();
     }
 
     // 监听页面变化（用于检测动态加载的弹窗）
-    const observer = new MutationObserver((mutations) => {
-        if (!isProcessing && checkWechatVerifyPopup()) {
+    observer = new MutationObserver((mutations) => {
+        if (!isProcessing && pendingRefreshTimer === null && checkWechatVerifyPopup()) {
             console.log('[微信扫码检测] 通过MutationObserver检测到微信扫码验证弹窗！');
-            clearInterval(checkTimer);
-
-            const delay = getRandomDelay();
-            console.log(`[微信扫码检测] 将在 ${delay / 1000} 秒后执行刷新操作`);
-
-            setTimeout(() => {
-                executeRefresh();
-            }, delay);
+            stopCheckTimer();
+            scheduleRefresh();
         }
     });
 
@@ -3846,6 +4123,14 @@
         subtree: true,
         attributes: true,
         characterData: true
+    });
+    lifecycleRuntime?.register?.(() => {
+        stopCheckTimer();
+        if (pendingRefreshTimer !== null) clearTimeout(pendingRefreshTimer);
+        if (startDetectionHandler) document.removeEventListener('DOMContentLoaded', startDetectionHandler);
+        observer?.disconnect();
+        checkTimer = null;
+        pendingRefreshTimer = null;
     });
 
 })();
