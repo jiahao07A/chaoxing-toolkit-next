@@ -3,16 +3,22 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const script = fs.readFileSync(new URL("./学习通脚本.js", import.meta.url), "utf8");
+const runtime = {
+  destroyed: false,
+  register(handler) {
+    return () => {};
+  }
+};
 const waitIframeStart = script.indexOf("waitIframeLoaded = (");
 const waitElementStart = script.indexOf("waitElementLoaded =", waitIframeStart);
 assert.ok(waitIframeStart >= 0 && waitElementStart > waitIframeStart, "无法定位 iframe 等待函数");
 const waitIframeSource = script.slice(waitIframeStart, waitElementStart).replace(/\),\s*$/, ")").replace(/^waitIframeLoaded = /, "");
-const waitIframeLoaded = new Function(`return ${waitIframeSource}`)();
+const waitIframeLoaded = new Function("runtime", `return ${waitIframeSource}`)(runtime);
 const removeHtmlStart = script.indexOf("removeHtml =", waitElementStart);
-const waitElementEnd = script.indexOf(", parseChapterTaskInfo =", waitElementStart);
+const waitElementEnd = script.indexOf(", createNativeVideoPlayer =", waitElementStart);
 assert.ok(removeHtmlStart > waitElementStart, "无法定位元素等待函数结束位置");
 const waitElementSource = script.slice(waitElementStart, Math.min(removeHtmlStart, waitElementEnd > waitElementStart ? waitElementEnd : removeHtmlStart)).replace(/,\s*$/, "").replace(/^waitElementLoaded = /, "");
-const waitElementLoaded = new Function(`return ${waitElementSource}`)();
+const waitElementLoaded = new Function("runtime", `return ${waitElementSource}`)(runtime);
 const decodeStart = script.indexOf("decode = async (iframeWindow) => {");
 const decodeEnd = script.indexOf("}, hasUsableAnswer", decodeStart);
 assert.ok(decodeStart >= 0 && decodeEnd > decodeStart, "无法定位章节题目解码函数");
@@ -25,7 +31,7 @@ assert.match(script, /const Timu = iframeWindow\.document\.querySelectorAll\("\.
 assert.match(script, /题目加载超时，下一轮重试/);
 assert.match(script, /题目仍在加载，等待下一轮重试/);
 assert.match(script, /章节测验处理失败，下一轮重试/);
-assert.match(script, /const started = await startWork\(\);\s*if \(started\) iframeCom = _self1\.location\.href/);
+assert.match(script, /const started = await startWork\(\);\s*if \(!runtime\.destroyed && started\) iframeCom = _self1\.location\.href/);
 
 test("等待章节 iframe 时只注册一个 load 监听", async () => {
   const listeners = [];

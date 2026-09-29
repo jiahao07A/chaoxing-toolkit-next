@@ -28,13 +28,16 @@ test("未知章节任务不能被当作已完成后自动跳过", () => {
   assert.doesNotMatch(script, /未知任务跳过.*success/);
 });
 
-test("工作台拖动应按动画帧合并指针事件", () => {
-  assert.match(script, /pointerFrameState/);
-  assert.match(script, /requestAnimationFrame\(/);
-  assert.match(script, /cancelAnimationFrame\(/);
+test("章节轮询保留互斥与退避，工作台指针逻辑已移除", () => {
+  assert.match(script, /let chapterPollRunning = false/);
+  assert.match(script, /if \(chapterPollRunning\) return/);
+  assert.match(script, /5e3/);
+  assert.doesNotMatch(script, /WorkbenchApp|cx-workbench|pointerFrameState|beginResize|requestPointerFrame/);
 });
 
 test("视频控制应保留播放器原生 pause 方法", () => {
   assert.doesNotMatch(script, /player\.pause\s*=\s*function/);
-  assert.match(script, /意外暂停/);
+  assert.match(script, /createNativeVideoPlayer = \(video\)/);
+  assert.match(script, /pause:\s*\(\) => video\.pause\(\)/);
+  assert.match(script, /player\.pause\(\)/);
 });
