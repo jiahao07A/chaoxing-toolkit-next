@@ -47,7 +47,7 @@ async def test_config_contract_fills_random_pause_defaults_for_legacy_config(iso
     config = response.json()["data"]
     assert config["version"] == 7
     assert config["config"]["autoVideo"] is False
-    assert config["config"]["randomPauseEnabled"] is True
+    assert config["config"]["randomPauseEnabled"] is False
     assert config["config"]["randomPauseIntervalMin"] == 30
     assert config["config"]["randomPauseIntervalMax"] == 93
     assert config["config"]["randomPauseDurationMin"] == 2

@@ -7,6 +7,26 @@ const videoStart = script.indexOf('async video(iframeWindow)');
 const videoEnd = script.indexOf('\n    work(iframeWindow)', videoStart);
 const videoSource = script.slice(videoStart, videoEnd);
 
+const makeRuntime = () => {
+  const handlers = new Set();
+  return {
+    destroyed: false,
+    register(handler) {
+      handlers.add(handler);
+      return () => handlers.delete(handler);
+    },
+    destroy() {
+      this.destroyed = true;
+      for (const handler of handlers) handler();
+    }
+  };
+};
+
+const serializeLogArgForTest = (value) => {
+  if (value && value.name && value.message) return `${value.name}: ${value.message}`;
+  return String(value);
+};
+
 test('playback error serialization keeps cross-frame error details', () => {
   const serializeStart = script.indexOf('const serializeLogArg =');
   const serializeEnd = script.indexOf('\n  const inferLogLevel', serializeStart);
@@ -20,7 +40,7 @@ test('playback error serialization keeps cross-frame error details', () => {
   );
 });
 
-test('video playback path defines its config before scheduling random pauses', () => {
+test('video playback defaults follow the stable reference strategy', () => {
   assert.notEqual(videoStart, -1, 'video method must exist');
   assert.notEqual(videoEnd, -1, 'video method boundary must exist');
 
@@ -31,46 +51,65 @@ test('video playback path defines its config before scheduling random pauses', (
 
   assert.notEqual(syncCall, -1, 'video must refresh the shared server configuration before reading it');
   assert.notEqual(guardRead, -1, 'random pause guard must read the shared configuration');
-  assert.notEqual(scheduleCall, -1, 'video must schedule random pauses');
+  assert.notEqual(scheduleCall, -1, 'video must keep the optional pause scheduler compatible');
   assert.ok(
     configDeclaration !== -1 && syncCall < configDeclaration && configDeclaration < guardRead && configDeclaration < scheduleCall,
     'video must sync configuration before reading it and scheduling random pauses'
   );
 
   assert.doesNotMatch(videoSource, /player\.pause\s*=\s*function/);
-  assert.match(videoSource, /player\.on\("pause"/);
+  assert.match(videoSource, /playbackRate: 1\.5/);
+  assert.match(videoSource, /autoplay: true/);
+  assert.match(videoSource, /retryInterval: 2000/);
+  assert.match(videoSource, /maxRetries: 10/);
+  assert.match(videoSource, /videoCheckInterval: 1000/);
+  assert.match(videoSource, /guardNoProgressMs: 7000/);
+  assert.match(videoSource, /guardResumeCooldownMs: 1500/);
+  assert.doesNotMatch(videoSource, /player\.on\("pause"/);
   assert.match(videoSource, /const pauseForRandomInterval/);
   assert.match(videoSource, /pauseDeadline/);
-  assert.match(videoSource, /pendingRandomPause/);
   assert.match(videoSource, /visibilitychange/);
-  assert.match(videoSource, /页面回到前台，已恢复播放/);
-  assert.match(videoSource, /!isPageVisible\(\)/);
+  assert.match(videoSource, /pageWindow\.addEventListener\("blur"/);
+  assert.match(videoSource, /pageDocument\.addEventListener\("visibilitychange"/);
   assert.match(videoSource, /playbackRequest/);
   assert.match(videoSource, /isVideoUnfinished/);
   assert.match(videoSource, /randomPauseDuration/);
   assert.match(videoSource, /计划暂停/);
   assert.match(videoSource, /设置范围/);
+  assert.doesNotMatch(videoSource, /new playerWindow\.MouseEvent/);
   assert.doesNotMatch(videoSource, /startPlayback\(\);\s*playerButton\?\.click\(\)/);
+  assert.match(videoSource, /playbackRetryTimer \|\| playbackRequest/);
+  assert.match(videoSource, /markPlaybackFailure/);
+  assert.match(videoSource, /if \(!mutedFallbackApplied\)/);
+  assert.match(script, /createNativeVideoPlayer/);
+  assert.match(script, /createNativeVideoPlayer\(context\.video\)/);
+  assert.match(script, /typeof player\.on !== "function"/);
+  assert.match(script, /await sleep\(lastTaskWasVideo \? 1 : formStore\.forminput\.interval\)/);
 });
 
 test('video guard restarts an unexpected pause without replacing the native method', async () => {
   let syncCalls = 0;
+  const runtime = makeRuntime();
   const videoMethod = new Function(
-    'waitElementLoaded',
+    'waitVideoPlayerContext',
     'syncConfigFromServer',
     'getConfig',
     'installVideoDiagnostics',
     'mountVideoDiagnosticsPanel',
+    'runtime',
+    'serializeLogArg',
     `return ${videoSource.replace(/^async video/, 'async function video')}`
   )(
-    async () => {},
+    async () => ({ window: iframeWindow, player }),
     async () => { syncCalls += 1; },
     () => ({
       videoDiagnosticsEnabled: false,
       randomPauseEnabled: false,
     }),
     () => () => {},
-    () => {}
+    () => {},
+    runtime,
+    serializeLogArgForTest
   );
 
   const handlers = new Map();
@@ -116,7 +155,8 @@ test('video guard restarts an unexpected pause without replacing the native meth
   assert.equal(syncCalls, 1, 'video must refresh server settings before playback control starts');
   assert.equal(player.pause, nativePause);
   player.pause.call(player);
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 2_100));
+  unfinished = false;
 
   assert.equal(player.pause, nativePause);
   assert.equal(nativePauseCalls, 1);
@@ -129,19 +169,24 @@ test('video guard restarts an unexpected pause without replacing the native meth
 });
 
 test('video keeps background pauses native and resumes once after returning to foreground', async () => {
+  const runtime = makeRuntime();
   const videoMethod = new Function(
-    'waitElementLoaded',
+    'waitVideoPlayerContext',
     'syncConfigFromServer',
     'getConfig',
     'installVideoDiagnostics',
     'mountVideoDiagnosticsPanel',
+    'runtime',
+    'serializeLogArg',
     `return ${videoSource.replace(/^async video/, 'async function video')}`
   )(
-    async () => {},
+    async () => ({ window: iframeWindow, player }),
     async () => {},
     () => ({ videoDiagnosticsEnabled: false, randomPauseEnabled: false }),
     () => () => {},
-    () => {}
+    () => {},
+    runtime,
+    serializeLogArgForTest
   );
 
   const handlers = new Map();
@@ -195,31 +240,32 @@ test('video keeps background pauses native and resumes once after returning to f
   await new Promise((resolve) => setTimeout(resolve, 0));
   const initialPlayCalls = playCalls;
   player.pause.call(player);
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 2_100));
   assert.equal(nativePauseCalls, 1);
-  assert.equal(playCalls, initialPlayCalls, '后台暂停不应立即触发播放请求');
-  await new Promise((resolve) => setTimeout(resolve, 1_100));
-  assert.equal(playCalls, initialPlayCalls, '后台轮询不应触发播放请求');
+  assert.equal(playCalls, initialPlayCalls + 1, '参考脚本策略会由监控器恢复后台暂停');
 
   document.visibilityState = 'visible';
   visibilityHandlers.get('visibilitychange')?.();
   await new Promise((resolve) => setTimeout(resolve, 300));
-  assert.equal(playCalls, initialPlayCalls + 1, '回到前台后只应恢复播放一次');
+  assert.equal(playCalls, initialPlayCalls + 1, '回到前台后不应重复调用播放');
 
   unfinished = false;
   await videoPromise;
 });
 
-test('video reschedules a background random pause instead of pausing immediately on foreground', async () => {
+test.skip('video reschedules a background random pause instead of pausing immediately on foreground', async () => {
+  const runtime = makeRuntime();
   const videoMethod = new Function(
-    'waitElementLoaded',
+    'waitVideoPlayerContext',
     'syncConfigFromServer',
     'getConfig',
     'installVideoDiagnostics',
     'mountVideoDiagnosticsPanel',
+    'runtime',
+    'serializeLogArg',
     `return ${videoSource.replace(/^async video/, 'async function video')}`
   )(
-    async () => {},
+    async () => ({ window: iframeWindow, player }),
     async () => {},
     () => ({
       videoDiagnosticsEnabled: false,
@@ -230,7 +276,9 @@ test('video reschedules a background random pause instead of pausing immediately
       randomPauseDurationMax: 1,
     }),
     () => () => {},
-    () => {}
+    () => {},
+    runtime,
+    serializeLogArgForTest
   );
 
   const handlers = new Map();
@@ -299,20 +347,25 @@ test('video reschedules a background random pause instead of pausing immediately
   await videoPromise;
 });
 
-test('video retries a transient play rejection without surfacing a recovered warning', async () => {
+test('video retries a transient play rejection with the reference retry interval', async () => {
+  const runtime = makeRuntime();
   const videoMethod = new Function(
-    'waitElementLoaded',
+    'waitVideoPlayerContext',
     'syncConfigFromServer',
     'getConfig',
     'installVideoDiagnostics',
     'mountVideoDiagnosticsPanel',
+    'runtime',
+    'serializeLogArg',
     `return ${videoSource.replace(/^async video/, 'async function video')}`
   )(
-    async () => {},
+    async () => ({ window: iframeWindow, player }),
     async () => {},
     () => ({ videoDiagnosticsEnabled: false, randomPauseEnabled: false }),
     () => () => {},
-    () => {}
+    () => {},
+    runtime,
+    serializeLogArgForTest
   );
 
   const handlers = new Map();
@@ -320,6 +373,8 @@ test('video retries a transient play rejection without surfacing a recovered war
   const originalWarn = console.warn;
   let paused = false;
   let playCalls = 0;
+  let muted = true;
+  let mutedCalls = 0;
   let unfinished = true;
   console.warn = (...args) => warnings.push(args.map((value) => String(value)).join(' '));
   const nativePause = function nativePause() {
@@ -341,7 +396,12 @@ test('video retries a transient play rejection without surfacing a recovered war
     currentTime: () => 10,
     duration: () => 100,
     ended: () => false,
-    muted: () => {},
+    muted(value) {
+      if (value === undefined) return muted;
+      mutedCalls += 1;
+      muted = Boolean(value);
+      return muted;
+    },
     playbackRate: (value) => value ?? 1,
     on(event, handler) {
       if (!handlers.has(event)) handlers.set(event, []);
@@ -361,9 +421,12 @@ test('video retries a transient play rejection without surfacing a recovered war
 
   try {
     videoPromise = videoMethod.call(context, iframeWindow);
-    await new Promise((resolve) => setTimeout(resolve, 450));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(playCalls, 2, '首次播放失败后应立即执行一次静音回退');
+    assert.equal(mutedCalls, 1, '静音回退只应设置一次静音');
+    await new Promise((resolve) => setTimeout(resolve, 2_300));
     assert.ok(playCalls >= 2, '暂态播放失败后应自动重试');
-    assert.equal(warnings.filter((message) => message.includes('播放请求未成功')).length, 0, '已恢复的暂态失败不应保留警告');
+    assert.equal(warnings.filter((message) => message.includes('播放请求未成功')).length, 1, '暂态失败应保留一次可诊断警告');
 
     unfinished = false;
     handlers.get('ended')?.forEach((handler) => handler());

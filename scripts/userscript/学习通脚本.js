@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         💯【超星学习通满分助手】支持任务点自动跳转|章节测验、作业、考试全网检索答案，简答题支持chatgpt对接|音频、视频全自动静音播放|可视化参数配置
 // @namespace    askAuto
-// @version      2.1.9-concurrent
+// @version      2.1.12
 // @author       shushoujiu
 // @description  💯超星学习通满分助手，挂机解放时间，无需任何操作自动完成所有任务点。汇集全网免费、付费题库接口支持一键对接，答案更全更靠谱。
 // @icon         https://vitejs.dev/logo.svg
@@ -39,8 +39,6 @@
 // @run-at       document-end
 // @antifeature  ads      脚本可能包含第三方接口广告
 // @antifeature  payment  脚本存在第三方答题接口付费功能
-// @downloadURL https://update.greasyfork.org/scripts/436994/%F0%9F%92%AF%E3%80%90%E8%B6%85%E6%98%9F%E5%AD%A6%E4%B9%A0%E9%80%9A%E6%BB%A1%E5%88%86%E5%8A%A9%E6%89%8B%E3%80%91%E6%94%AF%E6%8C%81%E4%BB%BB%E5%8A%A1%E7%82%B9%E8%87%AA%E5%8A%A8%E8%B7%B3%E8%BD%AC%7C%E7%AB%A0%E8%8A%82%E6%B5%8B%E9%AA%8C%E3%80%81%E4%BD%9C%E4%B8%9A%E3%80%81%E8%80%83%E8%AF%95%E5%85%A8%E7%BD%91%E6%A3%80%E7%B4%A2%E7%AD%94%E6%A1%88%EF%BC%8C%E7%AE%80%E7%AD%94%E9%A2%98%E6%94%AF%E6%8C%81chatgpt%E5%AF%B9%E6%8E%A5%7C%E9%9F%B3%E9%A2%91%E3%80%81%E8%A7%86%E9%A2%91%E5%85%A8%E8%87%AA%E5%8A%A8%E9%9D%99%E9%9F%B3%E6%92%AD%E6%94%BE%7C%E5%8F%AF%E8%A7%86%E5%8C%96%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE.user.js
-// @updateURL https://update.greasyfork.org/scripts/436994/%F0%9F%92%AF%E3%80%90%E8%B6%85%E6%98%9F%E5%AD%A6%E4%B9%A0%E9%80%9A%E6%BB%A1%E5%88%86%E5%8A%A9%E6%89%8B%E3%80%91%E6%94%AF%E6%8C%81%E4%BB%BB%E5%8A%A1%E7%82%B9%E8%87%AA%E5%8A%A8%E8%B7%B3%E8%BD%AC%7C%E7%AB%A0%E8%8A%82%E6%B5%8B%E9%AA%8C%E3%80%81%E4%BD%9C%E4%B8%9A%E3%80%81%E8%80%83%E8%AF%95%E5%85%A8%E7%BD%91%E6%A3%80%E7%B4%A2%E7%AD%94%E6%A1%88%EF%BC%8C%E7%AE%80%E7%AD%94%E9%A2%98%E6%94%AF%E6%8C%81chatgpt%E5%AF%B9%E6%8E%A5%7C%E9%9F%B3%E9%A2%91%E3%80%81%E8%A7%86%E9%A2%91%E5%85%A8%E8%87%AA%E5%8A%A8%E9%9D%99%E9%9F%B3%E6%92%AD%E6%94%BE%7C%E5%8F%AF%E8%A7%86%E5%8C%96%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE.meta.js
 // ==/UserScript==
 
 (t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const i=document.createElement("style");i.textContent=t,document.head.append(i)})(" .dialog-footer button[data-v-6ed29f7f]:first-child{margin-right:10px}#csbutton[data-v-6ed29f7f]{position:fixed;bottom:20px;right:20px;z-index:99999}#zeokdjg[data-v-c3c6b09f]{position:fixed;left:10px;bottom:50vh;z-index:9999}.question_btn[data-v-c3c6b09f]{width:40px;height:40px;border-radius:5px;margin:5px}.question_div[data-v-c3c6b09f]{height:200px}.question_ti[data-v-c3c6b09f]{margin:10px 0 20px}.cx_log[data-v-c3c6b09f]{margin:2px 0}.status_log[data-v-c3c6b09f]{margin-top:10px}.dialog-footer button[data-v-c3c6b09f]:first-child{margin-right:10px}#csbutton[data-v-c3c6b09f]{position:fixed;bottom:20px;right:20px;z-index:99999} ");
@@ -65,6 +63,7 @@
   if (previousRuntime && typeof previousRuntime.destroy === "function") previousRuntime.destroy();
   const runtime = {
     destroyed: false,
+    verificationBlocked: false,
     cleanupHandlers: new Set(),
     register(handler) {
       if (typeof handler !== "function") return () => {};
@@ -101,13 +100,24 @@
     });
   };
   let settingsDialogObserver = null;
+  let settingsDialogTimer = null;
   if (_unsafeWindow === _unsafeWindow?.top && typeof MutationObserver !== "undefined" && typeof document !== "undefined" && document.body) {
     markSettingsDialogs();
-    settingsDialogObserver = new MutationObserver(markSettingsDialogs);
+    settingsDialogObserver = new MutationObserver(() => {
+      if (settingsDialogTimer !== null) return;
+      settingsDialogTimer = setTimeout(() => {
+        settingsDialogTimer = null;
+        if (!runtime.destroyed) markSettingsDialogs();
+      }, 100);
+    });
     settingsDialogObserver.observe(document.body, { childList: true, subtree: true });
-    runtime.register(() => settingsDialogObserver?.disconnect());
+    runtime.register(() => {
+      settingsDialogObserver?.disconnect();
+      if (settingsDialogTimer !== null) clearTimeout(settingsDialogTimer);
+      settingsDialogTimer = null;
+    });
   }
-  const GENERATED_CONFIG_CONTRACT = {"schemaVersion":1,"sourceSchemaSha256":"317199fbf6671a2b737b0e885771f928db0c6df5b1f8ad3293eb600aad77eb36","defaults":{"videoDiagnosticsEnabled":true,"randomPauseEnabled":true,"randomPauseIntervalMin":30,"randomPauseIntervalMax":93,"randomPauseDurationMin":2,"randomPauseDurationMax":5},"rules":{"videoDiagnosticsEnabled":{"type":"boolean"},"randomPauseEnabled":{"type":"boolean"},"randomPauseIntervalMin":{"type":"integer","minimum":1,"maximum":86400},"randomPauseIntervalMax":{"type":"integer","minimum":1,"maximum":86400},"randomPauseDurationMin":{"type":"integer","minimum":1,"maximum":3600},"randomPauseDurationMax":{"type":"integer","minimum":1,"maximum":3600}},"constraints":[["randomPauseIntervalMin","<=","randomPauseIntervalMax"],["randomPauseDurationMin","<=","randomPauseDurationMax"]]};
+  const GENERATED_CONFIG_CONTRACT = {"schemaVersion":1,"sourceSchemaSha256":"9671e3860c8bfae650ca01178de22c61d7f9449d2b742cb69706b9c1bc6a27d4","defaults":{"videoDiagnosticsEnabled":true,"randomPauseEnabled":false,"randomPauseIntervalMin":30,"randomPauseIntervalMax":93,"randomPauseDurationMin":2,"randomPauseDurationMax":5},"rules":{"videoDiagnosticsEnabled":{"type":"boolean"},"randomPauseEnabled":{"type":"boolean"},"randomPauseIntervalMin":{"type":"integer","minimum":1,"maximum":86400},"randomPauseIntervalMax":{"type":"integer","minimum":1,"maximum":86400},"randomPauseDurationMin":{"type":"integer","minimum":1,"maximum":3600},"randomPauseDurationMax":{"type":"integer","minimum":1,"maximum":3600}},"constraints":[["randomPauseIntervalMin","<=","randomPauseIntervalMax"],["randomPauseDurationMin","<=","randomPauseDurationMax"]]};
   const applyGeneratedConfigContract = (input) => {
     const output = { ...input };
     for (const [key, rule] of Object.entries(GENERATED_CONFIG_CONTRACT.rules || {})) {
@@ -136,11 +146,17 @@
     }
     return null;
   };
+  const PLAYBACK_DEFAULTS_MIGRATION_KEY = "__chaoxingToolkitPlaybackDefaultsV212";
   const getConfig = () => {
     const storedConfig = _GM_getValue("config");
     if (!storedConfig) return { ...defaultConfig$1, ...extendedConfigDefaults };
     let config = { ...GENERATED_CONFIG_CONTRACT.defaults, ...defaultConfig$1, ...extendedConfigDefaults, ...storedConfig };
     config = applyGeneratedConfigContract(config);
+    if (_GM_getValue && _GM_setValue && !_GM_getValue(PLAYBACK_DEFAULTS_MIGRATION_KEY)) {
+      config.randomPauseEnabled = false;
+      _GM_setValue("config", config);
+      _GM_setValue(PLAYBACK_DEFAULTS_MIGRATION_KEY, true);
+    }
     if (config.deepseekEnabled && !config.aiEnabled) {
       config.aiEnabled = true;
       config.aiApiKey = config.deepseekKey || "";
@@ -2286,11 +2302,44 @@
     if (settled) return;
     timer = setInterval(check, 100);
     timeoutId = setTimeout(() => finish(false), timeoutMs);
-  }), findVideoPlayerContext = (iframeWindow, depth = 0) => {
+  }), createNativeVideoPlayer = (video) => {
+    if (!video || typeof video.play !== "function" || typeof video.pause !== "function") return null;
+    const player = {
+      element: video,
+      play: () => video.play(),
+      pause: () => video.pause(),
+      paused: () => Boolean(video.paused),
+      ended: () => Boolean(video.ended),
+      currentTime: (value) => {
+        if (value !== undefined) video.currentTime = value;
+        return video.currentTime;
+      },
+      duration: () => Number(video.duration),
+      muted: (value) => {
+        if (value !== undefined) video.muted = Boolean(value);
+        return Boolean(video.muted);
+      },
+      playbackRate: (value) => {
+        if (value !== undefined) video.playbackRate = Number(value);
+        return Number(video.playbackRate);
+      },
+      readyState: () => Number(video.readyState),
+      networkState: () => Number(video.networkState),
+      on: (event, handler) => {
+        video.addEventListener(event, handler);
+        return player;
+      },
+      off: (event, handler) => {
+        video.removeEventListener(event, handler);
+        return player;
+      }
+    };
+    return player;
+  }, findVideoPlayerContext = (iframeWindow, depth = 0) => {
     if (!iframeWindow?.document || depth > 2) return null;
     try {
       const video = iframeWindow.document.querySelector('video#video_html5_api, video[id*="video_html5"], video.video-js, video');
-      if (video && typeof iframeWindow.videojs === "function") return { window: iframeWindow, video };
+      if (video) return { window: iframeWindow, video };
       for (const frame of iframeWindow.document.querySelectorAll("iframe")) {
         try {
           const nested = findVideoPlayerContext(frame.contentWindow, depth + 1);
@@ -2324,14 +2373,18 @@
     if (runtime.destroyed) return;
     const check = () => {
       const context = findVideoPlayerContext(iframeWindow);
-      if (!context || typeof context.window?.videojs !== "function") return;
+      if (!context) return;
+      let player = null;
       try {
-        const player = context.video.id ? context.window.videojs(context.video.id) : context.window.videojs(context.video);
-        if (player && typeof player.play === "function" && typeof player.pause === "function") {
-          finish({ ...context, player });
-        }
+        if (typeof context.window?.videojs === "function") player = context.video.id ? context.window.videojs(context.video.id) : context.window.videojs(context.video);
       } catch (error) {
-        // video 元素可能已加载，但播放器实例仍在初始化，继续等待。
+        player = null;
+      }
+      if (!player || typeof player.play !== "function" || typeof player.pause !== "function" || typeof player.on !== "function" || typeof player.off !== "function") {
+        player = createNativeVideoPlayer(context.video);
+      }
+      if (player && typeof player.play === "function" && typeof player.pause === "function" && typeof player.on === "function" && typeof player.off === "function") {
+        finish({ ...context, player });
       }
     };
     check();
@@ -3165,72 +3218,118 @@
       const config = getConfig();
       const stopVideoDiagnostics = installVideoDiagnostics(player);
       const unregisterDiagnostics = runtime.register(() => { try { stopVideoDiagnostics(); } catch (error) {} });
+      const playbackDefaults = {
+        playbackRate: 1.5,
+        autoplay: true,
+        retryInterval: 2000,
+        maxRetries: 10,
+        videoCheckInterval: 1000,
+        guardNoProgressMs: 7000,
+        guardResumeCooldownMs: 1500
+      };
       const handleRateChange = () => {
         if (runtime.destroyed) return;
-        const rate = player.playbackRate();
+        const rate = Number(player.playbackRate());
         this.askStore.task.video.status = rate > 1 ? 1 : 0;
-        if (rate !== 1) {
-          player.playbackRate(1);
-          console.log(`[视频] 播放速率已恢复为 1 倍（原速率: ${rate}）`);
-        }
       };
-      player.muted(true);
-      player.playbackRate(1);
+      player.playbackRate(playbackDefaults.playbackRate);
       this.askStore.task.video.status = player.playbackRate() > 1 ? 1 : 0;
       player.on("ratechange", handleRateChange);
       let playbackRequest = null;
       let playbackRetryTimer = null;
       let playbackRetryAttempt = 0;
+      let nextPlaybackAttemptAt = 0;
       let playbackFinished = false;
+      let playbackFailed = false;
       let randomPauseActive = false;
-      const describePlaybackError = (error) => {
-        const description = serializeLogArg(error);
-        return description === "{}" ? "未知播放错误" : description;
-      };
-      const canRetryPlayback = () => {
-        if (playbackFinished || randomPauseActive || runtime.destroyed) return false;
+      let finishVideoTask = null;
+      const setPlayerMuted = (value) => {
         try {
-          return player.paused();
+          if (typeof player.muted === "function") return player.muted(Boolean(value));
+          player.muted = Boolean(value);
+          return player.muted;
         } catch (error) {
           return false;
         }
       };
-      let startPlayback;
+      const isPlayerPaused = () => {
+        try {
+          return typeof player.paused === "function" ? Boolean(player.paused()) : Boolean(player.paused);
+        } catch (error) {
+          return true;
+        }
+      };
+      const describePlaybackError = (error) => {
+        const description = serializeLogArg(error);
+        return description === "{}" ? "未知播放错误" : description;
+      };
+      let mutedFallbackApplied = false;
+      const markPlaybackFailure = (error) => {
+        if (playbackFailed || playbackFinished || runtime.destroyed) return;
+        playbackFailed = true;
+        clearTimeout(playbackRetryTimer);
+        playbackRetryTimer = null;
+        this.askStore.task.status = "视频播放失败，已达到最大重试次数";
+        console.error(`[视频] 播放失败，已达到最大重试次数: ${describePlaybackError(error)}`);
+        if (finishVideoTask) finishVideoTask("视频播放失败，已达到最大重试次数", false);
+      };
       const schedulePlaybackRetry = () => {
-        if (playbackRetryTimer || playbackRetryAttempt >= 3 || !canRetryPlayback()) return false;
-        const retryDelays = [250, 500, 1e3];
-        const delay = retryDelays[playbackRetryAttempt++];
+        if (playbackRetryTimer || playbackFinished || playbackFailed || runtime.destroyed) return;
+        if (playbackRetryAttempt >= playbackDefaults.maxRetries) {
+          markPlaybackFailure(new Error("播放重试次数已达到上限"));
+          return;
+        }
+        playbackRetryAttempt += 1;
         playbackRetryTimer = setTimeout(() => {
           playbackRetryTimer = null;
-          startPlayback();
-        }, delay);
-        return true;
+          startPlayback("retry");
+        }, playbackDefaults.retryInterval);
       };
-      const reportPlaybackFailure = (error) => {
-        if (schedulePlaybackRetry()) return false;
-        console.warn(`[视频] 播放请求未成功: ${describePlaybackError(error)}`);
-        playbackRetryAttempt = 0;
-        return false;
-      };
-      startPlayback = () => {
-        if (playbackRequest) return playbackRequest;
-        if (playbackRetryTimer) return Promise.resolve(false);
+      const invokePlayerPlay = () => {
         let result;
         try {
           result = player.play();
         } catch (error) {
-          return Promise.resolve(reportPlaybackFailure(error));
+          return Promise.reject(error);
         }
-        const request = result && typeof result.then === "function" ? Promise.resolve(result) : Promise.resolve(true);
-        playbackRequest = request.then(() => {
-          playbackRetryAttempt = 0;
-          return true;
-        }).catch((error) => reportPlaybackFailure(error)).finally(() => {
+        return result && typeof result.then === "function" ? Promise.resolve(result) : Promise.resolve(true);
+      };
+      const startPlayback = (reason = "guard") => {
+        if (playbackRequest) return playbackRequest;
+        const isRetry = reason === "retry";
+        if (playbackRetryTimer && !isRetry) return Promise.resolve(false);
+        if (playbackFinished || playbackFailed || randomPauseActive || runtime.destroyed) return Promise.resolve(false);
+        if (!isRetry && reason !== "initial") {
+          if (!isPlayerPaused()) return Promise.resolve(false);
+          if (Date.now() < nextPlaybackAttemptAt) return Promise.resolve(false);
+        }
+        if (!isRetry) nextPlaybackAttemptAt = Date.now() + playbackDefaults.guardResumeCooldownMs;
+        if (reason !== "initial") console.info(`[视频] 触发播放恢复(${reason})`);
+        const request = invokePlayerPlay().catch((error) => {
+          console.warn(`[视频] 播放请求未成功: ${describePlaybackError(error)}`);
+          if (!mutedFallbackApplied) {
+            mutedFallbackApplied = true;
+            setPlayerMuted(true);
+            return invokePlayerPlay().catch((mutedError) => {
+              console.warn(`[视频] 静音回退播放未成功: ${describePlaybackError(mutedError)}`);
+              schedulePlaybackRetry();
+              return false;
+            });
+          }
+          schedulePlaybackRetry();
+          return false;
+        });
+        playbackRequest = request.then((succeeded) => {
+          if (succeeded !== false) {
+            playbackRetryAttempt = 0;
+            return true;
+          }
+          return false;
+        }).finally(() => {
           playbackRequest = null;
         });
         return playbackRequest;
       };
-      startPlayback();
       const isVideoUnfinished = () => {
         try {
           const taskWindow = typeof iframeWindow?.isUnFinishJob === "function" ? iframeWindow : playerWindow;
@@ -3241,13 +3340,11 @@
           return true;
         }
       };
-      let allowPlayerPause = false;
       let pauseTimer = null;
       let resumeTimer = null;
       let pauseDeadline = 0;
       let nextPauseAt = 0;
       let scheduledIntervalSeconds = 0;
-      let mouseMoveTimer = null;
       let lastObservedCurrentTime = Number(typeof player.currentTime === "function" ? player.currentTime() : 0) || 0;
       let lastProgressAt = Date.now();
       let lastProgressRecoveryAt = 0;
@@ -3264,32 +3361,7 @@
         if (currentTime > lastObservedCurrentTime + 0.01) lastProgressAt = now;
         lastObservedCurrentTime = currentTime;
       };
-      const pauseForRandomInterval = () => {
-        allowPlayerPause = true;
-        try {
-          return player.pause();
-        } finally {
-          allowPlayerPause = false;
-        }
-      };
-      const handleUnexpectedPause = () => {
-        if (!allowPlayerPause && !randomPauseActive && !playbackFinished && !runtime.destroyed) {
-          const playbackRequestAfterPause = startPlayback();
-          playbackRequestAfterPause.then((succeeded) => {
-            if (succeeded) console.log("[视频] 检测到意外暂停，已恢复播放");
-          });
-        }
-      };
-      player.on("pause", handleUnexpectedPause);
-      const handlePlaybackStall = (eventName) => {
-        if (playbackFinished || randomPauseActive || runtime.destroyed) return;
-        lastProgressAt = Math.min(lastProgressAt, Date.now() - 7000);
-        console.info(`[视频] 检测到${eventName}，等待无进度看门狗恢复`);
-      };
-      const handleWaiting = () => handlePlaybackStall("waiting");
-      const handleStalled = () => handlePlaybackStall("stalled");
-      player.on("waiting", handleWaiting);
-      player.on("stalled", handleStalled);
+      const pauseForRandomInterval = () => player.pause();
 
       // 随机暂停功能。前后台均按真实截止时间执行，后台计时器若被浏览器降频则在下一次回调补偿。
       const randomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -3310,7 +3382,7 @@
         }
         randomPauseActive = false;
         pauseDeadline = 0;
-        if (player.paused() && isVideoUnfinished()) {
+        if (isPlayerPaused() && isVideoUnfinished()) {
           const playbackRequestAfterPause = startPlayback();
           playbackRequestAfterPause.then((succeeded) => {
             if (succeeded) console.log(`[视频] 已恢复播放，实际暂停: ${Math.max(0, Math.round((Date.now() - pauseStartedAt) / 1000))}秒`);
@@ -3319,7 +3391,7 @@
         scheduleRandomPause();
       };
       const triggerRandomPause = (triggerIntervalSeconds = scheduledIntervalSeconds) => {
-        if (player.paused()) {
+        if (isPlayerPaused()) {
           scheduleRandomPause();
           return;
         }
@@ -3358,13 +3430,12 @@
         if (runtime.destroyed || playbackFinished) return;
         if (randomPauseActive) {
           resumeRandomPause();
-        } else if (player.paused() && isVideoUnfinished()) {
-          const playbackRequestAfterVisibility = startPlayback();
+        } else if (isPlayerPaused() && isVideoUnfinished()) {
+          const playbackRequestAfterVisibility = startPlayback("visibility");
           playbackRequestAfterVisibility.then((succeeded) => {
             if (succeeded) console.log("[视频] 页面状态变化后已恢复播放");
           });
         }
-        scheduleMouseMovement();
         if (randomPauseActive) return;
         if (nextPauseAt && Date.now() >= nextPauseAt) {
           clearTimeout(pauseTimer);
@@ -3377,56 +3448,28 @@
       };
       const visibilityTarget = playerWindow.document;
       if (visibilityTarget && typeof visibilityTarget.addEventListener === "function") visibilityTarget.addEventListener("visibilitychange", handleVisibilityChange);
+      const pageWindow = typeof window !== "undefined" ? window : null;
+      const pageDocument = typeof document !== "undefined" ? document : null;
+      const preventPagePause = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+      };
+      const resumeOnPageEvent = () => {
+        if (runtime.destroyed || playbackFinished || randomPauseActive || !isVideoUnfinished()) return;
+        startPlayback("page-event");
+      };
+      if (pageWindow && typeof pageWindow.addEventListener === "function") {
+        pageWindow.addEventListener("mouseleave", preventPagePause);
+        pageWindow.addEventListener("mouseout", preventPagePause);
+        pageWindow.addEventListener("blur", resumeOnPageEvent);
+      }
+      if (pageDocument && typeof pageDocument.addEventListener === "function") {
+        pageDocument.addEventListener("mouseleave", preventPagePause);
+        pageDocument.addEventListener("mouseout", preventPagePause);
+        pageDocument.addEventListener("visibilitychange", resumeOnPageEvent);
+      }
       scheduleRandomPause();
 
-      // 模拟鼠标滑动功能，仅作用于当前视频 iframe 内的视频元素。
-      const simulateMouseMovement = () => {
-        if (playbackFinished || runtime.destroyed || !isVideoUnfinished()) return;
-        const videoElement = videoContext.video;
-        if (!videoElement) return;
-
-        const rect = videoElement.getBoundingClientRect();
-        const left = Math.max(0, rect.left);
-        const top = Math.max(0, rect.top);
-        const right = Math.min(playerWindow.innerWidth, rect.right);
-        const bottom = Math.min(playerWindow.innerHeight, rect.bottom);
-        const width = right - left;
-        const height = bottom - top;
-        if (width <= 0 || height <= 0) return;
-        const x = Math.floor(Math.random() * width) + left;
-        const y = Math.floor(Math.random() * height) + top;
-        const events = ["mousemove", "mouseover", "mouseenter"];
-        events.forEach((eventType) => {
-          const event = new playerWindow.MouseEvent(eventType, {
-            bubbles: true,
-            cancelable: true,
-            view: playerWindow,
-            clientX: x,
-            clientY: y,
-            screenX: x + (playerWindow.screenX || 0),
-            screenY: y + (playerWindow.screenY || 0),
-            movementX: Math.floor(Math.random() * 10) - 5,
-            movementY: Math.floor(Math.random() * 10) - 5
-          });
-          videoElement.dispatchEvent(event);
-        });
-      };
-
-      // 每3-8秒模拟一次鼠标活动，前后台均持续调度；浏览器可能对后台计时器降频。
-      const scheduleMouseMovement = () => {
-        clearTimeout(mouseMoveTimer);
-        mouseMoveTimer = null;
-        if (playbackFinished || !isVideoUnfinished()) return;
-        const delay = Math.floor(Math.random() * (8 - 3 + 1) + 3) * 1000;
-        mouseMoveTimer = setTimeout(() => {
-          mouseMoveTimer = null;
-          if (!playbackFinished && isVideoUnfinished()) {
-            simulateMouseMovement();
-            scheduleMouseMovement();
-          }
-        }, delay);
-      };
-      scheduleMouseMovement();
       let unregisterRuntimeVideo = null;
 
       const videoResult = await new Promise((resolve) => {
@@ -3442,7 +3485,6 @@
           try { clearInterval(intervalId); } catch (error) {}
           try { clearTimeout(pauseTimer); } catch (error) {}
           try { clearTimeout(resumeTimer); } catch (error) {}
-          try { clearTimeout(mouseMoveTimer); } catch (error) {}
           try { clearTimeout(playbackRetryTimer); } catch (error) {}
           playbackRetryTimer = null;
           playbackRetryAttempt = 0;
@@ -3450,15 +3492,16 @@
           try {
             if (visibilityTarget && typeof visibilityTarget.removeEventListener === "function") visibilityTarget.removeEventListener("visibilitychange", handleVisibilityChange);
           } catch (error) {}
-          try {
-            if (typeof player.off === "function") player.off("pause", handleUnexpectedPause);
-          } catch (error) {}
-          try {
-            if (typeof player.off === "function") player.off("waiting", handleWaiting);
-          } catch (error) {}
-          try {
-            if (typeof player.off === "function") player.off("stalled", handleStalled);
-          } catch (error) {}
+          if (pageWindow && typeof pageWindow.removeEventListener === "function") {
+            pageWindow.removeEventListener("mouseleave", preventPagePause);
+            pageWindow.removeEventListener("mouseout", preventPagePause);
+            pageWindow.removeEventListener("blur", resumeOnPageEvent);
+          }
+          if (pageDocument && typeof pageDocument.removeEventListener === "function") {
+            pageDocument.removeEventListener("mouseleave", preventPagePause);
+            pageDocument.removeEventListener("mouseout", preventPagePause);
+            pageDocument.removeEventListener("visibilitychange", resumeOnPageEvent);
+          }
           try {
             if (typeof player.off === "function") player.off("timeupdate", handleTimeUpdate);
           } catch (error) {}
@@ -3472,6 +3515,7 @@
             unregisterRuntimeVideo();
             unregisterRuntimeVideo = null;
           }
+          finishVideoTask = null;
           unregisterDiagnostics();
           try { stopVideoDiagnostics(); } catch (error) {}
         };
@@ -3485,6 +3529,7 @@
             resolve(result);
           }
         };
+        finishVideoTask = finish;
         unregisterRuntimeVideo = runtime.register(() => finish("脚本实例已停止", false));
         if (runtime.destroyed) return;
         intervalId = setInterval(() => {
@@ -3504,22 +3549,21 @@
           const ended = typeof player.ended === "function" ? player.ended() : player.ended;
           const duration = Number(typeof player.duration === "function" ? player.duration() : player.duration);
           const hasRemaining = !Number.isFinite(duration) || !Number.isFinite(currentTime) || currentTime < duration;
-          if (player.paused() && !ended && hasRemaining) {
-            startPlayback();
+          if (playbackRetryTimer || playbackRequest) return;
+          if (isPlayerPaused() && !ended && hasRemaining) {
+            startPlayback("paused");
             return;
           }
 
-          if (!ended && Number.isFinite(currentTime) && now - lastProgressAt >= 7000 && now - lastProgressRecoveryAt >= 1500) {
+          if (!ended && Number.isFinite(currentTime) && now - lastProgressAt >= playbackDefaults.guardNoProgressMs && now - lastProgressRecoveryAt >= playbackDefaults.guardResumeCooldownMs) {
             lastProgressRecoveryAt = now;
             lastProgressAt = now;
-            console.warn("[视频] 检测到视频无进度，尝试恢复播放");
-            startPlayback().then((succeeded) => {
-              if (succeeded) console.log("[视频] 无进度恢复请求已完成");
-            });
+            startPlayback("no-progress");
           }
-        }, 1e3);
+        }, playbackDefaults.videoCheckInterval);
         handleEnded = () => finish("视频播放完成");
         player.on("ended", handleEnded);
+        if (playbackDefaults.autoplay) startPlayback("initial");
       });
       if (videoResult === false) return false;
       console.log("任务点完成");
@@ -3805,6 +3849,7 @@
       };
       const startWork = async () => {
         if (runtime.destroyed) return false;
+        if (runtime.verificationBlocked) return false;
         if (chapterWorkRunning) return false;
         chapterWorkRunning = true;
         try {
@@ -3816,6 +3861,7 @@
         if (typeof top?.scroll2Job === "function") top.scroll2Job();
         let jobList = _self1.document.querySelectorAll(".ans-job-icon") || [];
         let allTasksReady = true;
+        let lastTaskWasVideo = false;
         for (let i = 0; i < jobList.length; i++) {
           if (runtime.destroyed) return false;
           const item = jobList[i];
@@ -3855,6 +3901,7 @@
               cxModel.askStore.log("任务点元数据无效，下一轮重试", "warn");
               continue;
             }
+            lastTaskWasVideo = false;
             if (cxModel.askStore.log(`正在完成任务:${taskInfo.name || taskInfo.title || "未命名任务"}`), iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/video\/index\.html/)) {
               if (!formStore.forminput.autoVideo) {
                 cxModel.askStore.log("视频任务已跳过", "success");
@@ -3862,7 +3909,7 @@
               }
               const videoResult = await cxModel.video(iframe.contentWindow);
               if (runtime.destroyed) return false;
-              videoResult === false ? allTasksReady = false : cxModel.askStore.log("视频任务已完成", "success");
+              videoResult === false ? allTasksReady = false : (lastTaskWasVideo = true, cxModel.askStore.log("视频任务已完成", "success"));
             } else if (iframe == null ? void 0 : iframe.src.match(/\/ananas\/modules\/work\/index.html/)) {
               cxModel.askStore.log("即将开始做作业", "info");
               const workIframe = (_e = iframe.contentWindow) == null ? void 0 : _e.document.querySelector("iframe");
@@ -3891,7 +3938,7 @@
           return false;
         }
         if (runtime.destroyed) return false;
-        await sleep(formStore.forminput.interval);
+        await sleep(lastTaskWasVideo ? 1 : formStore.forminput.interval);
         if (runtime.destroyed) return false;
         scheduleNextChapter();
         return true;
@@ -3901,6 +3948,7 @@
       };
       chapterPollTimer = setInterval(async () => {
         if (runtime.destroyed) return;
+        if (runtime.verificationBlocked) return;
         if (chapterPollRunning) return;
         chapterPollRunning = true;
         try {
@@ -3920,7 +3968,7 @@
         } finally {
           chapterPollRunning = false;
         }
-      }, 2e3);
+      }, 5e3);
       break;
     case "/mooc2-ans/mycourse/stu":
     case "/mooc-ans/mycourse/stu":
@@ -3955,35 +4003,31 @@
 
 })(Vue, Pinia, ElementPlus, md5, $);
 
-// ==================== 微信扫码验证弹窗检测功能 ====================
+// ==================== 学习验证检测功能 ====================
 (function() {
     'use strict';
 
+    if (window !== window.top) return;
+
     const RUNTIME_KEY = '__chaoxingToolkitRuntimeV219';
     const runtimeHost = typeof unsafeWindow !== 'undefined' ? unsafeWindow : globalThis;
+    if (runtimeHost?.top && runtimeHost !== runtimeHost.top) return;
+    if (!document.body) return;
     const lifecycleRuntime = runtimeHost?.[RUNTIME_KEY];
 
     // 配置
     const CONFIG = {
         // 检测的关键词
         keywords: ['微信扫码验证', '请使用微信"扫一扫"扫码', '跳转小程序进行学习验证'],
-        // 检测间隔（毫秒）
-        checkInterval: 1000,
-        // 延迟执行时间范围（秒）
-        minDelay: 5,
-        maxDelay: 10
+        // 检测间隔（毫秒）。验证检测只做低频、受控扫描，避免干扰页面渲染。
+        checkInterval: 2500
     };
 
     let isProcessing = false;
     let checkTimer = null;
-    let pendingRefreshTimer = null;
+    let mutationCheckTimer = null;
     let observer = null;
     let startDetectionHandler = null;
-
-    // 生成随机延迟时间（5-10秒）
-    function getRandomDelay() {
-        return Math.floor(Math.random() * (CONFIG.maxDelay - CONFIG.minDelay + 1) + CONFIG.minDelay) * 1000;
-    }
 
     // 检查元素是否包含关键词
     function containsKeywords(element) {
@@ -3996,20 +4040,15 @@
     function checkWechatVerifyPopup() {
         if (isProcessing) return false;
 
-        // 常见的弹窗选择器
+        // 只检查明确的弹窗容器，避免反复遍历工作台和整个页面文本。
         const popupSelectors = [
+            '[role="dialog"]',
             '.el-dialog',
             '.el-message-box',
             '.van-dialog',
             '.weui-dialog',
             '.layui-layer',
             '.modal',
-            '.dialog',
-            '.popup',
-            '[class*="dialog"]',
-            '[class*="popup"]',
-            '[class*="modal"]',
-            // 学习通特定的弹窗类名
             '.verify-dialog',
             '.qrcode-dialog',
             '.scan-dialog'
@@ -4025,80 +4064,73 @@
             }
         }
 
-        // 检查整个页面文本（作为备用方案）
-        const bodyText = document.body.innerText || '';
-        if (CONFIG.keywords.every(keyword => bodyText.includes(keyword))) {
-            return true;
-        }
-
         return false;
     }
 
-    // 执行刷新操作
+    function checkImageVerification() {
+        const pendingDocuments = [document];
+        const checkedDocuments = new Set();
+        while (pendingDocuments.length && checkedDocuments.size < 12) {
+            const currentDocument = pendingDocuments.shift();
+            if (!currentDocument || checkedDocuments.has(currentDocument)) continue;
+            checkedDocuments.add(currentDocument);
+            const codeInput = currentDocument.querySelector('input[placeholder*="验证码"], input[placeholder*="校验码"], input[name*="captcha"]');
+            if (codeInput && codeInput.getClientRects().length > 0) return true;
+            for (const frame of currentDocument.querySelectorAll('iframe')) {
+                try {
+                    if (frame.contentDocument) pendingDocuments.push(frame.contentDocument);
+                } catch (error) {
+                    // 跨域 iframe 无法检查，由页面自身处理验证。
+                }
+            }
+        }
+        return false;
+    }
+
     function stopCheckTimer() {
         if (checkTimer !== null) clearInterval(checkTimer);
         checkTimer = null;
     }
 
-    function scheduleRefresh() {
-        if (isProcessing || pendingRefreshTimer !== null) return;
-
-        const delay = getRandomDelay();
-        console.log(`[微信扫码检测] 将在 ${delay / 1000} 秒后执行刷新操作`);
-        pendingRefreshTimer = setTimeout(() => {
-            pendingRefreshTimer = null;
-            executeRefresh();
-        }, delay);
-    }
-
-    function executeRefresh() {
+    function notifyVerificationRequired() {
         if (isProcessing) return;
         isProcessing = true;
-
-        console.log('[微信扫码检测] 检测到微信扫码验证弹窗，准备刷新页面...');
-
-        // 获取当前网址
-        const currentUrl = window.location.href;
-
-        // 复制网址到剪贴板
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(currentUrl).then(() => {
-                console.log('[微信扫码检测] 网址已复制到剪贴板:', currentUrl);
-            }).catch(err => {
-                console.error('[微信扫码检测] 复制网址失败:', err);
-                // 备用方案：使用传统方法
-                const textarea = document.createElement('textarea');
-                textarea.value = currentUrl;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                console.log('[微信扫码检测] 网址已复制到剪贴板(备用方法)');
-            });
+        if (lifecycleRuntime) lifecycleRuntime.verificationBlocked = true;
+        stopCheckTimer();
+        lifecycleRuntime?.destroy?.();
+        console.warn('[学习验证检测] 检测到验证页面，已暂停自动任务，请手动完成验证后刷新页面。');
+        try {
+            if (typeof ElementPlus !== 'undefined' && typeof ElementPlus.ElNotification === 'function') {
+                ElementPlus.ElNotification({
+                    title: '检测到学习验证',
+                    message: '请手动完成验证。自动任务已暂停，验证完成后请刷新当前页面继续。',
+                    type: 'warning',
+                    duration: 0,
+                    position: 'top-right'
+                });
+            }
+        } catch (error) {
+            console.warn('[学习验证检测] 无法显示页面提示', error);
         }
+    }
 
-        // 在新标签页打开当前页面
-        window.open(currentUrl, '_blank');
+    function checkNow() {
+        if (isProcessing || lifecycleRuntime?.destroyed) return;
+        if (checkWechatVerifyPopup() || checkImageVerification()) notifyVerificationRequired();
+    }
 
-        // 关闭当前页面
-        setTimeout(() => {
-            window.close();
-        }, 500);
+    function scheduleMutationCheck() {
+        if (isProcessing || lifecycleRuntime?.destroyed || mutationCheckTimer !== null) return;
+        mutationCheckTimer = setTimeout(() => {
+            mutationCheckTimer = null;
+            checkNow();
+        }, CONFIG.checkInterval);
     }
 
     // 主检测函数
     function startDetection() {
-        console.log('[微信扫码检测] 检测功能已启动，将在检测到微信扫码验证弹窗后自动处理');
-
-        checkTimer = setInterval(() => {
-            if (checkWechatVerifyPopup()) {
-                console.log('[微信扫码检测] 检测到微信扫码验证弹窗！');
-                stopCheckTimer();
-                scheduleRefresh();
-            }
-        }, CONFIG.checkInterval);
+        checkNow();
+        if (!isProcessing) checkTimer = setInterval(checkNow, CONFIG.checkInterval);
     }
 
     // 页面加载完成后启动检测
@@ -4111,27 +4143,21 @@
 
     // 监听页面变化（用于检测动态加载的弹窗）
     observer = new MutationObserver((mutations) => {
-        if (!isProcessing && pendingRefreshTimer === null && checkWechatVerifyPopup()) {
-            console.log('[微信扫码检测] 通过MutationObserver检测到微信扫码验证弹窗！');
-            stopCheckTimer();
-            scheduleRefresh();
-        }
+        scheduleMutationCheck();
     });
 
     observer.observe(document.body, {
         childList: true,
-        subtree: true,
-        attributes: true,
-        characterData: true
+        subtree: true
     });
     lifecycleRuntime?.register?.(() => {
         stopCheckTimer();
-        if (pendingRefreshTimer !== null) clearTimeout(pendingRefreshTimer);
+        if (mutationCheckTimer !== null) clearTimeout(mutationCheckTimer);
         if (startDetectionHandler) document.removeEventListener('DOMContentLoaded', startDetectionHandler);
         observer?.disconnect();
         checkTimer = null;
-        pendingRefreshTimer = null;
+        mutationCheckTimer = null;
     });
 
 })();
-// ==================== 微信扫码验证弹窗检测功能结束 ====================
+// ==================== 学习验证检测功能结束 ====================

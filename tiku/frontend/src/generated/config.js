@@ -1,6 +1,6 @@
 // Generated from config/settings.schema.json; do not edit manually.
 export const CONFIG_SCHEMA_VERSION = 1
-export const SOURCE_SCHEMA_SHA256 = '317199fbf6671a2b737b0e885771f928db0c6df5b1f8ad3293eb600aad77eb36'
+export const SOURCE_SCHEMA_SHA256 = '9671e3860c8bfae650ca01178de22c61d7f9449d2b742cb69706b9c1bc6a27d4'
 export const GENERATED_CONFIG_FIELDS = [
   {
     "key": "videoDiagnosticsEnabled",
@@ -13,10 +13,10 @@ export const GENERATED_CONFIG_FIELDS = [
   {
     "key": "randomPauseEnabled",
     "type": "boolean",
-    "default": true,
+    "default": false,
     "minimum": null,
     "maximum": null,
-    "description": "是否启用视频随机暂停"
+    "description": "是否启用视频随机暂停（默认关闭，参考稳定播放策略）"
   },
   {
     "key": "randomPauseIntervalMin",
