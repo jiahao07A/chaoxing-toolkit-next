@@ -600,6 +600,35 @@
     const _component_el_button = vue.resolveComponent("el-button"), _component_el_switch = vue.resolveComponent("el-switch"), _component_el_input = vue.resolveComponent("el-input"), _component_el_input_number = vue.resolveComponent("el-input-number"), _component_el_option = vue.resolveComponent("el-option"), _component_el_select = vue.resolveComponent("el-select"), _component_el_checkbox = vue.resolveComponent("el-checkbox"), _component_el_checkbox_group = vue.resolveComponent("el-checkbox-group"), _component_el_tooltip = vue.resolveComponent("el-tooltip"), _component_el_form_item = vue.resolveComponent("el-form-item"), _component_el_tab_pane = vue.resolveComponent("el-tab-pane"), _component_el_tabs = vue.resolveComponent("el-tabs"), _component_el_form = vue.resolveComponent("el-form"), _component_el_dialog = vue.resolveComponent("el-dialog");
     return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [vue.createVNode(_component_el_button, { type: "danger", id: "csbutton", icon: _ctx.Setting, circle: "", onClick: _cache[0] || (_cache[0] = ($event) => _ctx.dialogV = !_ctx.dialogV) }, null, 8, ["icon"]), vue.createVNode(_component_el_dialog, { modelValue: _ctx.dialogV, "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => _ctx.dialogV = $event), title: "💯超星学习通满分助手", width: "30%", modal: false, center: "", draggable: "" }, { footer: vue.withCtx(() => [vue.createElementVNode("span", _hoisted_1$1, [vue.createVNode(_component_el_button, { onClick: _cache[2] || (_cache[2] = ($event) => _ctx.dialogV = false) }, { default: vue.withCtx(() => [vue.createTextVNode("取消")]), _: 1 }), vue.createVNode(_component_el_button, { type: "primary", onClick: _cache[3] || (_cache[3] = ($event) => _ctx.submitForm(_ctx.ruleFormRef)) }, { default: vue.withCtx(() => [vue.createTextVNode("保存")]), _: 1 })])]), default: vue.withCtx(() => [vue.createVNode(_component_el_form, { ref: "ruleFormRef", rules: _ctx.rules, model: _ctx.forminput, class: "demo-ruleForm" }, { default: vue.withCtx(() => [vue.createVNode(_component_el_tabs, { class: "demo-tabs", modelValue: _ctx.activeName, "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => _ctx.activeName = $event) }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(_ctx.userConfig, (item) => (vue.openBlock(), vue.createBlock(_component_el_tab_pane, { key: item.name, label: item.label, name: item.name }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item.config, (item1) => (vue.openBlock(), vue.createBlock(_component_el_form_item, { label: item1.label, prop: item1.name }, { default: vue.withCtx(() => [vue.createVNode(_component_el_tooltip, { class: "box-item", effect: "dark", content: item1.desc || "", placement: "top" }, { default: vue.withCtx(() => ["switch" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_switch, { key: 0, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "input" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_input, { key: 1, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "number" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_input_number, { key: 2, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, null, 8, ["modelValue", "onUpdate:modelValue"])) : "select" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_select, { key: 3, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event, placeholder: "请选择" }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item1.options, (item2) => (vue.openBlock(), vue.createBlock(_component_el_option, { key: item2.value, label: item2.label, value: item2.value }, null, 8, ["label", "value"]))), 128))]), _: 2 }, 1032, ["modelValue", "onUpdate:modelValue"])) : "checkbox" === item1.type ? (vue.openBlock(), vue.createBlock(_component_el_checkbox_group, { key: 4, modelValue: _ctx.forminput[item1.name], "onUpdate:modelValue": ($event) => _ctx.forminput[item1.name] = $event }, { default: vue.withCtx(() => [(vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item1.options, (item2) => (vue.openBlock(), vue.createBlock(_component_el_checkbox, { key: item2.value, label: item2.value, name: item2.value }, { default: vue.withCtx(() => [vue.createTextVNode(vue.toDisplayString(item2.label), 1)]), _: 2 }, 1032, ["label", "name"]))), 128))]), _: 2 }, 1032, ["modelValue", "onUpdate:modelValue"])) : vue.createCommentVNode("", true)]), _: 2 }, 1032, ["content"])]), _: 2 }, 1032, ["label", "prop"]))), 256))]), _: 2 }, 1032, ["label", "name"]))), 128))]), _: 1 }, 8, ["modelValue"])]), _: 1 }, 8, ["rules", "model"])]), _: 1 }, 8, ["modelValue"])], 64);
   }], ["__scopeId", "data-v-6ed29f7f"]]);
+  const normalizeJudgmentAnswer = (answer) => {
+    if (Array.isArray(answer)) {
+      const values = answer.filter((item) => item !== null && item !== undefined && String(item).trim().length > 0);
+      if (values.length !== 1) return "";
+      answer = values[0];
+    }
+    if (typeof answer === "boolean") return answer ? "正确" : "错误";
+    if (typeof answer === "number") {
+      if (answer === 1) return "正确";
+      if (answer === 0) return "错误";
+      return "";
+    }
+    if (typeof answer !== "string") return "";
+
+    let value = answer.trim().replace(/\s+/g, "");
+    if (!value) return "";
+    value = value.replace(/^["'`(（【「『:：=]+/, "");
+    value = value.replace(/["'`\)\]}）】」』。！？.!?，,；;:：]+$/, "");
+    value = value.replace(/^(?:正确答案|标准答案|参考答案|我的答案|答案|correctanswer|myanswer|answer)(?:是|为)?(?:[:：=])?/i, "");
+    value = value.replace(/^["'`(（【「『:：=]+/, "");
+    value = value.replace(/["'`\)\]}）】」』。！？.!?，,；;:：]+$/, "");
+    value = value.toLowerCase().replace(/[０-９]/g, (digit) => String.fromCharCode(digit.charCodeAt(0) - "０".charCodeAt(0) + 48));
+
+    const positiveValues = new Set(["正确", "正确的", "对", "对的", "是", "√", "✔", "✓", "true", "yes", "y", "t", "1", "right", "ri"]);
+    const negativeValues = new Set(["错误", "错误的", "错", "错的", "否", "×", "✕", "✖", "✗", "✘", "❌", "false", "no", "n", "f", "0", "wrong", "wr"]);
+    if (positiveValues.has(value)) return "正确";
+    if (negativeValues.has(value)) return "错误";
+    return "";
+  };
   let defaultConfig = getConfig();
   class ServerApi {
     constructor(window2 = _unsafeWindow) {
@@ -902,13 +931,11 @@
       const typeNames = { "0": "单选题", "1": "多选题", "2": "填空题", "3": "判断题", "4": "简答题", "5": "名词解释", "6": "论述题", "7": "计算题" };
       const typeName = typeNames[questionTypeId] || "单选题";
       if (questionTypeId === "3") {
-        const isTrue = /正确|对|是|√|true/i.test(content);
-        const isFalse = /错误|错|否|×|false/i.test(content);
-        if (isTrue || isFalse) {
-          const answerText = isTrue ? "正确" : "错误";
+        const answerText = normalizeJudgmentAnswer(content);
+        if (answerText) {
           return { valid: true, answer: [answerText] };
         } else {
-          console.log("AI返回内容未匹配到判断结果:", content);
+          console.log("AI返回内容未匹配到明确的判断结果:", content);
           return { valid: false, answer: "" };
         }
       } else if (questionTypeId === "1") {
@@ -2631,20 +2658,83 @@
     }
     return false;
   }, setAnswer = (answer, questionData, html, iframeWindow) => {
+    const questionType = String(questionData.type);
+    const modernRows = $$1(html).find('ul:eq(0) li[role="radio"], ul:eq(0) li[role="checkbox"]');
+    if (["0", "1", "3"].includes(questionType) && modernRows.length > 0) {
+      const rows = [];
+      modernRows.each(function() { rows.push(this); });
+      const judgmentAnswer = questionType === "3" ? normalizeJudgmentAnswer(answer) : "";
+      const expectedIndexes = questionType === "3"
+        ? rows.flatMap((row, index) => judgmentAnswer && normalizeJudgmentAnswer($$1(row).find(".num_option").attr("data")) === judgmentAnswer ? [index] : [])
+        : Array.from(new Set(matchAnswer(answer, questionData.options))).sort((left, right) => left - right);
+      if (expectedIndexes.length === 0 || expectedIndexes.some((index) => index >= rows.length)) return false;
+      const selected = (row) => $$1(row).attr("aria-checked") === "true" || $$1(row).find(".num_option").is(".check_answer, .check_answer_dx") || $$1(row).find(".check_answer, .check_answer_dx").length > 0;
+      const selectedIndexes = () => rows.flatMap((row, index) => selected(row) ? [index] : []);
+      if (questionType === "1") {
+        rows.forEach((row, index) => {
+          if (selected(row) !== expectedIndexes.includes(index)) $$1(row).click();
+        });
+      } else {
+        if (expectedIndexes.length !== 1) return false;
+        const target = rows[expectedIndexes[0]];
+        if (!selected(target)) $$1(target).click();
+      }
+      const actualIndexes = selectedIndexes();
+      const filled = actualIndexes.length === expectedIndexes.length && actualIndexes.every((index, position) => index === expectedIndexes[position]);
+      return filled && (questionType === "3" ? judgmentAnswer : answer);
+    }
     switch (questionData.type) {
       case "0":
-      case "1":
-        const matchArr = matchAnswer(answer, questionData.options);
-        matchArr.length > 0 && clearCurrent(html, iframeWindow);
+      case "1": {
+        const matchArr = Array.from(new Set(matchAnswer(answer, questionData.options))).sort((left, right) => left - right);
+        const selectedInputIndexes = [];
+        $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").each(function(index) {
+          if ($$1(this).is(":checked")) selectedInputIndexes.push(index);
+        });
+        const selectedIndexes = selectedInputIndexes.length > 0 ? selectedInputIndexes : (() => {
+          const indexes = [];
+          $$1(html).find(".answerBg").each(function(index) {
+            if ($$1(this).find(".check_answer").length || $$1(this).find(".check_answer_dx").length) indexes.push(index);
+          });
+          return indexes;
+        })();
+        const hasSameAnswer = selectedIndexes.length === matchArr.length && selectedIndexes.every((index, position) => index === matchArr[position]);
+        if (matchArr.length > 0 && !hasSameAnswer) clearCurrent(html, iframeWindow);
         for (var i = 0; i < matchArr.length; i++)
-          console.log($$1(html).find("li").eq(matchArr[i]), matchArr[i]), $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").eq(matchArr[i]).click(), $$1(html).find(".answerBg").eq(matchArr[i]).click(), $$1(html).find("li").eq(matchArr[i]).click();
+          if (!hasSameAnswer) console.log($$1(html).find("li").eq(matchArr[i]), matchArr[i]), $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").eq(matchArr[i]).click(), $$1(html).find(".answerBg").eq(matchArr[i]).click(), $$1(html).find("li").eq(matchArr[i]).click();
         return matchArr.length > 0 && answer;
-      case "3":
-        return clearCurrent(html, iframeWindow), answer instanceof Array && (answer = answer[0]), $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").each(function() {
-          "true" == $$1(this).val() ? answer.match(/(^|,)(True|true|正确|是|对|√|T|ri)(,|$)/) && $$1(this).click() : answer.match(/(^|,)(False|false|错误|否|错|×|F|wr)(,|$)/) && $$1(this).click();
-        }), $$1(html).find(".answerBg").each(function() {
-          "true" == $$1(this).find(".num_option").attr("data") ? answer.match(/(^|,)(True|true|正确|是|对|√|T|ri)(,|$)/) && $$1(this).click() : answer.match(/(^|,)(False|false|错误|否|错|×|F|wr)(,|$)/) && $$1(this).click();
-        }), !!($$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").is(":checked") || $$1(html).find(".check_answer").length > 0 || $$1(html).find(".check_answer_dx").length > 0) && answer;
+      }
+      case "3": {
+        const judgmentAnswer = normalizeJudgmentAnswer(answer);
+        if (!judgmentAnswer) return false;
+        let selectedJudgmentAnswer = "";
+        $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").each(function() {
+          if (!$$1(this).is(":checked")) return;
+          const value = String($$1(this).val()).toLowerCase();
+          if (value === "true") selectedJudgmentAnswer = "正确";
+          if (value === "false") selectedJudgmentAnswer = "错误";
+        });
+        if (!selectedJudgmentAnswer) {
+          $$1(html).find(".answerBg").each(function() {
+            if (!($$1(this).find(".check_answer").length || $$1(this).find(".check_answer_dx").length)) return;
+            const value = String($$1(this).find(".num_option").attr("data")).toLowerCase();
+            if (value === "true") selectedJudgmentAnswer = "正确";
+            if (value === "false") selectedJudgmentAnswer = "错误";
+          });
+        }
+        if (selectedJudgmentAnswer === judgmentAnswer) return judgmentAnswer;
+        clearCurrent(html, iframeWindow);
+        const isPositive = judgmentAnswer === "正确";
+        $$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").each(function() {
+          const value = String($$1(this).val()).toLowerCase();
+          if ((isPositive && value === "true") || (!isPositive && value === "false")) $$1(this).click();
+        });
+        $$1(html).find(".answerBg").each(function() {
+          const value = String($$1(this).find(".num_option").attr("data")).toLowerCase();
+          if ((isPositive && value === "true") || (!isPositive && value === "false")) $$1(this).click();
+        });
+        return !!($$1(html).find("ul:eq(0) li :radio,:checkbox,textarea").is(":checked") || $$1(html).find(".check_answer").length > 0 || $$1(html).find(".check_answer_dx").length > 0) && judgmentAnswer;
+      }
       case "2":
       case "9":
       case "4":
