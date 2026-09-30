@@ -1,47 +1,20 @@
-# 最终使用说明
+Chaoxing Toolkit Next — 使用说明
 
-## ✅ 配置已修正
+项目介绍：README.md
+完整安装指南：docs/guides/quick-start.md
+脚本排障：docs/guides/脚本界面问题排查.md
 
-Chrome 工作区已修正为：**Default**（对应 jiahao001 账号）
+用户脚本可单独安装到 Tampermonkey；需要自建题库和服务端配置同步时，再安装本地题库服务。
+正式文件：scripts/userscript/学习通脚本.js
+更新前备份配置，避免同时启用多个版本。
 
-## 🚀 立即开始
+首次启动服务需要 Python 虚拟环境、后端依赖和前端构建，不能只双击启动器完成部署。
+管理台：http://localhost:8002/，仅本机使用，无需登录。
+设置 API_KEY 不提供完整认证保护，不要将管理服务暴露到公网。
 
-### 一键启动
-```
-双击运行: scripts/launcher/start-simple.bat
-```
+题库匹配与 AI 建议可能出错，需要人工核对；遵守学校和平台规则，不用于代学、考试作弊或绕过验证。
+第三方接口可能发送题干、选项等内容并产生费用，启用前确认权限和条款。
 
-## 📋 启动脚本会自动完成
-
-1. ✅ 启动题库服务器（http://localhost:8002）
-2. ✅ 打开题库管理界面（使用 Default 工作区，jiahao001 账号）
-3. ✅ 打开仅供本机访问的管理后台（无需登录）
-4. ✅ 打开学习通页面（使用 Default 工作区，jiahao001 账号）
-
-## 🎯 确认配置
-
-- **Chrome 工作区**: Default
-- **Chrome 账号**: jiahao001 (jiahao071016001@gmail.com)
-- **服务端口**: 8002
-- **管理账号**: admin / admin
-
-## 📝 下一步操作
-
-### 1. 启动系统
-双击 `scripts/launcher/start-simple.bat`
-
-### 2. 配置 Tampermonkey
-在脚本设置中填入：
-```
-http://localhost:8002/api/search
-```
-
-### 3. 开始使用
-在学习通页面做题，脚本会自动查询题库答案
-
-## 🛑 停止服务器
-双击 `scripts/launcher/stop.bat`
-
----
-
-**现在配置正确，可以开始使用了！** 🎉
+反馈问题：https://github.com/jiahao07A/chaoxing-toolkit-next/issues
+提交反馈前移除密钥、Cookies、账号及课程参数。
+来源与授权状态见 NOTICE.md；安全报告方式见 SECURITY.md。

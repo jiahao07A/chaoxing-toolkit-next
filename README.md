@@ -1,219 +1,109 @@
-# 超星学习通自动化系统
+# Chaoxing Toolkit Next
 
-超星学习通（Chaoxing）在线学习平台自动化工具，基于 [超星学习通满分助手](https://greasyfork.org/zh-CN/scripts/436994) 改造，新增自定义题库服务器和 AI 解题功能，包含用户脚本和服务端题库 API 两部分。
+学习通学习辅助与本地题库管理工具，由 Tampermonkey 用户脚本和可选的本地题库服务组成，支持题目查询、待处理题目管理、配置同步，以及自行配置的 AI 答案建议。
 
-### 相比原版的改进
+本仓库由 `jiahao07A` 独立维护，不是超星官方产品，也不代表原项目或原脚本作者。历史来源与授权状态见 [来源说明](NOTICE.md)。
 
-- 新增自定义题库服务器，支持对接自建 API 查询答案
-- 新增 AI 解题功能，支持接入 DeepSeek 等大模型
-- 保留原版全部功能：任务点自动跳转、章节测验、作业、考试、全网搜索答案、视频/音频全自动静音播放
+[快速开始](docs/guides/quick-start.md) · [文档导航](docs/README.md) · [反馈问题](https://github.com/jiahao07A/chaoxing-toolkit-next/issues) · [参与贡献](CONTRIBUTING.md) · [安全说明](SECURITY.md)
 
-## 使用建议
+## 使用前了解
 
-本系统提供两种答题方式，适用于不同场景：
+- 本项目面向个人本机学习辅助、题库整理与技术研究。请先确认学校、课程及平台规则允许使用；不得用于代学、考试作弊或绕过平台验证。
+- 题库匹配与 AI 建议均可能出错，需要人工核对；不承诺答案正确率、成绩或所有页面的兼容性。
+- 本地服务默认仅监听 `127.0.0.1`，管理界面没有登录和权限控制。仓库公开不意味着服务可以安全暴露到公网或作为多人托管服务。
+- 第三方题库、AI 服务和脚本依赖可能产生外部请求。题库查询与 AI 请求可能发送题干、选项等内容；启用前请确认数据权限、服务条款和费用。
+- 当前仓库尚未提供统一许可证。公开可浏览不等于获得任意复制、再分发或商业使用授权，详情见 [来源与授权状态](NOTICE.md)。
+- 当前前端依赖检查存在待处理的安全告警，详情见 [已知依赖告警](SECURITY.md#已知依赖告警)；本次内容整理不代表全面安全审计。
 
-| | AI 解题 | 题库服务器 |
-|--|---------|-----------|
-| **适用人群** | 个人学生 | 机构、培训中心 |
-| **正确率** | 一般（依赖大模型能力） | 高（题目与答案一一对应） |
-| **部署成本** | 无需部署，配置 API Key 即可 | 需要搭建服务器并导入题库 |
-| **题目覆盖** | 广泛，但冷门题目可能出错 | 有限，仅限已导入的题目 |
+## 可以做什么
 
-- **个人学生**：直接使用 AI 解题即可，配置 DeepSeek 等 API Key 后脚本会自动调用大模型生成答案，无需额外部署。
-- **机构/批量场景**：如果对正确率有严格要求（如批量刷题、机构统一管理），建议搭建题库服务器，将标准答案导入数据库，确保每道题都能精确匹配。
+| 模块 | 当前功能 | 使用边界 |
+| --- | --- | --- |
+| 浏览器用户脚本 | 可视化设置、题库查询、答案填入、课程任务与视频播放辅助 | 依赖页面结构和平台规则，平台更新可能影响功能；验证须手动完成 |
+| 本地题库服务 | 题目增删改查、待处理题目、导入预检、导出、备份与恢复、匹配质量查看 | 适合单机使用，导入的题目及答案须自行核验 |
+| 配置与日志 | 管理台和用户脚本配置同步、日志开关、本地脱敏视频诊断 | 运行配置和诊断数据不是公共题库，不应上传到仓库或 Issues |
+| 可选 AI 接口 | 题库未命中时请求兼容接口提供答案建议 | 需自行提供服务地址、模型及密钥，可能产生费用，不包含免费额度 |
 
-## 效果展示
-
-**脚本配置面板** - 在学习通页面中打开 Tampermonkey 设置，配置题库地址和 AI API：
-
-![脚本配置面板](docs/assets/脚本配置面板.png)
-
-**题库管理后台登录** - 访问 `http://localhost:8002` 进入管理界面：
-
-![题库管理后台登录](docs/assets/后台登录页.png)
-
-**题库管理面板** - 登录后可查看、搜索、新增、导入、导出题目：
-
-![题库管理面板](docs/assets/题库管理面板.png)
-
-**待处理题目** - 未匹配到答案的题目会自动归入待处理列表，支持手动补充答案：
-
-![待处理题目](docs/assets/待处理题目.png)
-
-## 项目结构
-
-```
-├── scripts/                  # 本地启动器和用户脚本
-│   ├── launcher/             # Windows、跨平台和 Linux 启停脚本
-│   └── userscript/           # Tampermonkey 用户脚本
-├── tiku/                      # 题库服务器
-│   ├── main.py                # 服务入口
-│   ├── app/                   # FastAPI 应用（路由、数据库、中间件）
-│   │   ├── config.py          # 配置常量
-│   │   ├── database.py        # SQLite 异步数据库
-│   │   ├── matching.py        # 题目匹配逻辑
-│   │   ├── middleware.py       # 限流中间件
-│   │   ├── schemas.py         # Pydantic 数据模型
-│   │   └── routes/            # API 路由
-│   ├── frontend/              # Vue 3 管理界面（Vite + Element Plus）
-│   ├── data/
-│   │   └── tiku.json          # 可版本控制的题库种子数据
-│   ├── legacy/templates/      # 旧版 HTML，仅作历史参考
-│   ├── static/                # 前端构建产物（本机生成）
-│   ├── questions.db           # SQLite 数据库（本机运行时文件）
-│   ├── requirements.txt       # Python 依赖
-│   └── README.md              # 服务说明
-├── docs/                      # 指南、架构记录、截图和发布记录
-└── AGENTS.md                  # 项目协作约定
-```
+用户脚本可以独立安装。只有需要自建题库或服务端配置同步时，才需要运行题库服务；单独使用第三方接口时，无需安装 Python 和 Node.js。
 
 ## 快速开始
 
 ### 1. 安装用户脚本
 
-本脚本需要在 [Tampermonkey（篡改猴）](https://www.tampermonkey.net/) 浏览器扩展上运行，以下是详细安装教程：
+1. 在 Chrome、Edge 或 Firefox 中安装 [Tampermonkey](https://www.tampermonkey.net/)。
+2. 打开本仓库的正式脚本 [`scripts/userscript/学习通脚本.js`](scripts/userscript/学习通脚本.js)，复制完整内容。
+3. 在 Tampermonkey 管理面板选择“添加新脚本”，替换默认内容并保存。
+4. 打开允许使用辅助工具的学习通页面，确认脚本已启用，再在页面中的脚本设置入口检查题库、AI 和自动处理开关。
 
-**第一步：安装 Tampermonkey**
+已有旧版脚本时，请先备份原脚本及记录配置，在现有条目中替换内容，避免同时启用多个版本。脚本名称已统一为 `Chaoxing Toolkit Next`；保留原有命名空间，不配置原作者地址自动更新。不同安装方式可能生成新条目，升级后应核对配置。详细步骤见 [用户脚本安装与升级](docs/guides/quick-start.md#用户脚本安装与升级)。
 
-1. 打开 [Tampermonkey 官网](https://www.tampermonkey.net/)
-2. 点击对应你浏览器的安装按钮（支持 Chrome、Firefox、Edge、Safari 等）
-3. 在浏览器扩展商店中确认安装
+### 2. 可选：启动本地题库服务
 
-**第二步：添加脚本**
+准备 **Python 3.11+、Node.js 22.12+（推荐 24 LTS）和 npm**。下面是在 Windows PowerShell 中从全新克隆开始的完整步骤，不需要激活虚拟环境：
 
-1. 点击浏览器右上角的 Tampermonkey 图标
-2. 选择「添加新脚本...」
-3. 清空编辑器中的默认内容
-4. 将 `scripts/userscript/学习通脚本.js` 的全部内容粘贴进去
-5. 按 `Ctrl + S` 保存
-
-**第三步：使用脚本**
-
-1. 打开超星学习通网站并登录
-2. 进入课程页面，脚本将自动运行
-3. 点击浏览器右上角 Tampermonkey 图标可查看脚本状态和配置
-
-### 2. 启动题库服务器
-
-```bash
-# 在仓库根目录执行
-cd tiku
-
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 启动服务（默认端口 8002）
-python main.py
+```powershell
+git clone https://github.com/jiahao07A/chaoxing-toolkit-next.git
+Set-Location chaoxing-toolkit-next
+python -m venv tiku/venv
+.\tiku\venv\Scripts\python.exe -m pip install -r .\tiku\requirements.txt
+npm --prefix .\tiku\frontend ci
+npm --prefix .\tiku\frontend run build
+.\tiku\venv\Scripts\python.exe .\tiku\main.py
 ```
 
-或使用启动脚本：
+首次构建前端是必需步骤；构建产物自动写入 `tiku/static/`，无需手动复制。完整的 [Windows、macOS/Linux 安装与排障说明](docs/guides/quick-start.md) 包含健康检查、停止服务和后续启动方法。
 
-```bash
-cd ..
-./scripts/launcher/start-linux.sh              # 默认端口 8002
-./scripts/launcher/start-linux.sh 8002         # 指定端口
-./scripts/launcher/start-linux.sh 8002 true    # 高性能模式（多工作进程）
+启动后打开：
+
+- 管理界面：`http://localhost:8002/`，仅本机使用，无需登录。
+- 健康检查：`http://localhost:8002/api/health`，正常时返回 `status: "ok"`。
+- API 文档：`http://localhost:8002/docs`。
+
+在用户脚本设置中启用自定义题库，并填写 `http://localhost:8002/api/search`。题库开关和地址是否生效，请结合脚本查询日志核对。停止前台服务可按 `Ctrl+C`。
+
+## 配置与数据
+
+默认端口为 `8002`。在启动后端前设置环境变量，可以调整端口和运行数据目录：
+
+| 环境变量 | 默认值或行为 | 说明 |
+| --- | --- | --- |
+| `PORT` | `8002` | 修改后须同步调整脚本接口地址与前端开发代理 |
+| `WORKERS` | `1` | 后端进程数，单机使用建议保留默认值 |
+| `TIKU_DATA_DIR` | `tiku/data/` | 数据库、配置及导入备份的默认存放目录 |
+| `DATABASE_FILE` / `JSON_FILE` / `CONFIG_FILE` | 根据数据目录确定 | 单独覆盖数据库、种子数据或配置文件路径 |
+| `IMPORT_BACKUP_DIR` | 数据目录下的 `import_backups/` | 导入备份存放位置 |
+| `CORS_ORIGINS` | 本机管理界面来源 | 逗号分隔的允许来源；不能替代身份认证 |
+| `API_KEY` | `your_api_key` | 查询接口的兼容参数，不是完整的访问控制 |
+
+当前查询接口仅在请求携带非空 `key` 时校验其值；管理接口也没有身份认证。设置 `API_KEY` 不会让服务具备公网部署所需的认证保护。更多边界见 [安全说明](SECURITY.md)。
+
+- `tiku/data/tiku.json` 是随仓库保留的历史种子数据，不保证题目覆盖、答案准确性或再分发授权。仅在本机数据库为空时尝试导入，不会持续覆盖已有题库。
+- `questions.db`、`config.json`、导入备份、日志、虚拟环境及构建产物属于本机数据，已列入 Git 忽略规则。
+- 服务兼容旧版 `tiku/` 根目录中的数据库和配置；升级前请备份实际使用的文件，详见 [数据目录说明](tiku/data/README.md)。
+
+## 项目结构
+
+```text
+scripts/userscript/学习通脚本.js  正式用户脚本
+scripts/launcher/              本地启动和停止工具
+tiku/app/                      FastAPI 后端及匹配、配置、导入服务
+tiku/frontend/                 Vue 3 + Element Plus 管理界面
+tiku/data/                     种子数据和本机运行数据
+tiku/static/                   本机构建生成的前端页面（不提交）
+config/settings.schema.json    前后端与脚本共享的配置约束
+tests/                         Python 与部分 Node.js 回归测试
+docs/                          使用指南、研究记录、架构与历史说明
 ```
 
-启动后访问：
-- 管理界面：`http://localhost:8002`
-- API 接口：`http://localhost:8002/api/search`
+技术栈：用户脚本使用 Vue、Pinia、Element Plus 和 Tampermonkey API；后端使用 Python、FastAPI、uvicorn、aiosqlite 与 SQLite；管理界面使用 Vue 3、Element Plus 与 Vite。
 
-### 3. 前端开发
+## 开发与反馈
 
-```bash
-cd tiku/frontend
-npm install
-npm run dev      # 开发模式
-npm run build    # 构建到 tiku/static/
-```
+- 使用问题和功能建议请提交到 [本仓库 Issues](https://github.com/jiahao07A/chaoxing-toolkit-next/issues)，附上复现步骤、版本和脱敏日志。
+- 开发环境、回归测试与提交约定见 [贡献指南](CONTRIBUTING.md)。
+- 页面功能人工验收见 [测试清单](docs/guides/manual-testing.md)。
+- API 密钥、账号、Cookies、个人数据库及安全漏洞细节请勿公开上传；报告方式见 [安全说明](SECURITY.md)。
 
-## API 接口
+## 来源与授权
 
-### 查询答案
-
-```
-POST /api/search
-Content-Type: application/json
-```
-
-**请求参数：**
-
-| 字段       | 类型   | 说明                     |
-| ---------- | ------ | ------------------------ |
-| `question` | string | 题目文本                 |
-| `type`     | string | 题目类型（0-7）          |
-| `key`      | string | API 密钥（可选）         |
-
-**题目类型：**
-
-| 值 | 类型     |
-| -- | -------- |
-| 0  | 单选题   |
-| 1  | 多选题   |
-| 2  | 填空题   |
-| 3  | 判断题   |
-| 4  | 简答题   |
-| 5  | 名词解释 |
-| 6  | 论述题   |
-| 7  | 计算题   |
-
-**响应示例：**
-
-```json
-{
-  "code": -1,
-  "msg": "查询成功",
-  "data": {
-    "answer": "A#B#C",
-    "num": "1000",
-    "usenum": "100"
-  }
-}
-```
-
-**答案格式：**
-- 单选/判断题：直接返回答案文本（如 `"36V"`、`"正确"`）
-- 多选题：多个答案用 `#` 分隔（如 `"A#B#C"`）
-- 填空题：多个空用 `|` 分隔
-
-## 配置说明
-
-### 服务器环境变量
-
-| 变量        | 默认值         | 说明                 |
-| ----------- | -------------- | -------------------- |
-| `PORT`      | `8002`         | 服务端口             |
-| `API_KEY`   | `your_api_key` | API 认证密钥         |
-| `WORKERS`   | `1`            | 工作进程数           |
-
-### 脚本配置
-
-在脚本配置面板中可设置：
-- **启用自定义题库**：开启后优先使用自定义接口
-- **自定义题库地址**：填入 API URL（如 `http://localhost:8002/api/search`）
-- **自定义题库密钥**：填入服务器要求的 API 密钥
-- **本地视频诊断**：可选开启播放器事件记录；数据只保存在 Tampermonkey 本地，默认保留 7 天，可从页面右下角导出或清理
-
-![脚本配置面板](docs/assets/脚本配置面板.png)
-
-## 技术栈
-
-**用户脚本：** Vue 3 / Pinia / Element Plus（内嵌），Tampermonkey GM_* API
-
-**题库服务器：**
-- 后端：Python / FastAPI / uvicorn / aiosqlite
-- 前端：Vue 3 / Element Plus / Vite
-- 数据库：SQLite
-
-## 免责声明
-
-1. 本项目仅供**学习交流与技术研究**使用，严禁用于任何商业用途或违反平台服务条款的行为。
-2. 使用本工具产生的一切后果由使用者自行承担，开发者不承担任何责任。
-3. 本项目不保证功能的持续可用性，超星学习通平台可能更新反作弊机制导致脚本失效。
-4. 请遵守超星学习通平台的用户协议及相关法律法规，合理使用本工具。
-5. 本项目仅供学习交流使用。
+本项目保留了原仓库和原用户脚本的历史来源及作者署名，独立维护不改变这些内容的权利归属。第三方接口和依赖分别遵循其自身条款。详见 [NOTICE.md](NOTICE.md)。

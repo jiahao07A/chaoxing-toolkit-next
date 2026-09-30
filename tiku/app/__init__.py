@@ -1,5 +1,5 @@
 """
-司索工题库服务器 - FastAPI 应用工厂
+Chaoxing Toolkit Next 本地题库服务 - FastAPI 应用工厂
 """
 
 import os
@@ -103,8 +103,8 @@ def create_app(
 ) -> FastAPI:
     """创建 FastAPI 应用实例"""
     app = FastAPI(
-        title="司索工题库服务器",
-        description="支持题目查询API和Web管理界面 - 高性能并发版本",
+        title="Chaoxing Toolkit Next — 本地题库服务",
+        description="个人本机题库管理、答案查询与脚本配置同步；管理接口无身份认证，仅供本机使用",
         version="2.2.0",
         lifespan=lifespan
     )

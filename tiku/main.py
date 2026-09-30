@@ -1,5 +1,5 @@
 """
-司索工题库服务器 - 入口文件
+Chaoxing Toolkit Next 本地题库服务 - 入口文件
 """
 
 import os

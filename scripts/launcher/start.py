@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 
 # 配置
-CHROME_PROFILE = "Default"  # jiahao001 对应的配置文件目录
+CHROME_PROFILE = "Default"  # Chrome 配置目录名称，不是邮箱或学习通账号
 TIKU_PORT = 8002
 CHAOXING_URL = "https://i.chaoxing.com/base?ws=1&t=1790138632014"
 TIKU_URL = f"http://localhost:{TIKU_PORT}"

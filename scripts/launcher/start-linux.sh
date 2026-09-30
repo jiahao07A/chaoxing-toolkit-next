@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# 司索工题库服务器启动脚本 (高性能并发版本)
+# Chaoxing Toolkit Next 本地题库服务启动脚本
 # 可用端口: 8001, 8002, 8003, 8004
-# 支持100+并发请求
+# 多进程为可选运行方式，不构成性能承诺
 
 # 从脚本位置定位仓库和题库服务目录，避免依赖当前工作目录
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,21 +19,21 @@ HIGH_PERFORMANCE=${2:-false}
 # 检查端口范围
 if [[ $PORT -lt 8001 || $PORT -gt 8004 ]]; then
     echo "错误: 端口必须在 8001-8004 之间"
-    echo "用法: ./start.sh [端口] [高性能模式]"
-    echo "示例: ./start.sh 8002        # 普通模式"
-    echo "示例: ./start.sh 8002 true   # 高性能模式(100并发)"
+    echo "用法: ./start-linux.sh [端口] [高性能模式]"
+    echo "示例: ./start-linux.sh 8002        # 普通模式"
+    echo "示例: ./start-linux.sh 8002 true   # 可选多进程模式"
     exit 1
 fi
 
 echo "=========================================="
-echo "    司索工题库服务器 (高性能并发版)"
-echo "    支持 100+ 并发请求"
+echo "    Chaoxing Toolkit Next 本地题库服务"
+echo "    仅绑定本机，管理接口无身份认证"
 echo "=========================================="
 echo ""
 
 # 检查 Python
 if ! command -v python3 &> /dev/null; then
-    echo "错误: 未找到 python3，请先安装 Python 3.8+"
+    echo "错误: 未找到 python3，请先安装 Python 3.11+"
     exit 1
 fi
 
@@ -69,10 +69,10 @@ if [ "$HIGH_PERFORMANCE" = "true" ]; then
     
     echo "- 模式:     高性能模式"
     echo "- 工作进程: $WORKERS (基于CPU核心数: $CPU_CORES)"
-    echo "- 并发能力: 100+ 并发请求"
+    echo "- 并发能力: 取决于本机环境，未提供基准性能承诺"
     echo "- 限流配置: 200请求/分钟/IP"
     echo ""
-    echo "提示: 使用 ./start.sh $PORT true 启动高性能模式"
+    echo "提示: 使用 ./start-linux.sh $PORT true 启动高性能模式"
     echo "=========================================="
     echo ""
     
@@ -101,7 +101,7 @@ uvicorn.run(
 "
 else
     echo "- 模式:     普通模式"
-    echo "- 并发能力: 100+ 并发请求"
+    echo "- 并发能力: 取决于本机环境，未提供基准性能承诺"
     echo "- 限流配置: 200请求/分钟/IP"
     echo ""
     echo "按 Ctrl+C 停止服务器"

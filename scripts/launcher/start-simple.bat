@@ -51,7 +51,7 @@ echo.
 echo Service Information:
 echo   Admin Panel: http://localhost:%TIKU_PORT%
 echo   API Endpoint: http://localhost:%TIKU_PORT%/api/search
-echo   Chrome Profile: %CHROME_PROFILE% (jiahao001)
+echo   Chrome Profile: %CHROME_PROFILE%
 echo.
 echo Admin Panel: local-only, no login required
 echo.
